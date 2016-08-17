@@ -6,8 +6,7 @@
   },
   "parser": "babel-eslint",
   "plugins": [
-    "sort-class-members",
-    "sorting"
+    "sort-class-members"
   ],
   "rules": {
     "camelcase": 2,
@@ -75,7 +74,10 @@
     "object-shorthand": 2,
     "one-var": [
       2,
-      "never"
+      {
+        "const": "never",
+        "let": "always"
+      }
     ],
     "padded-blocks": [
       2,
@@ -95,14 +97,17 @@
     ],
     "semi": 2,
     "sort-imports": 2,
-    "vars-on-top": 2,
-    "yoda": 2,
-    "sorting/sort-object-props": [
+    "sort-keys": [
       2,
+      "asc",
       {
-        "ignoreCase": false
+        "natural": true
       }
     ],
+    "space-after-keywords": 2,
+    "space-before-keywords": 2,
+    "vars-on-top": 2,
+    "yoda": 2,
     "sort-class-members/sort-class-members": 2
   }
 }
