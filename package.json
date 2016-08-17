@@ -24,5 +24,12 @@
     "mocha": "3.0.2",
     "sinon": "1.17.5",
     "webpack": "1.13.1"
+  },
+  "scripts": {
+    "build": "webpack -p",
+    "coverage": "babel-node node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha --report html",
+    "eslint": "eslint . --ignore-path .gitignore",
+    "test": "mocha",
+    "verify": "npm run eslint && npm run test"
   }
 }
