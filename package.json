@@ -1,0 +1,10 @@
+{
+  "name": "diy-angular",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/my-js-ventures/diy-angular.git"
+  },
+  "author": "Gopikrishna Sathyamurthy",
+  "license": "ISC"
+}
