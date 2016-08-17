@@ -32,8 +32,8 @@
       "smart"
     ],
     "indent": [
-      "error",
-      2
+      2,
+      4
     ],
     "keyword-spacing": 2,
     "new-cap": 2,
