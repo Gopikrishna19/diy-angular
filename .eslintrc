@@ -5,11 +5,12 @@
     "es6": true
   },
   "parser": "babel-eslint",
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "sourceType": "module"
-  },
+  "plugins": [
+    "sort-class-members",
+    "sorting"
+  ],
   "rules": {
+    "camelcase": 2,
     "consistent-return": 2,
     "complexity": [
       2,
@@ -35,6 +36,8 @@
       "error",
       2
     ],
+    "new-cap": 2,
+    "new-parens": 2,
     "newline-after-var": 2,
     "no-alert": 2,
     "no-caller": 2,
@@ -44,6 +47,7 @@
     "no-magic-numbers": [
       2,
       {
+        "detectObjects": true,
         "ignore": [
           0,
           1,
@@ -64,6 +68,7 @@
     "no-shadow": 2,
     "no-trailing-spaces": 2,
     "no-undef": 2,
+    "no-underscore-dangle": 2,
     "no-unused-expressions": 2,
     "no-unused-vars": 2,
     "no-var": 2,
@@ -81,23 +86,23 @@
       }
     ],
     "prefer-const": 2,
+    "prefer-rest-params": 2,
+    "prefer-spread": 2,
+    "prefer-template": 2,
     "quotes": [
       2,
       "single"
     ],
     "semi": 2,
-    "sort-imports": [
+    "sort-imports": 2,
+    "vars-on-top": 2,
+    "yoda": 2,
+    "sorting/sort-object-props": [
       2,
       {
-        "memberSyntaxSortOrder": [
-          "single",
-          "multiple",
-          "all",
-          "none"
-        ]
+        "ignoreCase": false
       }
     ],
-    "vars-on-top": 2,
-    "yoda": 2
+    "sort-class-members/sort-class-members": 2
   }
 }
