@@ -29,7 +29,7 @@
     "build": "webpack -p",
     "coverage": "babel-node node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha --report html",
     "eslint": "eslint . --ignore-path .gitignore",
-    "test": "mocha",
+    "test": "npm run coverage -- --threshold 100",
     "verify": "npm run eslint && npm run test"
   }
 }
