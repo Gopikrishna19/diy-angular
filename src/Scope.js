@@ -5,6 +5,33 @@ const $$watchers = new WeakMap();
 
 export default class Scope {
 
+    static $$digestOnce($scope) {
+
+        let dirty = false;
+
+        forEach($$watchers.get($scope), watcher => {
+
+            const newValue = watcher.watchFn($scope);
+            const oldValue = watcher.last;
+
+            if (newValue !== oldValue) {
+
+                watcher.last = newValue;
+                watcher.listenerFn(
+                    newValue,
+                    oldValue === $$initialWatchValue ? newValue : oldValue,
+                    $scope);
+
+                dirty = true;
+
+            }
+
+        });
+
+        return dirty;
+
+    }
+
     constructor() {
 
         $$watchers.set(this, []);
@@ -23,22 +50,13 @@ export default class Scope {
 
     $digest() {
 
-        forEach($$watchers.get(this), watcher => {
+        let dirty;
 
-            const newValue = watcher.watchFn(this);
-            const oldValue = watcher.last;
+        do {
 
-            if (newValue !== oldValue) {
+            dirty = Scope.$$digestOnce(this);
 
-                watcher.last = newValue;
-                watcher.listenerFn(
-                    newValue,
-                    oldValue === $$initialWatchValue ? newValue : oldValue,
-                    this);
-
-            }
-
-        });
+        } while (dirty);
 
     }
 
