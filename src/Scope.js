@@ -1,5 +1,6 @@
 import {forEach} from 'lodash';
 
+const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$watchers = new WeakMap();
 
 export default class Scope {
@@ -13,6 +14,7 @@ export default class Scope {
     $watch(watchFn, listenerFn) {
 
         $$watchers.get(this).push({
+            last: $$initialWatchValue,
             listenerFn,
             watchFn
         });

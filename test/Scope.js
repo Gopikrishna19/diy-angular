@@ -80,6 +80,21 @@ describe('Scope', () => {
 
         });
 
+        it('should call the listener function when watch value is first undefined', () => {
+
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.someValue,
+                (newValue, oldValue, scope) => scope.counter += 1
+            );
+
+            $scope.$digest();
+
+            expect($scope.counter).equals(1);
+
+        });
+
     });
 
 });
