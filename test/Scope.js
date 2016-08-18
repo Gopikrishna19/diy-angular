@@ -172,6 +172,38 @@ describe('Scope', () => {
 
         });
 
+        it('should end the digest when the last dirty watch is clean', () => {
+
+            const length = 100;
+            const affectedItemIndex = 1;
+            const eachCalledTwiceOnFirstDigest = 200;
+            const stopsAfterLastDirtyWatchIsClean = eachCalledTwiceOnFirstDigest +
+                                                    length +
+                                                    affectedItemIndex;
+            let watchExecutions = 0;
+
+            $scope.array = Array.from({length});
+
+            $scope.array.forEach((item, index) =>
+                $scope.$watch(
+                    scope => {
+
+                        watchExecutions += 1;
+                        return scope.array[index];
+
+                    }
+                )
+            );
+
+            $scope.$digest();
+            expect(watchExecutions).equals(eachCalledTwiceOnFirstDigest);
+
+            $scope.array[affectedItemIndex - 1] = 'a';
+            $scope.$digest();
+            expect(watchExecutions).equals(stopsAfterLastDirtyWatchIsClean);
+
+        });
+
     });
 
 });

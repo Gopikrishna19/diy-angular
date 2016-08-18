@@ -2,6 +2,7 @@ import {forEach} from 'lodash';
 import literals from './literals';
 
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
+const $$lastDirtyWatch = new WeakMap();
 const $$watchers = new WeakMap();
 
 export default class Scope {
@@ -17,15 +18,24 @@ export default class Scope {
 
             if (newValue !== oldValue) {
 
+                $$lastDirtyWatch.set($scope, watcher);
+
                 watcher.last = newValue;
                 watcher.listenerFn(
                     newValue,
-                    oldValue === $$initialWatchValue ? newValue : oldValue,
-                    $scope);
+                    Scope.getOldValue(newValue, oldValue),
+                    $scope
+                );
 
                 dirty = true;
 
+            } else if ($$lastDirtyWatch.get($scope) === watcher) {
+
+                return false;
+
             }
+
+            return true;
 
         });
 
@@ -33,9 +43,16 @@ export default class Scope {
 
     }
 
+    static getOldValue(newValue, oldValue) {
+
+        return oldValue === $$initialWatchValue ? newValue : oldValue;
+
+    }
+
     constructor() {
 
         $$watchers.set(this, []);
+        $$lastDirtyWatch.set(this, null);
 
     }
 
@@ -51,8 +68,10 @@ export default class Scope {
 
     $digest() {
 
-        let dirty,
+        let dirty = false,
             iterations = 10;
+
+        $$lastDirtyWatch.set(this, null);
 
         do {
 
