@@ -223,6 +223,26 @@ describe('Scope', () => {
 
         });
 
+        it('should watch value if enabled in addition to reference for complex data', () => {
+
+            $scope.aValue = [0, 1, 2];
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.aValue,
+                (newValue, oldValue, scope) => scope.counter += 1,
+                true
+            );
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+            $scope.aValue.push(1);
+            $scope.$digest();
+            expect($scope.counter).equals(2);
+
+        });
+
     });
 
 });

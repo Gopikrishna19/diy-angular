@@ -1,4 +1,4 @@
-import {forEach} from 'lodash';
+import {cloneDeep, forEach, isEqual} from 'lodash';
 import literals from './literals';
 
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
@@ -7,20 +7,29 @@ const $$watchers = new WeakMap();
 
 export default class Scope {
 
+    static $$areEqual(newValue, oldValue, compareValues) {
+
+        return compareValues ?
+               isEqual(newValue, oldValue) :
+               newValue === oldValue;
+
+    }
+
     static $$digestOnce($scope) {
 
         let dirty = false;
 
         forEach($$watchers.get($scope), watcher => {
 
+            const {compareValues} = watcher;
             const newValue = watcher.watchFn($scope);
             const oldValue = watcher.last;
 
-            if (newValue !== oldValue) {
+            if (!Scope.$$areEqual(newValue, oldValue, compareValues)) {
 
                 $$lastDirtyWatch.set($scope, watcher);
 
-                watcher.last = newValue;
+                watcher.last = Scope.copyValue(newValue, compareValues);
                 watcher.listenerFn(
                     newValue,
                     Scope.getOldValue(newValue, oldValue),
@@ -40,6 +49,12 @@ export default class Scope {
         });
 
         return dirty;
+
+    }
+
+    static copyValue(value, shouldClone) {
+
+        return shouldClone ? cloneDeep(value) : value;
 
     }
 
@@ -79,9 +94,10 @@ export default class Scope {
 
     }
 
-    $watch(watchFn, listenerFn = (() => {})) {
+    $watch(watchFn, listenerFn = (() => {}), compareValues = false) {
 
         $$watchers.get(this).push({
+            compareValues,
             last: $$initialWatchValue,
             listenerFn,
             watchFn
