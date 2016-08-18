@@ -1,5 +1,6 @@
 import Scope from '../src/Scope';
 import {expect} from 'code';
+import literals from '../src/literals';
 import sinon from 'sinon';
 
 describe('Scope', () => {
@@ -149,6 +150,25 @@ describe('Scope', () => {
             $scope.name = 'Doe';
             $scope.$digest();
             expect($scope.initial).equals('D.');
+
+        });
+
+        it('should give up after 10 iterations', () => {
+
+            $scope.counterA = 0;
+            $scope.counterB = 0;
+
+            $scope.$watch(
+                scope => scope.counterA,
+                (newValue, oldValue, scope) => scope.counterB += 1
+            );
+
+            $scope.$watch(
+                scope => scope.counterB,
+                (newValue, oldValue, scope) => scope.counterA += 1
+            );
+
+            expect(() => $scope.$digest()).throw(literals.INFINITE_DIGESTION);
 
         });
 

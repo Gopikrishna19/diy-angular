@@ -1,4 +1,5 @@
 import {forEach} from 'lodash';
+import literals from './literals';
 
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$watchers = new WeakMap();
@@ -50,11 +51,20 @@ export default class Scope {
 
     $digest() {
 
-        let dirty;
+        let dirty,
+            iterations = 10;
 
         do {
 
             dirty = Scope.$$digestOnce(this);
+
+            if (dirty && !iterations) {
+
+                throw new Error(literals.INFINITE_DIGESTION);
+
+            }
+
+            iterations -= 1;
 
         } while (dirty);
 
