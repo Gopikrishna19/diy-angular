@@ -28,7 +28,7 @@
   },
   "scripts": {
     "build": "webpack -p",
-    "coverage": "babel-node node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha --report html",
+    "coverage": "babel-node node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha --report html --report lcov",
     "eslint": "eslint . --ignore-path .gitignore",
     "test": "npm run coverage -- --threshold 100",
     "verify": "npm run eslint && npm run test"
