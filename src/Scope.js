@@ -11,7 +11,7 @@ export default class Scope {
 
     }
 
-    $watch(watchFn, listenerFn) {
+    $watch(watchFn, listenerFn = (() => {})) {
 
         $$watchers.get(this).push({
             last: $$initialWatchValue,

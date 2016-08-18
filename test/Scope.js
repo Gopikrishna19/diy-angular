@@ -111,6 +111,15 @@ describe('Scope', () => {
 
         });
 
+        it('should allow watchers without a listener function', () => {
+
+            $scope.$watch(watchFn);
+
+            $scope.$digest();
+            sinon.assert.calledOnce(watchFn);
+
+        });
+
     });
 
 });
