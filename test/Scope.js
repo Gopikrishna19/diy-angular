@@ -204,6 +204,25 @@ describe('Scope', () => {
 
         });
 
+        it('should not end digest when a new watch is added', () => {
+
+            $scope.aValue = 'abc';
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.aValue,
+                (newValue, oldValue, scope) =>
+                    $scope.$watch(
+                        () => scope.aValue,
+                        () => scope.counter += 1
+                    )
+            );
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+        });
+
     });
 
 });

@@ -56,16 +56,6 @@ export default class Scope {
 
     }
 
-    $watch(watchFn, listenerFn = (() => {})) {
-
-        $$watchers.get(this).push({
-            last: $$initialWatchValue,
-            listenerFn,
-            watchFn
-        });
-
-    }
-
     $digest() {
 
         let dirty = false,
@@ -86,6 +76,18 @@ export default class Scope {
             iterations -= 1;
 
         } while (dirty);
+
+    }
+
+    $watch(watchFn, listenerFn = (() => {})) {
+
+        $$watchers.get(this).push({
+            last: $$initialWatchValue,
+            listenerFn,
+            watchFn
+        });
+
+        $$lastDirtyWatch.set(this, null);
 
     }
 
