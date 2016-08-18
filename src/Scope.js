@@ -21,7 +21,12 @@ export default class Scope {
 
     $digest() {
 
-        forEach($$watchers.get(this), watcher => watcher.listenerFn());
+        forEach($$watchers.get(this), watcher => {
+
+            watcher.watchFn(this);
+            watcher.listenerFn();
+
+        });
 
     }
 

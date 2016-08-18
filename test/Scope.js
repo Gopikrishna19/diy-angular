@@ -43,6 +43,17 @@ describe('Scope', () => {
 
         });
 
+        it('should call the watch function with scope as argument', () => {
+
+            $scope.$watch(watchFn, listenerFn);
+
+            $scope.$digest();
+
+            sinon.assert.calledOnce(watchFn);
+            sinon.assert.calledWithExactly(watchFn, $scope);
+
+        });
+
     });
 
 });
