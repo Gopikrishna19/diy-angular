@@ -54,6 +54,32 @@ describe('Scope', () => {
 
         });
 
+        it('should call listener function when watched value changes', () => {
+
+            $scope.someValue = 'a';
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.someValue,
+                (newValue, oldValue, scope) => scope.counter += 1
+            );
+
+            expect($scope.counter).equals(0);
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+            $scope.someValue = 'b';
+            expect($scope.counter).equals(1);
+
+            $scope.$digest();
+            expect($scope.counter).equals(2);
+
+        });
+
     });
 
 });

@@ -23,8 +23,15 @@ export default class Scope {
 
         forEach($$watchers.get(this), watcher => {
 
-            watcher.watchFn(this);
-            watcher.listenerFn();
+            const newValue = watcher.watchFn(this);
+            const oldValue = watcher.last;
+
+            if (newValue !== oldValue) {
+
+                watcher.last = newValue;
+                watcher.listenerFn(newValue, oldValue, this);
+
+            }
 
         });
 
