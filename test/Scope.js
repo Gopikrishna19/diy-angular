@@ -28,7 +28,7 @@ describe('Scope', () => {
 
     });
 
-    describe('digest', () => {
+    describe('$digest', () => {
 
         it('should call the listener function of a watch on first $digest', () => {
 
@@ -54,7 +54,7 @@ describe('Scope', () => {
 
         });
 
-        it('should call listener function when watched value changes', () => {
+        it('should call the listener function when watched value changes', () => {
 
             $scope.someValue = 'a';
             $scope.counter = 0;
@@ -92,6 +92,22 @@ describe('Scope', () => {
             $scope.$digest();
 
             expect($scope.counter).equals(1);
+
+        });
+
+        it('should call the listener with new value as old value the first time', () => {
+
+            let oldValueGiven;
+
+            $scope.someValue = 'a';
+
+            $scope.$watch(
+                scope => scope.someValue,
+                (newValue, oldValue) => oldValueGiven = oldValue
+            );
+
+            $scope.$digest();
+            expect(oldValueGiven).equals($scope.someValue);
 
         });
 

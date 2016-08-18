@@ -31,7 +31,10 @@ export default class Scope {
             if (newValue !== oldValue) {
 
                 watcher.last = newValue;
-                watcher.listenerFn(newValue, oldValue, this);
+                watcher.listenerFn(
+                    newValue,
+                    oldValue === $$initialWatchValue ? newValue : oldValue,
+                    this);
 
             }
 
