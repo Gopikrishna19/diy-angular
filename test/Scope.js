@@ -49,7 +49,7 @@ describe('Scope', () => {
 
             $scope.$digest();
 
-            sinon.assert.calledOnce(watchFn);
+            sinon.assert.calledTwice(watchFn);
             sinon.assert.calledWithExactly(watchFn, $scope);
 
         });
@@ -116,7 +116,7 @@ describe('Scope', () => {
             $scope.$watch(watchFn);
 
             $scope.$digest();
-            sinon.assert.calledOnce(watchFn);
+            sinon.assert.calledTwice(watchFn);
 
         });
 
