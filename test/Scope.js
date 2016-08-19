@@ -31,7 +31,7 @@ describe('Scope', () => {
 
     describe('$digest', () => {
 
-        it('should call the listener function of a watch on first $digest', () => {
+        it('should call the listener function on first $digest', () => {
 
             $scope.$watch(
                 () => 'watch',
@@ -96,7 +96,7 @@ describe('Scope', () => {
 
         });
 
-        it('should call the listener with new value as old value the first time', () => {
+        it('should call the listener function with new value as old value the first time', () => {
 
             let oldValueGiven;
 
@@ -121,7 +121,7 @@ describe('Scope', () => {
 
         });
 
-        it('should trigger chained watchers in the same $digest', () => {
+        it('should call chained watchers in the same $digest', () => {
 
             $scope.name = 'Jane';
 
@@ -153,7 +153,7 @@ describe('Scope', () => {
 
         });
 
-        it('should give up after 10 iterations', () => {
+        it('should throw INFINITE_DIGESTION after 10 iterations of dirty watchers', () => {
 
             $scope.counterA = 0;
             $scope.counterB = 0;
@@ -172,7 +172,7 @@ describe('Scope', () => {
 
         });
 
-        it('should end the digest when the last dirty watch is clean', () => {
+        it('should end the digest when the last dirty watcher is clean', () => {
 
             const length = 100;
             const affectedItemIndex = 1;
@@ -204,7 +204,7 @@ describe('Scope', () => {
 
         });
 
-        it('should not end digest when a new watch is added', () => {
+        it('should not end digest when a new watcher is added', () => {
 
             $scope.aValue = 'abc';
             $scope.counter = 0;
@@ -243,7 +243,7 @@ describe('Scope', () => {
 
         });
 
-        it('should watch the NaN', () => {
+        it('should watch for the values with NaN', () => {
 
             $scope.number = NaN;
             $scope.counter = 0;
