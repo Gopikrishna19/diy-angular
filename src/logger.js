@@ -1,4 +1,4 @@
-export default function logger(type, ...args) {
+export function log(type, ...args) {
 
     console[type](...args); // eslint-disable-line no-console
 

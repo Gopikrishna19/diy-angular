@@ -1,4 +1,4 @@
-import logger from '../src/logger';
+import * as logger from '../src/logger';
 import sinon from 'sinon';
 
 describe('logger', () => {
@@ -19,7 +19,7 @@ describe('logger', () => {
 
         sandbox.stub(console, type);
 
-        logger(type, messageToLog);
+        logger.log(type, messageToLog);
 
         sinon.assert.calledOnce(console[type]);
         sinon.assert.calledWithExactly(console[type], messageToLog);
