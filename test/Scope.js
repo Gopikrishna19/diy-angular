@@ -1,3 +1,4 @@
+import * as logger from '../src/logger';
 import Scope from '../src/Scope';
 import {expect} from 'code';
 import literals from '../src/literals';
@@ -16,6 +17,8 @@ describe('Scope', () => {
         sandbox = sinon.sandbox.create();
         listenerFn = sandbox.stub();
         watchFn = sandbox.stub();
+
+        sandbox.stub(logger, 'log');
 
     });
 
@@ -259,6 +262,65 @@ describe('Scope', () => {
                 expect($scope.counter).equals(1);
 
                 $scope.$digest();
+                expect($scope.counter).equals(1);
+
+            });
+
+        });
+
+        describe('exceptions', () => {
+
+            const error = new Error('error');
+
+            it('should log the error and continue $digesting after an exception in watch function', () => {
+
+                $scope.aValue = 'abc';
+                $scope.counter = 0;
+
+                $scope.$watch(
+                    () => {
+
+                        throw error;
+
+                    }
+                );
+                $scope.$watch(
+                    scope => scope.aValue,
+                    (newValue, oldValue, scope) => scope.counter += 1
+                );
+
+                $scope.$digest();
+
+                sinon.assert.called(logger.log);
+                sinon.assert.calledWithExactly(logger.log, 'error', error);
+
+                expect($scope.counter).equals(1);
+
+            });
+
+            it('should log the error and continue $digesting after an exception in listener function', () => {
+
+                $scope.aValue = 'abc';
+                $scope.counter = 0;
+
+                $scope.$watch(
+                    scope => scope.aValue,
+                    () => {
+
+                        throw error;
+
+                    }
+                );
+                $scope.$watch(
+                    scope => scope.aValue,
+                    (newValue, oldValue, scope) => scope.counter += 1
+                );
+
+                $scope.$digest();
+
+                sinon.assert.calledOnce(logger.log);
+                sinon.assert.calledWithExactly(logger.log, 'error', error);
+
                 expect($scope.counter).equals(1);
 
             });

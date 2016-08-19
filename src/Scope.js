@@ -1,5 +1,6 @@
 import {cloneDeep, forEach, isEqual} from 'lodash';
 import literals from './literals';
+import {log} from './logger';
 
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$lastDirtyWatch = new WeakMap();
@@ -19,28 +20,36 @@ export default class Scope {
 
         let dirty = false;
 
-        forEach($$watchers.get($scope), watcher => {
+        forEach($$watchers.get($scope), watcher => { // eslint-disable-line complexity
 
-            const {compareValues} = watcher;
-            const newValue = watcher.watchFn($scope);
-            const oldValue = watcher.last;
+            try {
 
-            if (!Scope.$$areEqual(newValue, oldValue, compareValues)) {
+                const {compareValues} = watcher;
+                const newValue = watcher.watchFn($scope);
+                const oldValue = watcher.last;
 
-                $$lastDirtyWatch.set($scope, watcher);
+                if (!Scope.$$areEqual(newValue, oldValue, compareValues)) {
 
-                watcher.last = Scope.copyValue(newValue, compareValues);
-                watcher.listenerFn(
-                    newValue,
-                    Scope.getOldValue(newValue, oldValue),
-                    $scope
-                );
+                    $$lastDirtyWatch.set($scope, watcher);
 
-                dirty = true;
+                    watcher.last = Scope.copyValue(newValue, compareValues);
+                    watcher.listenerFn(
+                        newValue,
+                        Scope.getOldValue(newValue, oldValue),
+                        $scope
+                    );
 
-            } else if ($$lastDirtyWatch.get($scope) === watcher) {
+                    dirty = true;
 
-                return false;
+                } else if ($$lastDirtyWatch.get($scope) === watcher) {
+
+                    return false;
+
+                }
+
+            } catch (error) {
+
+                log('error', error);
 
             }
 
