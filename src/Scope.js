@@ -11,7 +11,7 @@ export default class Scope {
 
         return compareValues ?
                isEqual(newValue, oldValue) :
-               newValue === oldValue;
+               newValue === oldValue || Scope.testNaN(newValue, oldValue);
 
     }
 
@@ -61,6 +61,17 @@ export default class Scope {
     static getOldValue(newValue, oldValue) {
 
         return oldValue === $$initialWatchValue ? newValue : oldValue;
+
+    }
+
+    static testNaN(newValue, oldValue) {
+
+        return [
+            () => typeof newValue === 'number',
+            () => typeof oldValue === 'number',
+            () => isNaN(newValue),
+            () => isNaN(oldValue)
+        ].every(condition => condition());
 
     }
 

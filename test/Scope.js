@@ -243,6 +243,24 @@ describe('Scope', () => {
 
         });
 
+        it('should watch the NaN', () => {
+
+            $scope.number = NaN;
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.number,
+                (newValue, oldValue, scope) => scope.counter += 1
+            );
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+        });
+
     });
 
 });
