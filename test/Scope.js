@@ -243,21 +243,25 @@ describe('Scope', () => {
 
         });
 
-        it('should watch for the values with NaN', () => {
+        describe('quirks', () => {
 
-            $scope.number = NaN;
-            $scope.counter = 0;
+            it('should watch for the values with NaN', () => {
 
-            $scope.$watch(
-                scope => scope.number,
-                (newValue, oldValue, scope) => scope.counter += 1
-            );
+                $scope.number = NaN;
+                $scope.counter = 0;
 
-            $scope.$digest();
-            expect($scope.counter).equals(1);
+                $scope.$watch(
+                    scope => scope.number,
+                    (newValue, oldValue, scope) => scope.counter += 1
+                );
 
-            $scope.$digest();
-            expect($scope.counter).equals(1);
+                $scope.$digest();
+                expect($scope.counter).equals(1);
+
+                $scope.$digest();
+                expect($scope.counter).equals(1);
+
+            });
 
         });
 
