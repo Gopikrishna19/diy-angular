@@ -18,8 +18,6 @@ describe('Scope', () => {
         listenerFn = sandbox.stub();
         watchFn = sandbox.stub();
 
-        sandbox.stub(logger, 'log');
-
     });
 
     afterEach(() => sandbox.restore());
@@ -272,6 +270,12 @@ describe('Scope', () => {
 
             const error = new Error('error');
 
+            beforeEach(() => {
+
+                sandbox.stub(logger, 'log');
+
+            });
+
             it('should log the error and continue $digesting after an exception in watch function', () => {
 
                 $scope.aValue = 'abc';
@@ -429,6 +433,31 @@ describe('Scope', () => {
 
                 $scope.$digest();
                 expect($scope.counter).equals(1);
+
+            });
+
+            it('should allow destroying several $watches during digest', function () {
+
+                $scope.aValue = 'abc';
+                $scope.counter = 0;
+
+                let destroyWatch1 = null,
+                    destroyWatch2 = null;
+
+                destroyWatch1 = $scope.$watch(() => {
+
+                    destroyWatch1();
+                    destroyWatch2();
+
+                });
+
+                destroyWatch2 = $scope.$watch(
+                    scope => scope.aValue,
+                    (newValue, oldValue, scope) => scope.counter += 1
+                );
+
+                $scope.$digest();
+                expect($scope.counter).equals(0);
 
             });
 

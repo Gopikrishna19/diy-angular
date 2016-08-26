@@ -22,6 +22,12 @@ export default class Scope {
 
         forEachRight($$watchers.get($scope), watcher => { // eslint-disable-line complexity
 
+            if (!watcher) {
+
+                return true;
+
+            }
+
             try {
 
                 const {compareValues} = watcher;
