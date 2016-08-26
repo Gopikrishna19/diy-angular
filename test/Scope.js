@@ -408,6 +408,30 @@ describe('Scope', () => {
 
             });
 
+            it('should allow a watcher to destroy another during $digest', () => {
+
+                $scope.aValue = 'abc';
+                $scope.counter = 0;
+
+                let destroyWatch = null;
+
+                $scope.$watch(
+                    scope => scope.aValue,
+                    () => destroyWatch()
+                );
+
+                destroyWatch = $scope.$watch(() => {});
+
+                $scope.$watch(
+                    scope => scope.aValue,
+                    (newValue, oldValue, scope) => scope.counter += 1
+                );
+
+                $scope.$digest();
+                expect($scope.counter).equals(1);
+
+            });
+
         });
 
     });

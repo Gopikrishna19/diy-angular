@@ -133,6 +133,7 @@ export default class Scope {
             if (index >= 0) {
 
                 $$watchers.get(this).splice(index, 1);
+                $$lastDirtyWatch.set(this, null);
 
             }
 
