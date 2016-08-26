@@ -116,14 +116,27 @@ export default class Scope {
 
     $watch(watchFn, listenerFn = (() => {}), compareValues = false) {
 
-        $$watchers.get(this).push({
+        const watcher = {
             compareValues,
             last: $$initialWatchValue,
             listenerFn,
             watchFn
-        });
+        };
 
+        $$watchers.get(this).push(watcher);
         $$lastDirtyWatch.set(this, null);
+
+        return () => {
+
+            const index = $$watchers.get(this).indexOf(watcher);
+
+            if (index >= 0) {
+
+                $$watchers.get(this).splice(index, 1);
+
+            }
+
+        };
 
     }
 

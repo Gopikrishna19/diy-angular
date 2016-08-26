@@ -327,6 +327,57 @@ describe('Scope', () => {
 
         });
 
+        describe('destroying watchers', () => {
+
+            it('should destroy the watcher with a removal function', () => {
+
+                $scope.aValue = 'abc';
+                $scope.counter = 0;
+
+                const destroyWatch = $scope.$watch(
+                    scope => scope.aValue,
+                    (newValue, oldValue, scope) => scope.counter += 1
+                );
+
+                $scope.$digest();
+                expect($scope.counter).equals(1);
+
+                $scope.aValue = 'def';
+                $scope.$digest();
+                expect($scope.counter).equals(2);
+
+                $scope.aValue = 'ghi';
+                destroyWatch();
+                $scope.$digest();
+                expect($scope.counter).equals(2);
+
+            });
+
+            it('should not throw when removal function is called multiple times', () => {
+
+                $scope.aValue = 'abc';
+                $scope.counter = 0;
+
+                const destroyWatch = $scope.$watch(
+                    scope => scope.aValue,
+                    (newValue, oldValue, scope) => scope.counter += 1
+                );
+
+                $scope.$digest();
+                expect($scope.counter).equals(1);
+
+                $scope.aValue = 'ghi';
+
+                destroyWatch();
+                destroyWatch();
+
+                $scope.$digest();
+                expect($scope.counter).equals(1);
+
+            });
+
+        });
+
     });
 
 });
