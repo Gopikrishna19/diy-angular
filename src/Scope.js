@@ -1,4 +1,4 @@
-import {cloneDeep, forEach, isEqual} from 'lodash';
+import {cloneDeep, forEachRight, isEqual} from 'lodash';
 import literals from './literals';
 import {log} from './logger';
 
@@ -20,7 +20,7 @@ export default class Scope {
 
         let dirty = false;
 
-        forEach($$watchers.get($scope), watcher => { // eslint-disable-line complexity
+        forEachRight($$watchers.get($scope), watcher => { // eslint-disable-line complexity
 
             try {
 
@@ -123,7 +123,7 @@ export default class Scope {
             watchFn
         };
 
-        $$watchers.get(this).push(watcher);
+        $$watchers.get(this).unshift(watcher);
         $$lastDirtyWatch.set(this, null);
 
         return () => {

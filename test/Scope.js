@@ -175,7 +175,7 @@ describe('Scope', () => {
 
         });
 
-        it('should end the digest when the last dirty watcher is clean', () => {
+        it('should end the $digest when the last dirty watcher is clean', () => {
 
             const length = 100;
             const affectedItemIndex = 1;
@@ -207,7 +207,7 @@ describe('Scope', () => {
 
         });
 
-        it('should not end digest when a new watcher is added', () => {
+        it('should not end $digest when a new watcher is added', () => {
 
             $scope.aValue = 'abc';
             $scope.counter = 0;
@@ -373,6 +373,38 @@ describe('Scope', () => {
 
                 $scope.$digest();
                 expect($scope.counter).equals(1);
+
+            });
+
+            it('should allow destroying a watcher during $digest', () => {
+
+                $scope.aValue = 'abc';
+
+                const watchCalls = [];
+
+                $scope.$watch(scope => {
+
+                    watchCalls.push('first');
+                    return scope.aValue;
+
+                });
+
+                const destroyWatch = $scope.$watch(() => {
+
+                    watchCalls.push('second');
+                    destroyWatch();
+
+                });
+
+                $scope.$watch(scope => {
+
+                    watchCalls.push('third');
+                    return scope.aValue;
+
+                });
+
+                $scope.$digest();
+                expect(watchCalls).equals(['first', 'second', 'third', 'first', 'third']);
 
             });
 
