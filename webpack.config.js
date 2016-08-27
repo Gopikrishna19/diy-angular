@@ -1,6 +1,7 @@
 const packageName = require('./package.json').name;
 
 module.exports = {
+    devtool: 'source-map',
     entry: './index',
     module: {
         loaders: [
@@ -13,6 +14,7 @@ module.exports = {
     },
     output: {
         filename: `${packageName}.js`,
+        library: ['diyAngular'],
         path: `${__dirname}/dist`
     }
 };
