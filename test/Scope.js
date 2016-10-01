@@ -582,6 +582,30 @@ describe('Scope', () => {
 
         });
 
+        it('should evaluate given async function from a watch function even when not dirty', () => {
+
+            $scope.aValue = [1, 2];
+            $scope.asyncEval = 0;
+
+            $scope.$watch(
+                scope => {
+
+                    if (scope.asyncEval < 2) {
+
+                        scope.$evalAsync(() => scope.asyncEval += 1);
+
+                    }
+
+                    return scope.aValue;
+
+                }
+            );
+
+            $scope.$digest();
+            expect($scope.asyncEval).equals(2);
+
+        });
+
     });
 
 });

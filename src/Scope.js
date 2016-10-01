@@ -68,6 +68,16 @@ export default class Scope {
 
     }
 
+    static checkForInfiniteDigestion(dirty, iterations) {
+
+        if (dirty && !iterations) {
+
+            throw new Error(literals.INFINITE_DIGESTION);
+
+        }
+
+    }
+
     static copyValue(value, shouldClone) {
 
         return shouldClone ? cloneDeep(value) : value;
@@ -156,15 +166,11 @@ export default class Scope {
 
             dirty = Scope.$$digestOnce(this);
 
-            if (dirty && !iterations) {
-
-                throw new Error(literals.INFINITE_DIGESTION);
-
-            }
+            Scope.checkForInfiniteDigestion(dirty, iterations);
 
             iterations -= 1;
 
-        } while (dirty);
+        } while (dirty || $$asyncQueue.get(this).length);
 
     }
 
