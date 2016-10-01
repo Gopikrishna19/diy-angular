@@ -474,11 +474,13 @@ describe('Scope', () => {
 
         it('should execute given function and return result', () => {
 
-            $scope.aValue = 123;
+            const aValue = 123;
+
+            $scope.aValue = aValue;
 
             const result = $scope.$eval(scope => scope.aValue);
 
-            expect(result).equals(123);
+            expect(result).equals(aValue);
 
         });
 
@@ -488,8 +490,31 @@ describe('Scope', () => {
 
             const args = 456;
             const result = $scope.$eval((scope, arg) => scope.aValue + arg, args);
+            const expectedResult = 579;
 
-            expect(result).equals(579);
+            expect(result).equals(expectedResult);
+
+        });
+
+    });
+
+    describe('$apply', () => {
+
+        it('should execute given function and start $digest', () => {
+
+            $scope.aValue = '123';
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.aValue,
+                (newValue, oldValue, scope) => scope.counter += 1
+            );
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+            $scope.$apply(scope => scope.aValue = '456');
+            expect($scope.counter).equals(2);
 
         });
 

@@ -97,6 +97,20 @@ export default class Scope {
 
     }
 
+    $apply(...args) {
+
+        try {
+
+            this.$eval(...args);
+
+        } finally {
+
+            this.$digest();
+
+        }
+
+    }
+
     $eval(evalFn, ...args) {
 
         return evalFn(this, ...args);
