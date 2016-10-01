@@ -74,6 +74,20 @@ export default class Scope {
 
     }
 
+    static executeAsyncQueue($scope) {
+
+        const asyncQueue = $$asyncQueue.get($scope);
+
+        while (asyncQueue.length) {
+
+            const asyncTask = asyncQueue.shift();
+
+            asyncTask.scope.$eval(asyncTask.evalFn, ...asyncTask.args);
+
+        }
+
+    }
+
     static getOldValue(newValue, oldValue) {
 
         return oldValue === $$initialWatchValue ? newValue : oldValue;
@@ -137,6 +151,8 @@ export default class Scope {
         $$lastDirtyWatch.set(this, null);
 
         do {
+
+            Scope.executeAsyncQueue(this);
 
             dirty = Scope.$$digestOnce(this);
 

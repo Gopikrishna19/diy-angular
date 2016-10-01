@@ -522,7 +522,7 @@ describe('Scope', () => {
 
     describe('$evalAsync', () => {
 
-        it('should store given function in queue and not execute it immediately', () => {
+        it('should store given function in queue and execute it later in the same $digest', () => {
 
             $scope.aValue = [1, 2];
             $scope.asyncEval = false;
@@ -533,14 +533,14 @@ describe('Scope', () => {
                 (newValue, oldValue, scope) => {
 
                     scope.$evalAsync(() => scope.asyncEval = true);
-                    scope.asyncEvalImmediate = true;
+                    scope.asyncEvalImmediate = scope.asyncEval;
 
                 }
             );
 
             $scope.$digest();
-            expect($scope.asyncEval).false();
-            expect($scope.asyncEvalImmediate).true();
+            expect($scope.asyncEval).true();
+            expect($scope.asyncEvalImmediate).false();
 
         });
 
