@@ -2,6 +2,7 @@ import {cloneDeep, forEachRight, isEqual} from 'lodash';
 import literals from './literals';
 import {log} from './logger';
 
+const $$asyncQueue = new WeakMap();
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$lastDirtyWatch = new WeakMap();
 const $$watchers = new WeakMap();
@@ -92,8 +93,9 @@ export default class Scope {
 
     constructor() {
 
-        $$watchers.set(this, []);
+        $$asyncQueue.set(this, []);
         $$lastDirtyWatch.set(this, null);
+        $$watchers.set(this, []);
 
     }
 
@@ -114,6 +116,16 @@ export default class Scope {
     $eval(evalFn, ...args) {
 
         return evalFn(this, ...args);
+
+    }
+
+    $evalAsync(evalFn, ...args) {
+
+        $$asyncQueue.get(this).push({
+            args,
+            evalFn,
+            scope: this
+        });
 
     }
 
