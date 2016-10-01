@@ -178,7 +178,23 @@ export default class Scope {
 
     $evalAsync(evalFn, ...args) {
 
-        $$asyncQueue.get(this).push({
+        const asyncQueue = $$asyncQueue.get(this);
+
+        if (!this.$$phase && !asyncQueue.length) {
+
+            setTimeout(() => {
+
+                if (asyncQueue.length) {
+
+                    this.$digest();
+
+                }
+
+            });
+
+        }
+
+        asyncQueue.push({
             args,
             evalFn,
             scope: this

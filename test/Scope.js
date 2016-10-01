@@ -626,6 +626,30 @@ describe('Scope', () => {
 
         });
 
+        it('should schedule a $digest', done => {
+
+            const delay = 50;
+
+            $scope.aValue = 'abc';
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.aValue,
+                (newValue, oldValue, scope) => scope.counter += 1
+            );
+            $scope.$evalAsync(() => { });
+
+            expect($scope.counter).equals(0);
+
+            setTimeout(() => {
+
+                expect($scope.counter).equals(1);
+                done();
+
+            }, delay);
+
+        });
+
     });
 
     describe('phase', () => {
