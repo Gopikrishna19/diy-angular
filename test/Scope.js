@@ -104,7 +104,7 @@ describe('Scope', () => {
 
         it('should call the listener function with new value as old value the first time', () => {
 
-            let oldValueGiven;
+            let oldValueGiven = null;
 
             $scope.someValue = 'a';
 
