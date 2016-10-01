@@ -544,6 +544,20 @@ describe('Scope', () => {
 
         });
 
+        it('should execute given function with given args', () => {
+
+            $scope.aValue = 123;
+
+            const args = 456;
+            const expectedResult = 579;
+
+            $scope.$evalAsync((scope, arg) => scope.aValue += arg, args);
+
+            $scope.$digest();
+            expect($scope.aValue).equals(expectedResult);
+
+        });
+
     });
 
 });
