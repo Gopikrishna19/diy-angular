@@ -472,7 +472,7 @@ describe('Scope', () => {
 
     describe('$eval', () => {
 
-        it('should execute given function and return result', () => {
+        it('should evaluate given function and return result', () => {
 
             const aValue = 123;
 
@@ -484,7 +484,7 @@ describe('Scope', () => {
 
         });
 
-        it('should execute given function with given args', () => {
+        it('should evaluate given function with given args', () => {
 
             $scope.aValue = 123;
 
@@ -500,7 +500,7 @@ describe('Scope', () => {
 
     describe('$apply', () => {
 
-        it('should execute given function and start $digest', () => {
+        it('should apply given function and start $digest', () => {
 
             $scope.aValue = '123';
             $scope.counter = 0;
@@ -522,7 +522,7 @@ describe('Scope', () => {
 
     describe('$evalAsync', () => {
 
-        it('should store given function in queue and execute it later in the same $digest', () => {
+        it('should store given function in queue and evaluate it later in the same $digest', () => {
 
             $scope.aValue = [1, 2];
             $scope.asyncEval = false;
@@ -544,7 +544,7 @@ describe('Scope', () => {
 
         });
 
-        it('should execute given function with given args', () => {
+        it('should evaluate given function with given args', () => {
 
             $scope.aValue = 123;
 
