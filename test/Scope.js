@@ -606,6 +606,25 @@ describe('Scope', () => {
 
         });
 
+        it('should eventually exhaust queued async functions from watch function', () => {
+
+            $scope.aValue = [1, 2];
+            $scope.asyncEval = 0;
+
+            $scope.$watch(
+                scope => {
+
+                    scope.$evalAsync(() => {});
+
+                    return scope.aValue;
+
+                }
+            );
+
+            expect(() => $scope.$digest()).throw(literals.INFINITE_DIGESTION);
+
+        });
+
     });
 
 });

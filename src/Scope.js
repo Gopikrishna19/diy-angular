@@ -164,13 +164,13 @@ export default class Scope {
 
             Scope.executeAsyncQueue(this);
 
-            dirty = Scope.$$digestOnce(this);
+            dirty = Scope.$$digestOnce(this) || $$asyncQueue.get(this).length;
 
             Scope.checkForInfiniteDigestion(dirty, iterations);
 
             iterations -= 1;
 
-        } while (dirty || $$asyncQueue.get(this).length);
+        } while (dirty);
 
     }
 
