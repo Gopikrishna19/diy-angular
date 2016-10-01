@@ -44,7 +44,7 @@
         "no-magic-numbers": [
             2,
             {
-                "detectObjects": true,
+                "detectObjects": false,
                 "ignore": [
                     0,
                     1,
