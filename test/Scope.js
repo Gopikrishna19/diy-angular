@@ -15,8 +15,6 @@ describe('Scope', () => {
 
         $scope = new Scope();
         sandbox = sinon.sandbox.create();
-        listenerFn = sandbox.stub();
-        watchFn = sandbox.stub();
 
     });
 
@@ -31,6 +29,13 @@ describe('Scope', () => {
     });
 
     describe('$digest', () => {
+
+        beforeEach(() => {
+
+            listenerFn = sandbox.stub();
+            watchFn = sandbox.stub();
+
+        });
 
         it('should call the listener function on first $digest', () => {
 
@@ -179,8 +184,8 @@ describe('Scope', () => {
             const affectedItemIndex = 1;
             const eachCalledTwiceOnFirstDigest = 200;
             const stopsAfterLastDirtyWatchIsClean = eachCalledTwiceOnFirstDigest +
-                                                    length +
-                                                    affectedItemIndex;
+                length +
+                affectedItemIndex;
             let watchExecutions = 0;
 
             $scope.array = Array.from({length});
@@ -460,6 +465,31 @@ describe('Scope', () => {
                 expect($scope.counter).equals(0);
 
             });
+
+        });
+
+    });
+
+    describe('$eval', () => {
+
+        it('should execute given function and return result', () => {
+
+            $scope.aValue = 123;
+
+            const result = $scope.$eval(scope => scope.aValue);
+
+            expect(result).equals(123);
+
+        });
+
+        it('should execute given function with given args', () => {
+
+            $scope.aValue = 123;
+
+            const args = 456;
+            const result = $scope.$eval((scope, arg) => scope.aValue + arg, args);
+
+            expect(result).equals(579);
 
         });
 
