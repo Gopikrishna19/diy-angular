@@ -5,15 +5,40 @@ import {log} from './logger';
 const $$asyncQueue = new WeakMap();
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$lastDirtyWatch = new WeakMap();
+const $$phase = new WeakMap();
 const $$watchers = new WeakMap();
 
 export default class Scope {
+
+    get $$phase() {
+
+        return $$phase.get(this);
+
+    }
 
     static $$areEqual(newValue, oldValue, compareValues) {
 
         return compareValues ?
                isEqual(newValue, oldValue) :
                newValue === oldValue || Scope.testNaN(newValue, oldValue);
+
+    }
+
+    static $$beginPhase($scope, phase) {
+
+        if ($scope.$$phase) {
+
+            throw new Error(`${$scope.$$phase} ${literals.PHASE_ALREADY_IN_PROGRESS}`);
+
+        }
+
+        $$phase.set($scope, phase);
+
+    }
+
+    static $$clearPhase($scope) {
+
+        $$phase.set($scope, null);
 
     }
 
@@ -68,9 +93,11 @@ export default class Scope {
 
     }
 
-    static checkForInfiniteDigestion(dirty, iterations) {
+    static checkForInfiniteDigestion($scope, dirty, iterations) {
 
         if (dirty && !iterations) {
+
+            Scope.$$clearPhase($scope);
 
             throw new Error(literals.INFINITE_DIGESTION);
 
@@ -121,15 +148,21 @@ export default class Scope {
         $$lastDirtyWatch.set(this, null);
         $$watchers.set(this, []);
 
+        Scope.$$clearPhase(this);
+
     }
 
     $apply(...args) {
 
         try {
 
+            Scope.$$beginPhase(this, '$apply');
+
             this.$eval(...args);
 
         } finally {
+
+            Scope.$$clearPhase(this);
 
             this.$digest();
 
@@ -158,6 +191,8 @@ export default class Scope {
         let dirty = false,
             iterations = 10;
 
+        Scope.$$beginPhase(this, '$digest');
+
         $$lastDirtyWatch.set(this, null);
 
         do {
@@ -166,11 +201,13 @@ export default class Scope {
 
             dirty = Scope.$$digestOnce(this) || $$asyncQueue.get(this).length;
 
-            Scope.checkForInfiniteDigestion(dirty, iterations);
+            Scope.checkForInfiniteDigestion(this, dirty, iterations);
 
             iterations -= 1;
 
         } while (dirty);
+
+        Scope.$$clearPhase(this);
 
     }
 

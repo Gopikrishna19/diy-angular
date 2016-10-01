@@ -7,9 +7,7 @@ import sinon from 'sinon';
 describe('Scope', () => {
 
     let $scope,
-        listenerFn,
-        sandbox,
-        watchFn;
+        sandbox;
 
     beforeEach(() => {
 
@@ -29,6 +27,9 @@ describe('Scope', () => {
     });
 
     describe('$digest', () => {
+
+        let listenerFn,
+            watchFn;
 
         beforeEach(() => {
 
@@ -606,7 +607,7 @@ describe('Scope', () => {
 
         });
 
-        it('should eventually exhaust queued async functions from watch function', () => {
+        it('should eventually exhaust queued async functions from a watch function', () => {
 
             $scope.aValue = [1, 2];
             $scope.asyncEval = 0;
@@ -622,6 +623,49 @@ describe('Scope', () => {
             );
 
             expect(() => $scope.$digest()).throw(literals.INFINITE_DIGESTION);
+
+        });
+
+    });
+
+    describe('phase', () => {
+
+        let phase = null;
+
+        it('should be $digest when in watch function', () => {
+
+            $scope.$watch(
+                scope => phase = scope.$$phase
+            );
+
+            $scope.$digest();
+            expect(phase).equals('$digest');
+
+        });
+
+        it('should be $digest when in listener function', () => {
+
+            $scope.$watch(
+                () => {},
+                (newValue, oldValue, scope) => phase = scope.$$phase
+            );
+
+            $scope.$digest();
+            expect(phase).equals('$digest');
+
+        });
+
+        it('should be $apply when in apply function', () => {
+
+            $scope.$apply(scope => phase = scope.$$phase);
+
+            expect(phase).equals('$apply');
+
+        });
+
+        it('should throw PHASE_ALREADY_IN_PROGRESS if already in a phase', () => {
+
+            expect(() => $scope.$apply(scope => scope.$digest())).throw(`$apply ${literals.PHASE_ALREADY_IN_PROGRESS}`);
 
         });
 
