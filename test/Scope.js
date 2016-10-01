@@ -558,6 +558,30 @@ describe('Scope', () => {
 
         });
 
+        it('should evaluate given async function from a watch function', () => {
+
+            $scope.aValue = [1, 2];
+            $scope.asyncEval = false;
+
+            $scope.$watch(
+                scope => {
+
+                    if (!scope.asyncEval) {
+
+                        scope.$evalAsync(() => scope.asyncEval = true);
+
+                    }
+
+                    return scope.aValue;
+
+                }
+            );
+
+            $scope.$digest();
+            expect($scope.asyncEval).true();
+
+        });
+
     });
 
 });
