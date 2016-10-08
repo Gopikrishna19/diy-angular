@@ -8,12 +8,17 @@ describe('Scope', () => {
 
     const delay = 50;
     let $scope,
-        sandbox;
+        listenerFn,
+        sandbox,
+        watchFn;
 
     beforeEach(() => {
 
         $scope = new Scope();
         sandbox = sinon.sandbox.create();
+
+        listenerFn = sandbox.stub();
+        watchFn = sandbox.stub();
 
     });
 
@@ -28,16 +33,6 @@ describe('Scope', () => {
     });
 
     describe('$digest', () => {
-
-        let listenerFn,
-            watchFn;
-
-        beforeEach(() => {
-
-            listenerFn = sandbox.stub();
-            watchFn = sandbox.stub();
-
-        });
 
         it('should call the listener function on first $digest', () => {
 
@@ -66,41 +61,37 @@ describe('Scope', () => {
         it('should call the listener function when watched value changes', () => {
 
             $scope.someValue = 'a';
-            $scope.counter = 0;
 
             $scope.$watch(
                 scope => scope.someValue,
-                (newValue, oldValue, scope) => scope.counter += 1
+                listenerFn
             );
 
-            expect($scope.counter).equals(0);
+            sinon.assert.notCalled(listenerFn);
 
             $scope.$digest();
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
             $scope.$digest();
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
             $scope.someValue = 'b';
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
             $scope.$digest();
-            expect($scope.counter).equals(2);
+            sinon.assert.calledTwice(listenerFn);
 
         });
 
         it('should call the listener function when watch value is first undefined', () => {
 
-            $scope.counter = 0;
-
             $scope.$watch(
                 scope => scope.someValue,
-                (newValue, oldValue, scope) => scope.counter += 1
+                listenerFn
             );
 
             $scope.$digest();
-
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
         });
 
@@ -161,25 +152,6 @@ describe('Scope', () => {
 
         });
 
-        it('should throw INFINITE_DIGESTION after 10 iterations of dirty watchers', () => {
-
-            $scope.counterA = 0;
-            $scope.counterB = 0;
-
-            $scope.$watch(
-                scope => scope.counterA,
-                (newValue, oldValue, scope) => scope.counterB += 1
-            );
-
-            $scope.$watch(
-                scope => scope.counterB,
-                (newValue, oldValue, scope) => scope.counterA += 1
-            );
-
-            expect(() => $scope.$digest()).throw(literals.INFINITE_DIGESTION);
-
-        });
-
         it('should end the $digest when the last dirty watcher is clean', () => {
 
             const length = 100;
@@ -215,39 +187,37 @@ describe('Scope', () => {
         it('should not end $digest when a new watcher is added', () => {
 
             $scope.aValue = 'abc';
-            $scope.counter = 0;
 
             $scope.$watch(
                 scope => scope.aValue,
                 (newValue, oldValue, scope) =>
                     $scope.$watch(
                         () => scope.aValue,
-                        () => scope.counter += 1
+                        listenerFn
                     )
             );
 
             $scope.$digest();
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
         });
 
         it('should watch value if enabled in addition to reference for complex data', () => {
 
             $scope.aValue = [0, 1, 2];
-            $scope.counter = 0;
 
             $scope.$watch(
                 scope => scope.aValue,
-                (newValue, oldValue, scope) => scope.counter += 1,
+                listenerFn,
                 true
             );
 
             $scope.$digest();
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
             $scope.aValue.push(1);
             $scope.$digest();
-            expect($scope.counter).equals(2);
+            sinon.assert.calledTwice(listenerFn);
 
         });
 
@@ -256,18 +226,17 @@ describe('Scope', () => {
             it('should watch for the values with NaN', () => {
 
                 $scope.number = NaN;
-                $scope.counter = 0;
 
                 $scope.$watch(
                     scope => scope.number,
-                    (newValue, oldValue, scope) => scope.counter += 1
+                    listenerFn
                 );
 
                 $scope.$digest();
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
                 $scope.$digest();
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
             });
 
@@ -283,10 +252,28 @@ describe('Scope', () => {
 
             });
 
+            it('should throw INFINITE_DIGESTION after 10 iterations of dirty watchers', () => {
+
+                $scope.counterA = 0;
+                $scope.counterB = 0;
+
+                $scope.$watch(
+                    scope => scope.counterA,
+                    (newValue, oldValue, scope) => scope.counterB += 1
+                );
+
+                $scope.$watch(
+                    scope => scope.counterB,
+                    (newValue, oldValue, scope) => scope.counterA += 1
+                );
+
+                expect(() => $scope.$digest()).throw(literals.INFINITE_DIGESTION);
+
+            });
+
             it('should log the error and continue $digesting after an exception in watch function', () => {
 
                 $scope.aValue = 'abc';
-                $scope.counter = 0;
 
                 $scope.$watch(
                     () => {
@@ -297,7 +284,7 @@ describe('Scope', () => {
                 );
                 $scope.$watch(
                     scope => scope.aValue,
-                    (newValue, oldValue, scope) => scope.counter += 1
+                    listenerFn
                 );
 
                 $scope.$digest();
@@ -305,14 +292,13 @@ describe('Scope', () => {
                 sinon.assert.called(logger.log);
                 sinon.assert.calledWithExactly(logger.log, 'error', error);
 
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
             });
 
             it('should log the error and continue $digesting after an exception in listener function', () => {
 
                 $scope.aValue = 'abc';
-                $scope.counter = 0;
 
                 $scope.$watch(
                     scope => scope.aValue,
@@ -324,7 +310,7 @@ describe('Scope', () => {
                 );
                 $scope.$watch(
                     scope => scope.aValue,
-                    (newValue, oldValue, scope) => scope.counter += 1
+                    listenerFn
                 );
 
                 $scope.$digest();
@@ -332,7 +318,7 @@ describe('Scope', () => {
                 sinon.assert.calledOnce(logger.log);
                 sinon.assert.calledWithExactly(logger.log, 'error', error);
 
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
             });
 
@@ -343,39 +329,37 @@ describe('Scope', () => {
             it('should destroy the watcher with a removal function', () => {
 
                 $scope.aValue = 'abc';
-                $scope.counter = 0;
 
                 const destroyWatch = $scope.$watch(
                     scope => scope.aValue,
-                    (newValue, oldValue, scope) => scope.counter += 1
+                    listenerFn
                 );
 
                 $scope.$digest();
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
                 $scope.aValue = 'def';
                 $scope.$digest();
-                expect($scope.counter).equals(2);
+                sinon.assert.calledTwice(listenerFn);
 
                 $scope.aValue = 'ghi';
                 destroyWatch();
                 $scope.$digest();
-                expect($scope.counter).equals(2);
+                sinon.assert.calledTwice(listenerFn);
 
             });
 
             it('should not throw when removal function is called multiple times', () => {
 
                 $scope.aValue = 'abc';
-                $scope.counter = 0;
 
                 const destroyWatch = $scope.$watch(
                     scope => scope.aValue,
-                    (newValue, oldValue, scope) => scope.counter += 1
+                    listenerFn
                 );
 
                 $scope.$digest();
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
                 $scope.aValue = 'ghi';
 
@@ -383,7 +367,7 @@ describe('Scope', () => {
                 destroyWatch();
 
                 $scope.$digest();
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
             });
 
@@ -421,32 +405,30 @@ describe('Scope', () => {
 
             it('should allow a watcher to destroy another during $digest', () => {
 
-                $scope.aValue = 'abc';
-                $scope.counter = 0;
-
                 let destroyWatch = null;
+
+                $scope.aValue = 'abc';
 
                 $scope.$watch(
                     scope => scope.aValue,
                     () => destroyWatch()
                 );
 
-                destroyWatch = $scope.$watch(() => {});
+                destroyWatch = $scope.$watch(watchFn);
 
                 $scope.$watch(
                     scope => scope.aValue,
-                    (newValue, oldValue, scope) => scope.counter += 1
+                    listenerFn
                 );
 
                 $scope.$digest();
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
 
             });
 
-            it('should allow destroying several $watches during digest', function () {
+            it('should allow destroying several $watches during digest', () => {
 
                 $scope.aValue = 'abc';
-                $scope.counter = 0;
 
                 let destroyWatch1 = null,
                     destroyWatch2 = null;
@@ -460,11 +442,11 @@ describe('Scope', () => {
 
                 destroyWatch2 = $scope.$watch(
                     scope => scope.aValue,
-                    (newValue, oldValue, scope) => scope.counter += 1
+                    listenerFn
                 );
 
                 $scope.$digest();
-                expect($scope.counter).equals(0);
+                sinon.assert.notCalled(listenerFn);
 
             });
 
@@ -505,18 +487,17 @@ describe('Scope', () => {
         it('should apply given function and start $digest', () => {
 
             $scope.aValue = '123';
-            $scope.counter = 0;
 
             $scope.$watch(
                 scope => scope.aValue,
-                (newValue, oldValue, scope) => scope.counter += 1
+                listenerFn
             );
 
             $scope.$digest();
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
             $scope.$apply(scope => scope.aValue = '456');
-            expect($scope.counter).equals(2);
+            sinon.assert.calledTwice(listenerFn);
 
         });
 
@@ -587,14 +568,13 @@ describe('Scope', () => {
         it('should evaluate given async function from a watch function even when not dirty', () => {
 
             $scope.aValue = [1, 2];
-            $scope.asyncEval = 0;
 
             $scope.$watch(
                 scope => {
 
-                    if (scope.asyncEval < 2) {
+                    if (watchFn.callCount < 2) {
 
-                        scope.$evalAsync(() => scope.asyncEval += 1);
+                        scope.$evalAsync(watchFn);
 
                     }
 
@@ -604,19 +584,18 @@ describe('Scope', () => {
             );
 
             $scope.$digest();
-            expect($scope.asyncEval).equals(2);
+            sinon.assert.calledTwice(watchFn);
 
         });
 
         it('should eventually exhaust queued async functions from a watch function', () => {
 
             $scope.aValue = [1, 2];
-            $scope.asyncEval = 0;
 
             $scope.$watch(
                 scope => {
 
-                    scope.$evalAsync(() => {});
+                    scope.$evalAsync(watchFn);
 
                     return scope.aValue;
 
@@ -630,19 +609,19 @@ describe('Scope', () => {
         it('should schedule a $digest', done => {
 
             $scope.aValue = 'abc';
-            $scope.counter = 0;
 
             $scope.$watch(
                 scope => scope.aValue,
-                (newValue, oldValue, scope) => scope.counter += 1
+                listenerFn
             );
-            $scope.$evalAsync(() => { });
 
-            expect($scope.counter).equals(0);
+            $scope.$evalAsync(watchFn);
+
+            sinon.assert.notCalled(listenerFn);
 
             setTimeout(() => {
 
-                expect($scope.counter).equals(1);
+                sinon.assert.calledOnce(listenerFn);
                 done();
 
             }, delay);
@@ -655,22 +634,20 @@ describe('Scope', () => {
 
         it('should apply function asynchronously', done => {
 
-            $scope.counter = 0;
-
             $scope.$watch(
                 scope => scope.aValue,
-                (newValue, oldValue, scope) => scope.counter += 1
+                listenerFn
             );
 
             $scope.$digest();
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
             $scope.$applyAsync(scope => scope.aValue = 'abc');
-            expect($scope.counter).equals(1);
+            sinon.assert.calledOnce(listenerFn);
 
             setTimeout(() => {
 
-                expect($scope.counter).equals(2);
+                sinon.assert.calledTwice(listenerFn);
                 done();
 
             }, delay);
@@ -700,25 +677,16 @@ describe('Scope', () => {
 
         });
 
-        it('should coalesce all async functions', function (done) {
+        it('should coalesce all async functions', done => {
 
-            $scope.counter = 0;
-
-            $scope.$watch(
-                scope => {
-
-                    scope.counter += 1;
-                    return scope.aValue;
-
-                }
-            );
+            $scope.$watch(watchFn.returns($scope.aValue));
 
             $scope.$applyAsync(scope => scope.aValue = 'abc');
             $scope.$applyAsync(scope => scope.aValue = 'def');
 
             setTimeout(() => {
 
-                expect($scope.counter).equals(2);
+                sinon.assert.calledTwice(watchFn);
                 done();
 
             }, delay);
@@ -727,26 +695,18 @@ describe('Scope', () => {
 
         it('should cancel and flush async queue if a $digest is triggered', done => {
 
-            $scope.counter = 0;
+            $scope.$watch(watchFn.returns($scope.aValue));
 
-            $scope.$watch(
-                scope => {
-
-                    scope.counter += 1;
-                    return $scope.aValue;
-
-                }
-            );
             $scope.$applyAsync(scope => scope.aValue = 'abc');
             $scope.$applyAsync(scope => scope.aValue = 'def');
 
             $scope.$digest();
-            expect($scope.counter).equals(2);
+            sinon.assert.calledTwice(watchFn);
             expect($scope.aValue).equals('def');
 
             setTimeout(() => {
 
-                expect($scope.counter).equals(2);
+                sinon.assert.calledTwice(watchFn);
                 done();
 
             }, delay);
@@ -773,7 +733,7 @@ describe('Scope', () => {
         it('should be $digest when in listener function', () => {
 
             $scope.$watch(
-                () => {},
+                watchFn,
                 (newValue, oldValue, scope) => phase = scope.$$phase
             );
 
