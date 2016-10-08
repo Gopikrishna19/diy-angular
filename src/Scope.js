@@ -115,9 +115,17 @@ export default class Scope {
 
         while (asyncQueue.length) {
 
-            const asyncTask = asyncQueue.shift();
+            try {
 
-            asyncTask.scope.$eval(asyncTask.evalFn, ...asyncTask.args);
+                const asyncTask = asyncQueue.shift();
+
+                asyncTask.scope.$eval(asyncTask.evalFn, ...asyncTask.args);
+
+            } catch (error) {
+
+                log('error', error);
+
+            }
 
         }
 
@@ -147,7 +155,15 @@ export default class Scope {
 
         while (applyAsyncQueue.length) {
 
-            applyAsyncQueue.shift()();
+            try {
+
+                applyAsyncQueue.shift()();
+
+            } catch (error) {
+
+                log('error', error);
+
+            }
 
         }
 

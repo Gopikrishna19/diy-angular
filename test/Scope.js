@@ -7,6 +7,7 @@ import sinon from 'sinon';
 describe('Scope', () => {
 
     const delay = 50;
+    const error = new Error('error');
     let $scope,
         listenerFn,
         sandbox,
@@ -19,6 +20,8 @@ describe('Scope', () => {
 
         listenerFn = sandbox.stub();
         watchFn = sandbox.stub();
+
+        sandbox.stub(logger, 'log');
 
     });
 
@@ -244,14 +247,6 @@ describe('Scope', () => {
 
         describe('exceptions', () => {
 
-            const error = new Error('error');
-
-            beforeEach(() => {
-
-                sandbox.stub(logger, 'log');
-
-            });
-
             it('should throw INFINITE_DIGESTION after 10 iterations of dirty watchers', () => {
 
                 $scope.counterA = 0;
@@ -275,13 +270,7 @@ describe('Scope', () => {
 
                 $scope.aValue = 'abc';
 
-                $scope.$watch(
-                    () => {
-
-                        throw error;
-
-                    }
-                );
+                $scope.$watch(watchFn.throws(error));
                 $scope.$watch(
                     scope => scope.aValue,
                     listenerFn
@@ -289,7 +278,7 @@ describe('Scope', () => {
 
                 $scope.$digest();
 
-                sinon.assert.called(logger.log);
+                sinon.assert.calledTwice(logger.log);
                 sinon.assert.calledWithExactly(logger.log, 'error', error);
 
                 sinon.assert.calledOnce(listenerFn);
@@ -302,11 +291,7 @@ describe('Scope', () => {
 
                 $scope.$watch(
                     scope => scope.aValue,
-                    () => {
-
-                        throw error;
-
-                    }
+                    sandbox.stub().throws(error)
                 );
                 $scope.$watch(
                     scope => scope.aValue,
@@ -628,6 +613,27 @@ describe('Scope', () => {
 
         });
 
+        describe('exceptions', () => {
+
+            it('should log the error and continue evaluating', done => {
+
+                $scope.$watch(sandbox.stub(), listenerFn);
+                $scope.$evalAsync(watchFn.throws(error));
+
+                setTimeout(() => {
+
+                    sinon.assert.calledOnce(logger.log);
+                    sinon.assert.calledWithExactly(logger.log, 'error', error);
+
+                    sinon.assert.calledOnce(listenerFn);
+                    done();
+
+                }, delay);
+
+            });
+
+        });
+
     });
 
     describe('$applyAsync', () => {
@@ -710,6 +716,29 @@ describe('Scope', () => {
                 done();
 
             }, delay);
+
+        });
+
+        describe('exceptions', () => {
+
+            it('should log the error and continue applying functions', done => {
+
+                $scope.$applyAsync(sandbox.stub().throws(error));
+                $scope.$applyAsync(sandbox.stub().throws(error));
+
+                $scope.$applyAsync(scope => scope.applied = true);
+
+                setTimeout(() => {
+
+                    sinon.assert.calledTwice(logger.log);
+                    sinon.assert.calledWithExactly(logger.log, 'error', error);
+
+                    expect($scope.applied).true();
+                    done();
+
+                }, delay);
+
+            });
 
         });
 
