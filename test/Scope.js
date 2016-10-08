@@ -725,6 +725,34 @@ describe('Scope', () => {
 
         });
 
+        it('should cancel and flush async queue if a $digest is triggered', done => {
+
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => {
+
+                    scope.counter += 1;
+                    return $scope.aValue;
+
+                }
+            );
+            $scope.$applyAsync(scope => scope.aValue = 'abc');
+            $scope.$applyAsync(scope => scope.aValue = 'def');
+
+            $scope.$digest();
+            expect($scope.counter).equals(2);
+            expect($scope.aValue).equals('def');
+
+            setTimeout(() => {
+
+                expect($scope.counter).equals(2);
+                done();
+
+            }, delay);
+
+        });
+
     });
 
     describe('phase', () => {

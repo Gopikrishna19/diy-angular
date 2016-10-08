@@ -95,6 +95,34 @@ export default class Scope {
 
     }
 
+    static $$flushApplyAsync($scope) {
+
+        const applyAsyncId = $$applyAsyncId.get($scope);
+
+        if (applyAsyncId) {
+
+            clearTimeout(applyAsyncId);
+
+            Scope.executeApplyQueue($scope);
+
+        }
+
+    }
+
+    static $$flushEvalAsync($scope) {
+
+        const asyncQueue = $$evalAsyncQueue.get($scope);
+
+        while (asyncQueue.length) {
+
+            const asyncTask = asyncQueue.shift();
+
+            asyncTask.scope.$eval(asyncTask.evalFn, ...asyncTask.args);
+
+        }
+
+    }
+
     static checkForInfiniteDigestion($scope, dirty, iterations) {
 
         if (dirty && !iterations) {
@@ -117,33 +145,13 @@ export default class Scope {
 
         const applyAsyncQueue = $$applyAsyncQueue.get($scope);
 
-        $scope.$apply(
-            () => {
+        while (applyAsyncQueue.length) {
 
-                while (applyAsyncQueue.length) {
-
-                    applyAsyncQueue.shift()();
-
-                }
-
-                $$applyAsyncId.set($scope, null);
-
-            }
-        );
-
-    }
-
-    static executeEvalQueue($scope) {
-
-        const asyncQueue = $$evalAsyncQueue.get($scope);
-
-        while (asyncQueue.length) {
-
-            const asyncTask = asyncQueue.shift();
-
-            asyncTask.scope.$eval(asyncTask.evalFn, ...asyncTask.args);
+            applyAsyncQueue.shift()();
 
         }
+
+        $$applyAsyncId.set($scope, null);
 
     }
 
@@ -204,7 +212,11 @@ export default class Scope {
 
             $$applyAsyncId.set(
                 this,
-                setTimeout(() => Scope.executeApplyQueue(this))
+                setTimeout(
+                    () => this.$apply(
+                        () => Scope.executeApplyQueue(this)
+                    )
+                )
             );
 
         }
@@ -252,9 +264,11 @@ export default class Scope {
 
         $$lastDirtyWatch.set(this, null);
 
+        Scope.$$flushApplyAsync(this);
+
         do {
 
-            Scope.executeEvalQueue(this);
+            Scope.$$flushEvalAsync(this);
 
             dirty = Scope.$$digestOnce(this) || $$evalAsyncQueue.get(this).length;
 
