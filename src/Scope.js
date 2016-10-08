@@ -2,8 +2,9 @@ import {cloneDeep, forEachRight, isEqual} from 'lodash';
 import literals from './literals';
 import {log} from './logger';
 
+const $$applyAsyncId = new WeakMap();
 const $$applyAsyncQueue = new WeakMap();
-const $$asyncQueue = new WeakMap();
+const $$evalAsyncQueue = new WeakMap();
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$lastDirtyWatch = new WeakMap();
 const $$phase = new WeakMap();
@@ -112,9 +113,29 @@ export default class Scope {
 
     }
 
-    static executeAsyncQueue($scope) {
+    static executeApplyQueue($scope) {
 
-        const asyncQueue = $$asyncQueue.get($scope);
+        const applyAsyncQueue = $$applyAsyncQueue.get($scope);
+
+        $scope.$apply(
+            () => {
+
+                while (applyAsyncQueue.length) {
+
+                    applyAsyncQueue.shift()();
+
+                }
+
+                $$applyAsyncId.set($scope, null);
+
+            }
+        );
+
+    }
+
+    static executeEvalQueue($scope) {
+
+        const asyncQueue = $$evalAsyncQueue.get($scope);
 
         while (asyncQueue.length) {
 
@@ -145,8 +166,9 @@ export default class Scope {
 
     constructor() {
 
+        $$applyAsyncId.set(this, null);
         $$applyAsyncQueue.set(this, []);
-        $$asyncQueue.set(this, []);
+        $$evalAsyncQueue.set(this, []);
         $$lastDirtyWatch.set(this, null);
         $$watchers.set(this, []);
 
@@ -178,17 +200,14 @@ export default class Scope {
 
         applyAsyncQueue.push(() => this.$eval(...args));
 
-        setTimeout(() => this.$apply(
-            () => {
+        if ($$applyAsyncId.get(this) === null) {
 
-                while (applyAsyncQueue.length) {
+            $$applyAsyncId.set(
+                this,
+                setTimeout(() => Scope.executeApplyQueue(this))
+            );
 
-                    applyAsyncQueue.shift()();
-
-                }
-
-            }
-        ));
+        }
 
     }
 
@@ -200,7 +219,7 @@ export default class Scope {
 
     $evalAsync(evalFn, ...args) {
 
-        const asyncQueue = $$asyncQueue.get(this);
+        const asyncQueue = $$evalAsyncQueue.get(this);
 
         if (!this.$$phase && !asyncQueue.length) {
 
@@ -235,9 +254,9 @@ export default class Scope {
 
         do {
 
-            Scope.executeAsyncQueue(this);
+            Scope.executeEvalQueue(this);
 
-            dirty = Scope.$$digestOnce(this) || $$asyncQueue.get(this).length;
+            dirty = Scope.$$digestOnce(this) || $$evalAsyncQueue.get(this).length;
 
             Scope.checkForInfiniteDigestion(this, dirty, iterations);
 

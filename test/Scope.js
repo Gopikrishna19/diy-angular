@@ -700,6 +700,31 @@ describe('Scope', () => {
 
         });
 
+        it('should coalesce all async functions', function (done) {
+
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => {
+
+                    scope.counter += 1;
+                    return scope.aValue;
+
+                }
+            );
+
+            $scope.$applyAsync(scope => scope.aValue = 'abc');
+            $scope.$applyAsync(scope => scope.aValue = 'def');
+
+            setTimeout(() => {
+
+                expect($scope.counter).equals(2);
+                done();
+
+            }, delay);
+
+        });
+
     });
 
     describe('phase', () => {
