@@ -6,6 +6,7 @@ import sinon from 'sinon';
 
 describe('Scope', () => {
 
+    const delay = 50;
     let $scope,
         sandbox;
 
@@ -628,8 +629,6 @@ describe('Scope', () => {
 
         it('should schedule a $digest', done => {
 
-            const delay = 50;
-
             $scope.aValue = 'abc';
             $scope.counter = 0;
 
@@ -644,6 +643,57 @@ describe('Scope', () => {
             setTimeout(() => {
 
                 expect($scope.counter).equals(1);
+                done();
+
+            }, delay);
+
+        });
+
+    });
+
+    describe('$applyAsync', () => {
+
+        it('should apply function asynchronously', done => {
+
+            $scope.counter = 0;
+
+            $scope.$watch(
+                scope => scope.aValue,
+                (newValue, oldValue, scope) => scope.counter += 1
+            );
+
+            $scope.$digest();
+            expect($scope.counter).equals(1);
+
+            $scope.$applyAsync(scope => scope.aValue = 'abc');
+            expect($scope.counter).equals(1);
+
+            setTimeout(() => {
+
+                expect($scope.counter).equals(2);
+                done();
+
+            }, delay);
+
+        });
+
+        it('should not apply async function in the same $digest', done => {
+
+            $scope.aValue = [1, 2];
+            $scope.asyncApplied = false;
+
+            $scope.$watch(
+                scope => scope.aValue,
+                (newValue, oldValue, scope) =>
+                    scope.$applyAsync(() => scope.asyncApplied = true)
+            );
+
+            $scope.$digest();
+            expect($scope.asyncApplied).false();
+
+            setTimeout(() => {
+
+                expect($scope.asyncApplied).true();
                 done();
 
             }, delay);
