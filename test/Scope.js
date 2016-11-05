@@ -226,16 +226,15 @@ describe('Scope', () => {
 
         it('should $digest its children', () => {
 
-            const parent = new Scope();
-            const child = parent.$new();
+            const child = $scope.$new();
 
-            parent.aValue = 'abc';
+            $scope.aValue = 'abc';
             child.$watch(
-                watchFn.returns(parent.aValue),
+                watchFn.returns($scope.aValue),
                 (newValue, oldValue, scope) => scope.aValueWas = newValue
             );
 
-            parent.$digest();
+            $scope.$digest();
             expect(child.aValueWas).equals('abc');
 
         });
@@ -916,11 +915,9 @@ describe('Scope', () => {
 
         it('should be constructed with parent properties', () => {
 
-            const parent = new Scope();
+            $scope.aValue = [1, 2];
 
-            parent.aValue = [1, 2];
-
-            const child = parent.$new();
+            const child = $scope.$new();
 
             expect(child.aValue).equals([1, 2]);
 
@@ -928,21 +925,19 @@ describe('Scope', () => {
 
         it('should be able to put properties on parent', () => {
 
-            const parent = new Scope();
-            const child = parent.$new();
+            const child = $scope.$new();
 
             child.aValue = [1, 2];
 
-            expect(parent.aValue).undefined();
+            expect($scope.aValue).undefined();
 
         });
 
         it('should reflect new parent properties', () => {
 
-            const parent = new Scope();
-            const child = parent.$new();
+            const child = $scope.$new();
 
-            parent.aValue = [1, 2];
+            $scope.aValue = [1, 2];
 
             expect(child.aValue).equals([1, 2]);
 
@@ -950,28 +945,25 @@ describe('Scope', () => {
 
         it('should be able to manipulate parent', () => {
 
-            const parent = new Scope();
+            $scope.aValue = [1, 2];
 
-            parent.aValue = [1, 2];
-
-            const child = parent.$new();
+            const child = $scope.$new();
 
             child.aValue.push(0);
 
             expect(child.aValue).equals([1, 2, 0]);
-            expect(parent.aValue).equals([1, 2, 0]);
+            expect($scope.aValue).equals([1, 2, 0]);
 
         });
 
         it('should be able to watch parent property', () => {
 
-            const parent = new Scope();
-            const child = parent.$new();
+            const child = $scope.$new();
 
-            parent.aValue = [1, 2];
+            $scope.aValue = [1, 2];
 
             child.$watch(
-                () => parent.aValue,
+                () => $scope.aValue,
                 listenerFn,
                 true
             );
@@ -979,7 +971,7 @@ describe('Scope', () => {
             child.$digest();
             sinon.assert.calledOnce(listenerFn);
 
-            parent.aValue.push(0);
+            $scope.aValue.push(0);
             listenerFn.reset();
 
             child.$digest();
@@ -1017,36 +1009,33 @@ describe('Scope', () => {
 
         it('should be able to shadow parent property', () => {
 
-            const parent = new Scope();
-            const child = parent.$new();
+            const child = $scope.$new();
 
-            parent.name = 'John';
+            $scope.name = 'John';
             child.name = 'Doe';
 
             expect(child.name).equals('Doe');
-            expect(parent.name).equals('John');
+            expect($scope.name).equals('John');
 
         });
 
         it('should not shadow members of parent property', () => {
 
-            const parent = new Scope();
-            const child = parent.$new();
+            const child = $scope.$new();
 
-            parent.user = {name: 'John'};
+            $scope.user = {name: 'John'};
             child.user.name = 'Doe';
 
             expect(child.user.name).equals('Doe');
-            expect(parent.user.name).equals('Doe');
+            expect($scope.user.name).equals('Doe');
 
         });
 
         it('should not $digest its parent(s)', () => {
 
-            const parent = new Scope();
-            const child = parent.$new();
+            const child = $scope.$new();
 
-            parent.$watch(
+            $scope.$watch(
                 watchFn,
                 (newValue, oldValue, scope) => scope.aValue = newValue
             );
