@@ -896,4 +896,109 @@ describe('Scope', () => {
 
     });
 
+    describe('$new', () => {
+
+        it('should return a child with parent properties', () => {
+
+            const parent = new Scope();
+
+            parent.aValue = [1, 2];
+
+            const child = parent.$new();
+
+            expect(child.aValue).equals([1, 2]);
+
+        });
+
+        it('should not allow child to put properties on parent', () => {
+
+            const parent = new Scope();
+            const child = parent.$new();
+
+            child.aValue = [1, 2];
+
+            expect(parent.aValue).undefined();
+
+        });
+
+        it('should allow new parent properties to reflect in child', () => {
+
+            const parent = new Scope();
+            const child = parent.$new();
+
+            parent.aValue = [1, 2];
+
+            expect(child.aValue).equals([1, 2]);
+
+        });
+
+        it('should allow child to manipulate parent', () => {
+
+            const parent = new Scope();
+
+            parent.aValue = [1, 2];
+
+            const child = parent.$new();
+
+            child.aValue.push(0);
+
+            expect(child.aValue).equals([1, 2, 0]);
+            expect(parent.aValue).equals([1, 2, 0]);
+
+        });
+
+        it('should allow child to watch parent property', () => {
+
+            const parent = new Scope();
+            const child = parent.$new();
+
+            parent.aValue = [1, 2];
+
+            child.$watch(
+                () => parent.aValue,
+                listenerFn,
+                true
+            );
+
+            child.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+            parent.aValue.push(0);
+            listenerFn.reset();
+
+            child.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+        });
+
+        it('should allow nesting to any depth without affecting siblings', () => {
+
+            const a = new Scope();
+
+            const aa = a.$new();
+            const aaa = aa.$new();
+            const aab = aa.$new();
+
+            const ab = a.$new();
+            const abb = ab.$new();
+
+            a.aValue = 1;
+
+            expect(aa.aValue).equals(1);
+            expect(aaa.aValue).equals(1);
+            expect(aab.aValue).equals(1);
+
+            expect(ab.aValue).equals(1);
+            expect(abb.aValue).equals(1);
+
+            ab.bValue = 2;
+
+            expect(abb.bValue).equals(2);
+            expect(aa.bValue).undefined();
+            expect(aaa.bValue).undefined();
+
+        });
+
+    });
+
 });

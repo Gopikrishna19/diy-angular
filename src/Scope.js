@@ -298,6 +298,24 @@ export default class Scope {
 
     }
 
+    $new() {
+
+        class ChildScope extends Scope {
+
+            constructor() {
+
+                super();
+
+            }
+
+        }
+
+        ChildScope.prototype = this;
+
+        return new ChildScope();
+
+    }
+
     $watch(watchFn, listenerFn = (() => {}), compareValues = false) {
 
         const watcher = {
