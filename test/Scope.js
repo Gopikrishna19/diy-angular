@@ -896,9 +896,9 @@ describe('Scope', () => {
 
     });
 
-    describe('$new', () => {
+    describe('child', () => {
 
-        it('should return a child with parent properties', () => {
+        it('should be constructed with parent properties', () => {
 
             const parent = new Scope();
 
@@ -910,7 +910,7 @@ describe('Scope', () => {
 
         });
 
-        it('should not allow child to put properties on parent', () => {
+        it('should be able to put properties on parent', () => {
 
             const parent = new Scope();
             const child = parent.$new();
@@ -921,7 +921,7 @@ describe('Scope', () => {
 
         });
 
-        it('should allow new parent properties to reflect in child', () => {
+        it('should reflect new parent properties', () => {
 
             const parent = new Scope();
             const child = parent.$new();
@@ -932,7 +932,7 @@ describe('Scope', () => {
 
         });
 
-        it('should allow child to manipulate parent', () => {
+        it('should be able to manipulate parent', () => {
 
             const parent = new Scope();
 
@@ -947,7 +947,7 @@ describe('Scope', () => {
 
         });
 
-        it('should allow child to watch parent property', () => {
+        it('should be able to watch parent property', () => {
 
             const parent = new Scope();
             const child = parent.$new();
@@ -971,7 +971,7 @@ describe('Scope', () => {
 
         });
 
-        it('should allow nesting to any depth without affecting siblings', () => {
+        it('should nest to any depth without affecting siblings', () => {
 
             const a = new Scope();
 
@@ -999,7 +999,7 @@ describe('Scope', () => {
 
         });
 
-        it('should allow child to shadow parent property', () => {
+        it('should be able to shadow parent property', () => {
 
             const parent = new Scope();
             const child = parent.$new();
