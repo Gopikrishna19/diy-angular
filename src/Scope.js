@@ -332,6 +332,14 @@ export default class Scope {
         let firstRun = true,
             scheduleToTellListener = false;
 
+        if (!watchFns.length) {
+
+            this.$evalAsync(() => listenerFn(newValues, newValues, this));
+
+            return;
+
+        }
+
         const tellListener = () => {
 
             listenerFn(newValues, firstRun ? newValues : oldValues, this);

@@ -854,6 +854,16 @@ describe('Scope', () => {
 
         });
 
+        it('should call the listener function once when the group is empty', () => {
+
+            $scope.$watchGroup([], listenerFn);
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+            sinon.assert.calledWithExactly(listenerFn, [], [], $scope);
+
+        });
+
     });
 
 });
