@@ -20,6 +20,8 @@ function initialize($scope) {
     $$lastDirtyWatch.set($scope.$root, null);
     $$watchers.set($scope, []);
 
+    Scope.$$clearPhase($scope);
+
 }
 
 export default class Scope {
@@ -223,8 +225,6 @@ export default class Scope {
 
         initialize(this);
 
-        Scope.$$clearPhase(this);
-
     }
 
     $apply(...args) {
@@ -325,23 +325,24 @@ export default class Scope {
 
     }
 
-    $new() {
+    $new(isolated = false) {
 
-        class ChildScope {
+        let $child;
 
-            constructor() {
+        if (isolated) {
 
-                initialize(this);
+            $child = new Scope();
 
-                Scope.$$clearPhase(this);
+        } else {
 
-            }
+            class ChildScope {}
+
+            ChildScope.prototype = this;
+            $child = new ChildScope();
+
+            initialize($child);
 
         }
-
-        ChildScope.prototype = this;
-
-        const $child = new ChildScope();
 
         $$children.get(this).push($child);
 

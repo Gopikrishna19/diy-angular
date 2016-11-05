@@ -239,6 +239,21 @@ describe('Scope', () => {
 
         });
 
+        it('should $digest its isolated children', () => {
+
+            const child = $scope.$new(true);
+
+            $scope.aValue = 'abc';
+            child.$watch(
+                watchFn.returns($scope.aValue),
+                (newValue, oldValue, scope) => scope.aValueWas = newValue
+            );
+
+            $scope.$digest();
+            expect(child.aValueWas).equals('abc');
+
+        });
+
         describe('quirks', () => {
 
             it('should watch for the values with NaN', () => {
@@ -946,7 +961,7 @@ describe('Scope', () => {
 
     });
 
-    describe('child', () => {
+    describe('child scope', () => {
 
         it('should be constructed with parent properties', () => {
 
@@ -1077,6 +1092,36 @@ describe('Scope', () => {
 
             child.$digest();
             expect(child.aValue).undefined();
+
+        });
+
+    });
+
+    describe('isolated scope', () => {
+
+        it('should be constructed without parent properties', () => {
+
+            $scope.aValue = 'abc';
+
+            const child = $scope.$new(true);
+
+            expect(child.aValue).undefined();
+
+        });
+
+        it('should not be able to watch parent attributes', () => {
+
+            const child = $scope.$new(true);
+
+            $scope.aValue = 'abc';
+
+            child.$watch(
+                $child => $child.aValue,
+                (newValue, oldValue, scope) => scope.aValueWas = newValue
+            );
+
+            child.$digest();
+            expect(child.aValueWas).undefined();
 
         });
 
