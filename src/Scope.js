@@ -17,7 +17,7 @@ function initialize($scope) {
     $$applyAsyncQueue.set($scope, []);
     $$children.set($scope, []);
     $$evalAsyncQueue.set($scope, []);
-    $$lastDirtyWatch.set($scope, null);
+    $$lastDirtyWatch.set($scope.$root, null);
     $$watchers.set($scope, []);
 
 }
@@ -79,7 +79,7 @@ export default class Scope {
 
                     if (!Scope.$$areEqual(newValue, oldValue, compareValues)) {
 
-                        $$lastDirtyWatch.set($scope, watcher);
+                        $$lastDirtyWatch.set($scope.$root, watcher);
 
                         watcher.last = Scope.copyValue(newValue, compareValues);
                         watcher.listenerFn(
@@ -90,7 +90,7 @@ export default class Scope {
 
                         dirty = true;
 
-                    } else if ($$lastDirtyWatch.get($scope) === watcher) {
+                    } else if ($$lastDirtyWatch.get($scope.$root) === watcher) {
 
                         continueDigest = false;
 
@@ -305,7 +305,7 @@ export default class Scope {
 
         Scope.$$beginPhase(this, '$digest');
 
-        $$lastDirtyWatch.set(this, null);
+        $$lastDirtyWatch.set(this.$root, null);
 
         Scope.$$flushApplyAsync(this);
 
@@ -359,7 +359,7 @@ export default class Scope {
         };
 
         $$watchers.get(this).unshift(watcher);
-        $$lastDirtyWatch.set(this, null);
+        $$lastDirtyWatch.set(this.$root, null);
 
         return () => {
 
@@ -368,7 +368,7 @@ export default class Scope {
             if (index >= 0) {
 
                 $$watchers.get(this).splice(index, 1);
-                $$lastDirtyWatch.set(this, null);
+                $$lastDirtyWatch.set(this.$root, null);
 
             }
 
