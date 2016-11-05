@@ -713,6 +713,21 @@ describe('Scope', () => {
 
         });
 
+        it('should evaluate given async functions on isolated children', done => {
+
+            const child = $scope.$new(true);
+
+            child.$evalAsync(listenerFn);
+
+            setTimeout(() => {
+
+                sinon.assert.calledOnce(listenerFn);
+                done();
+
+            }, delay);
+
+        });
+
         describe('exceptions', () => {
 
             it('should log the error and continue evaluating', done => {

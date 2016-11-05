@@ -333,6 +333,7 @@ export default class Scope {
 
             $child = new Scope();
             $child.$root = this.$root;
+            $$evalAsyncQueue.set($child, $$evalAsyncQueue.get(this));
 
         } else {
 
