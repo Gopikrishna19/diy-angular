@@ -224,6 +224,22 @@ describe('Scope', () => {
 
         });
 
+        it('should $digest its children', () => {
+
+            const parent = new Scope();
+            const child = parent.$new();
+
+            parent.aValue = 'abc';
+            child.$watch(
+                watchFn.returns(parent.aValue),
+                (newValue, oldValue, scope) => scope.aValueWas = newValue
+            );
+
+            parent.$digest();
+            expect(child.aValueWas).equals('abc');
+
+        });
+
         describe('quirks', () => {
 
             it('should watch for the values with NaN', () => {

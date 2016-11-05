@@ -4,6 +4,7 @@ import {log} from './logger';
 
 const $$applyAsyncId = new WeakMap();
 const $$applyAsyncQueue = new WeakMap();
+const $$children = new WeakMap();
 const $$evalAsyncQueue = new WeakMap();
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$lastDirtyWatch = new WeakMap();
@@ -44,54 +45,71 @@ export default class Scope {
 
     }
 
-    static $$digestOnce($scope) {
+    static $$digestOnce($root) {
 
-        let dirty = false;
+        let continueDigest = true,
+            dirty = false;
 
-        forEachRight($$watchers.get($scope), watcher => { // eslint-disable-line complexity
+        Scope.$$everyScope($root, $scope => {
 
-            if (!watcher) {
+            forEachRight($$watchers.get($scope), watcher => { // eslint-disable-line complexity
 
-                return true;
+                if (!watcher) {
 
-            }
-
-            try {
-
-                const {compareValues} = watcher;
-                const newValue = watcher.watchFn($scope);
-                const oldValue = watcher.last;
-
-                if (!Scope.$$areEqual(newValue, oldValue, compareValues)) {
-
-                    $$lastDirtyWatch.set($scope, watcher);
-
-                    watcher.last = Scope.copyValue(newValue, compareValues);
-                    watcher.listenerFn(
-                        newValue,
-                        Scope.getOldValue(newValue, oldValue),
-                        $scope
-                    );
-
-                    dirty = true;
-
-                } else if ($$lastDirtyWatch.get($scope) === watcher) {
-
-                    return false;
+                    return true;
 
                 }
 
-            } catch (error) {
+                try {
 
-                log('error', error);
+                    const {compareValues} = watcher;
+                    const newValue = watcher.watchFn($scope);
+                    const oldValue = watcher.last;
 
-            }
+                    if (!Scope.$$areEqual(newValue, oldValue, compareValues)) {
 
-            return true;
+                        $$lastDirtyWatch.set($scope, watcher);
+
+                        watcher.last = Scope.copyValue(newValue, compareValues);
+                        watcher.listenerFn(
+                            newValue,
+                            Scope.getOldValue(newValue, oldValue),
+                            $scope
+                        );
+
+                        dirty = true;
+
+                    } else if ($$lastDirtyWatch.get($scope) === watcher) {
+
+                        continueDigest = false;
+
+                        return false;
+
+                    }
+
+                } catch (error) {
+
+                    log('error', error);
+
+                }
+
+                return true;
+
+            });
+
+            return continueDigest;
 
         });
 
         return dirty;
+
+    }
+
+    static $$everyScope($scope, execFn) {
+
+        return execFn($scope) ? $$children.get($scope).every(
+            child => Scope.$$everyScope(child, execFn)
+        ) : false;
 
     }
 
@@ -192,6 +210,7 @@ export default class Scope {
 
         $$applyAsyncId.set(this, null);
         $$applyAsyncQueue.set(this, []);
+        $$children.set(this, []);
         $$evalAsyncQueue.set(this, []);
         $$lastDirtyWatch.set(this, null);
         $$watchers.set(this, []);
@@ -312,7 +331,11 @@ export default class Scope {
 
         ChildScope.prototype = this;
 
-        return new ChildScope();
+        const $child = new ChildScope();
+
+        $$children.get(this).push($child);
+
+        return $child;
 
     }
 
