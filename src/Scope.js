@@ -266,6 +266,52 @@ export default class Scope {
 
     }
 
+    $destroy() {
+
+        if (this.$parent) {
+
+            const siblings = $$children.get(this.$parent);
+            const index = siblings.indexOf(this);
+
+            if (index >= 0) {
+
+                siblings.splice(index, 1);
+
+            }
+
+        }
+
+        $$watchers.set(this, null);
+
+    }
+
+    $digest() {
+
+        let dirty = false,
+            iterations = 10;
+
+        Scope.$$beginPhase(this, '$digest');
+
+        $$lastDirtyWatch.set(this.$root, null);
+
+        Scope.$$flushApplyAsync(this);
+
+        do {
+
+            Scope.$$flushEvalAsync(this);
+
+            dirty = Scope.$$digestOnce(this) || $$evalAsyncQueue.get(this).length;
+
+            Scope.checkForInfiniteDigestion(this, dirty, iterations);
+
+            iterations -= 1;
+
+        } while (dirty);
+
+        Scope.$$clearPhase(this);
+
+    }
+
     $eval(evalFn, ...args) {
 
         return evalFn(this, ...args);
@@ -298,33 +344,6 @@ export default class Scope {
 
     }
 
-    $digest() {
-
-        let dirty = false,
-            iterations = 10;
-
-        Scope.$$beginPhase(this, '$digest');
-
-        $$lastDirtyWatch.set(this.$root, null);
-
-        Scope.$$flushApplyAsync(this);
-
-        do {
-
-            Scope.$$flushEvalAsync(this);
-
-            dirty = Scope.$$digestOnce(this) || $$evalAsyncQueue.get(this).length;
-
-            Scope.checkForInfiniteDigestion(this, dirty, iterations);
-
-            iterations -= 1;
-
-        } while (dirty);
-
-        Scope.$$clearPhase(this);
-
-    }
-
     $new(isolated = false, $parent = this) {
 
         let $child;
@@ -348,6 +367,8 @@ export default class Scope {
         }
 
         $$children.get($parent).push($child);
+
+        $child.$parent = $parent;
 
         return $child;
 

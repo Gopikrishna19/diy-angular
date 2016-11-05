@@ -1225,4 +1225,44 @@ describe('Scope', () => {
 
     });
 
+    describe('$destroy', () => {
+
+        it('should remove watchers', () => {
+
+            $scope.$watch(watchFn);
+
+            $scope.$destroy();
+            $scope.$digest();
+            sinon.assert.notCalled(watchFn);
+
+        });
+
+        it('should remove itself from its parent', () => {
+
+            const child = $scope.$new();
+
+            child.aValue = [1, 2];
+
+            child.$watch(
+                $child => $child.aValue,
+                listenerFn,
+                true
+            );
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+            child.aValue.push(1);
+            $scope.$digest();
+            sinon.assert.calledTwice(listenerFn);
+
+            child.$destroy();
+            child.aValue.push(0);
+            $scope.$digest();
+            sinon.assert.calledTwice(listenerFn);
+
+        });
+
+    });
+
 });
