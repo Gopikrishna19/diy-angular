@@ -501,7 +501,7 @@ describe('Scope', () => {
 
         });
 
-        it('should apply given function from root', () => {
+        it('should apply given function from $root', () => {
 
             const child = $scope.$new();
             const grandchild = child.$new();
@@ -633,6 +633,26 @@ describe('Scope', () => {
             $scope.$evalAsync(watchFn);
 
             sinon.assert.notCalled(listenerFn);
+
+            setTimeout(() => {
+
+                sinon.assert.calledOnce(listenerFn);
+                done();
+
+            }, delay);
+
+        });
+
+        it('should schedule a $digest from $root', done => {
+
+            const child = $scope.$new();
+            const grandchild = child.$new();
+
+            $scope.$watch(
+                watchFn,
+                listenerFn
+            );
+            grandchild.$evalAsync(() => {});
 
             setTimeout(() => {
 

@@ -282,7 +282,7 @@ export default class Scope {
 
                 if (asyncQueue.length) {
 
-                    this.$digest();
+                    this.$root.$digest();
 
                 }
 
