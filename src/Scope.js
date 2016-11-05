@@ -325,16 +325,16 @@ export default class Scope {
 
     }
 
-    $new(isolated = false) {
+    $new(isolated = false, $parent = this) {
 
         let $child;
 
         if (isolated) {
 
             $child = new Scope();
-            $child.$root = this.$root;
-            $$evalAsyncQueue.set($child, $$evalAsyncQueue.get(this));
-            $$applyAsyncQueue.set($child, $$applyAsyncQueue.get(this));
+            $child.$root = $parent.$root;
+            $$evalAsyncQueue.set($child, $$evalAsyncQueue.get($parent));
+            $$applyAsyncQueue.set($child, $$applyAsyncQueue.get($parent));
 
         } else {
 
@@ -347,7 +347,7 @@ export default class Scope {
 
         }
 
-        $$children.get(this).push($child);
+        $$children.get($parent).push($child);
 
         return $child;
 

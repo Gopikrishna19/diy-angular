@@ -1156,6 +1156,26 @@ describe('Scope', () => {
 
         });
 
+        it('should allow some other scope as the parent', function () {
+
+            const prototypeParent = new Scope();
+            const hierarchyParent = new Scope();
+
+            const child = prototypeParent.$new(false, hierarchyParent);
+
+            prototypeParent.aValue = 1;
+            expect(child.aValue).equals(1);
+
+            child.$watch(watchFn);
+
+            prototypeParent.$digest();
+            sinon.assert.notCalled(watchFn);
+
+            hierarchyParent.$digest();
+            sinon.assert.calledTwice(watchFn);
+
+        });
+
     });
 
     describe('isolated scope', () => {
@@ -1183,6 +1203,23 @@ describe('Scope', () => {
 
             child.$digest();
             expect(child.aValueWas).undefined();
+
+        });
+
+        it('should allow some other scope as the parent', function () {
+
+            const prototypeParent = new Scope();
+            const hierarchyParent = new Scope();
+
+            const child = prototypeParent.$new(true, hierarchyParent);
+
+            child.$watch(watchFn);
+
+            prototypeParent.$digest();
+            sinon.assert.notCalled(watchFn);
+
+            hierarchyParent.$digest();
+            sinon.assert.calledTwice(watchFn);
 
         });
 
