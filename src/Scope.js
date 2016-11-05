@@ -13,7 +13,7 @@ const $$watchers = new WeakMap();
 
 function initialize($scope) {
 
-    $$applyAsyncId.set($scope, null);
+    $$applyAsyncId.set($scope.$root, null);
     $$applyAsyncQueue.set($scope, []);
     $$children.set($scope, []);
     $$evalAsyncQueue.set($scope, []);
@@ -128,7 +128,7 @@ export default class Scope {
 
     static $$flushApplyAsync($scope) {
 
-        const applyAsyncId = $$applyAsyncId.get($scope);
+        const applyAsyncId = $$applyAsyncId.get($scope.$root);
 
         if (applyAsyncId) {
 
@@ -198,7 +198,7 @@ export default class Scope {
 
         }
 
-        $$applyAsyncId.set($scope, null);
+        $$applyAsyncId.set($scope.$root, null);
 
     }
 
@@ -251,10 +251,10 @@ export default class Scope {
 
         applyAsyncQueue.push(() => this.$eval(...args));
 
-        if ($$applyAsyncId.get(this) === null) {
+        if ($$applyAsyncId.get(this.$root) === null) {
 
             $$applyAsyncId.set(
-                this,
+                this.$root,
                 setTimeout(
                     () => this.$apply(
                         () => Scope.executeApplyQueue(this)
@@ -334,6 +334,7 @@ export default class Scope {
             $child = new Scope();
             $child.$root = this.$root;
             $$evalAsyncQueue.set($child, $$evalAsyncQueue.get(this));
+            $$applyAsyncQueue.set($child, $$applyAsyncQueue.get(this));
 
         } else {
 

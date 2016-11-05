@@ -834,6 +834,17 @@ describe('Scope', () => {
 
         });
 
+        it('should apply async function in isolated children', () => {
+
+            const child = $scope.$new(true);
+
+            $scope.$applyAsync(listenerFn);
+
+            child.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+        });
+
         describe('exceptions', () => {
 
             it('should log the error and continue applying functions', done => {
