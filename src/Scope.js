@@ -325,14 +325,15 @@ export default class Scope {
 
     }
 
-    $watchGroup(watchFns, listenerFn) {
+    $watchGroup(array, listenerFn) {
 
-        const newValues = new Array(watchFns.length);
-        const oldValues = new Array(watchFns.length);
-        let firstRun = true,
+        const newValues = new Array(array.length);
+        const oldValues = new Array(array.length);
+        let destroyer,
+            firstRun = true,
             scheduleToTellListener = false;
 
-        if (!watchFns.length) {
+        if (!array.length) {
 
             let destroyed = false;
 
@@ -346,39 +347,43 @@ export default class Scope {
 
             });
 
-            return () => destroyed = true;
+            destroyer = () => destroyed = true;
+
+        } else {
+
+            const tellListener = () => {
+
+                listenerFn(newValues, firstRun ? newValues : oldValues, this);
+
+                firstRun = false;
+                scheduleToTellListener = false;
+
+            };
+
+            const destroyers = array.map(
+                (watchFn, index) => this.$watch(
+                    watchFn,
+                    (newValue, oldValue) => {
+
+                        newValues[index] = newValue;
+                        oldValues[index] = oldValue;
+
+                        if (!scheduleToTellListener) {
+
+                            scheduleToTellListener = true;
+                            this.$evalAsync(tellListener);
+
+                        }
+
+                    }
+                )
+            );
+
+            destroyer = () => destroyers.forEach(destroy => destroy());
 
         }
 
-        const tellListener = () => {
-
-            listenerFn(newValues, firstRun ? newValues : oldValues, this);
-
-            firstRun = false;
-            scheduleToTellListener = false;
-
-        };
-
-        const destroyers = watchFns.map(
-            (watchFn, index) => this.$watch(
-                watchFn,
-                (newValue, oldValue) => {
-
-                    newValues[index] = newValue;
-                    oldValues[index] = oldValue;
-
-                    if (!scheduleToTellListener) {
-
-                        scheduleToTellListener = true;
-                        this.$evalAsync(tellListener);
-
-                    }
-
-                }
-            )
-        );
-
-        return () => destroyers.forEach(destroy => destroy());
+        return destroyer;
 
     }
 
