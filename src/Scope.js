@@ -21,8 +21,8 @@ export default class Scope {
     static $$areEqual(newValue, oldValue, compareValues) {
 
         return compareValues ?
-               isEqual(newValue, oldValue) :
-               newValue === oldValue || Scope.testNaN(newValue, oldValue);
+            isEqual(newValue, oldValue) :
+        newValue === oldValue || Scope.testNaN(newValue, oldValue);
 
     }
 
@@ -322,6 +322,41 @@ export default class Scope {
             }
 
         };
+
+    }
+
+    $watchGroup(watchFns, listenerFn) {
+
+        const newValues = new Array(watchFns.length);
+        const oldValues = new Array(watchFns.length);
+        let scheduleToTellListener = false;
+
+        const tellListener = () => {
+
+            listenerFn(newValues, oldValues, this);
+
+            scheduleToTellListener = false;
+
+        };
+
+        watchFns.forEach(
+            (watchFn, index) => this.$watch(
+                watchFn,
+                (newValue, oldValue) => {
+
+                    newValues[index] = newValue;
+                    oldValues[index] = oldValue;
+
+                    if (!scheduleToTellListener) {
+
+                        scheduleToTellListener = true;
+                        this.$evalAsync(tellListener);
+
+                    }
+
+                }
+            )
+        );
 
     }
 

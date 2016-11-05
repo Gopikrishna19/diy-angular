@@ -787,4 +787,24 @@ describe('Scope', () => {
 
     });
 
+    describe('$watchGroup', () => {
+
+        it('should take array of watch functions and call listener function once for all changes', () => {
+
+            $scope.$watchGroup(
+                [
+                    () => 1,
+                    () => 2
+                ],
+                listenerFn
+            );
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+            sinon.assert.calledWithExactly(listenerFn, [1, 2], [1, 2], $scope);
+
+        });
+
+    });
+
 });
