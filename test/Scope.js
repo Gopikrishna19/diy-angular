@@ -854,16 +854,6 @@ describe('Scope', () => {
 
         });
 
-        it('should call the listener function once when the group is empty', () => {
-
-            $scope.$watchGroup([], listenerFn);
-
-            $scope.$digest();
-            sinon.assert.calledOnce(listenerFn);
-            sinon.assert.calledWithExactly(listenerFn, [], [], $scope);
-
-        });
-
         it('should be able to be destroyed on calling the return function', () => {
 
             const destroy = $scope.$watchGroup([() => $scope.aValue], listenerFn);
@@ -876,6 +866,31 @@ describe('Scope', () => {
 
             $scope.$digest();
             sinon.assert.calledOnce(listenerFn);
+
+        });
+
+        describe('quirks', () => {
+
+            it('should call the listener function once when the group is empty', () => {
+
+                $scope.$watchGroup([], listenerFn);
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, [], [], $scope);
+
+            });
+
+            it('should not call listener of empty group when destroyed first', () => {
+
+                const destroy = $scope.$watchGroup([], listenerFn);
+
+                destroy();
+
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
 
         });
 

@@ -334,9 +334,19 @@ export default class Scope {
 
         if (!watchFns.length) {
 
-            this.$evalAsync(() => listenerFn(newValues, newValues, this));
+            let destroyed = false;
 
-            return () => {};
+            this.$evalAsync(() => {
+
+                if (!destroyed) {
+
+                    listenerFn(newValues, newValues, this);
+
+                }
+
+            });
+
+            return () => destroyed = true;
 
         }
 
