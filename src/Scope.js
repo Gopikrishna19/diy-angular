@@ -336,7 +336,7 @@ export default class Scope {
 
             this.$evalAsync(() => listenerFn(newValues, newValues, this));
 
-            return;
+            return () => {};
 
         }
 
@@ -349,7 +349,7 @@ export default class Scope {
 
         };
 
-        watchFns.forEach(
+        const destroyers = watchFns.map(
             (watchFn, index) => this.$watch(
                 watchFn,
                 (newValue, oldValue) => {
@@ -367,6 +367,8 @@ export default class Scope {
                 }
             )
         );
+
+        return () => destroyers.forEach(destroy => destroy());
 
     }
 

@@ -864,6 +864,21 @@ describe('Scope', () => {
 
         });
 
+        it('should be able to be destroyed on calling the return function', () => {
+
+            const destroy = $scope.$watchGroup([() => $scope.aValue], listenerFn);
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+            $scope.aValue = 1;
+            destroy();
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+        });
+
     });
 
 });
