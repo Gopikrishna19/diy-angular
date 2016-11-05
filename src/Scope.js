@@ -329,12 +329,14 @@ export default class Scope {
 
         const newValues = new Array(watchFns.length);
         const oldValues = new Array(watchFns.length);
-        let scheduleToTellListener = false;
+        let firstRun = true,
+            scheduleToTellListener = false;
 
         const tellListener = () => {
 
-            listenerFn(newValues, oldValues, this);
+            listenerFn(newValues, firstRun ? newValues : oldValues, this);
 
+            firstRun = false;
             scheduleToTellListener = false;
 
         };

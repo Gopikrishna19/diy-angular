@@ -805,6 +805,55 @@ describe('Scope', () => {
 
         });
 
+        it('should call the listener function with new and old values', () => {
+
+            const three = 3;
+
+            $scope.aValue = 1;
+            $scope.$watchGroup(
+                [
+                    () => $scope.aValue,
+                    () => 2
+                ],
+                listenerFn
+            );
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+            sinon.assert.calledWithExactly(listenerFn, [1, 2], [1, 2], $scope);
+
+            listenerFn.reset();
+            $scope.aValue = three;
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+            sinon.assert.calledWithExactly(listenerFn, [three, 2], [1, 2], $scope);
+
+        });
+
+        it('should call the listener function with new values as old values the first time', () => {
+
+            let newValuesList = null,
+                oldValuesList = null;
+
+            $scope.$watchGroup(
+                [
+                    () => 1,
+                    () => 2
+                ],
+                (newValues, oldValues) => {
+
+                    newValuesList = newValues;
+                    oldValuesList = oldValues;
+
+                }
+            );
+
+            $scope.$digest();
+            expect(newValuesList).shallow.equals(oldValuesList);
+
+        });
+
     });
 
 });
