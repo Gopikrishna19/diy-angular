@@ -999,6 +999,19 @@ describe('Scope', () => {
 
         });
 
+        it('should allow child to shadow parent property', () => {
+
+            const parent = new Scope();
+            const child = parent.$new();
+
+            parent.name = 'John';
+            child.name = 'Doe';
+
+            expect(child.name).equals('Doe');
+            expect(parent.name).equals('John');
+
+        });
+
     });
 
 });
