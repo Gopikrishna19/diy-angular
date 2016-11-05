@@ -501,6 +501,21 @@ describe('Scope', () => {
 
         });
 
+        it('should apply given function from root', () => {
+
+            const child = $scope.$new();
+            const grandchild = child.$new();
+
+            $scope.$watch(
+                watchFn,
+                listenerFn
+            );
+
+            grandchild.$apply(() => {});
+            sinon.assert.calledOnce(listenerFn);
+
+        });
+
     });
 
     describe('$evalAsync', () => {

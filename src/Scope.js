@@ -11,6 +11,17 @@ const $$lastDirtyWatch = new WeakMap();
 const $$phase = new WeakMap();
 const $$watchers = new WeakMap();
 
+function initialize($scope) {
+
+    $$applyAsyncId.set($scope, null);
+    $$applyAsyncQueue.set($scope, []);
+    $$children.set($scope, []);
+    $$evalAsyncQueue.set($scope, []);
+    $$lastDirtyWatch.set($scope, null);
+    $$watchers.set($scope, []);
+
+}
+
 export default class Scope {
 
     get $$phase() {
@@ -208,12 +219,9 @@ export default class Scope {
 
     constructor() {
 
-        $$applyAsyncId.set(this, null);
-        $$applyAsyncQueue.set(this, []);
-        $$children.set(this, []);
-        $$evalAsyncQueue.set(this, []);
-        $$lastDirtyWatch.set(this, null);
-        $$watchers.set(this, []);
+        this.$root = this;
+
+        initialize(this);
 
         Scope.$$clearPhase(this);
 
@@ -231,7 +239,7 @@ export default class Scope {
 
             Scope.$$clearPhase(this);
 
-            this.$digest();
+            this.$root.$digest();
 
         }
 
@@ -319,11 +327,13 @@ export default class Scope {
 
     $new() {
 
-        class ChildScope extends Scope {
+        class ChildScope {
 
             constructor() {
 
-                super();
+                initialize(this);
+
+                Scope.$$clearPhase(this);
 
             }
 
