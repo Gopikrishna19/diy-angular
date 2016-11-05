@@ -1012,6 +1012,19 @@ describe('Scope', () => {
 
         });
 
+        it('should not shadow members of parent property', () => {
+
+            const parent = new Scope();
+            const child = parent.$new();
+
+            parent.user = {name: 'John'};
+            child.user.name = 'Doe';
+
+            expect(child.user.name).equals('Doe');
+            expect(parent.user.name).equals('Doe');
+
+        });
+
     });
 
 });
