@@ -531,6 +531,21 @@ describe('Scope', () => {
 
         });
 
+        it('should apply given function from isolated $root', () => {
+
+            const child = $scope.$new(true);
+            const grandchild = child.$new();
+
+            $scope.$watch(
+                watchFn,
+                listenerFn
+            );
+
+            grandchild.$apply(() => {});
+            sinon.assert.calledOnce(listenerFn);
+
+        });
+
     });
 
     describe('$evalAsync', () => {
@@ -661,6 +676,26 @@ describe('Scope', () => {
         it('should schedule a $digest from $root', done => {
 
             const child = $scope.$new();
+            const grandchild = child.$new();
+
+            $scope.$watch(
+                watchFn,
+                listenerFn
+            );
+            grandchild.$evalAsync(() => {});
+
+            setTimeout(() => {
+
+                sinon.assert.calledOnce(listenerFn);
+                done();
+
+            }, delay);
+
+        });
+
+        it('should schedule a $digest from isolated $root', done => {
+
+            const child = $scope.$new(true);
             const grandchild = child.$new();
 
             $scope.$watch(
@@ -1006,7 +1041,7 @@ describe('Scope', () => {
 
         });
 
-        it('should be able to watch parent property', () => {
+        it('should be able to watch parent properties', () => {
 
             const child = $scope.$new();
 
@@ -1057,7 +1092,7 @@ describe('Scope', () => {
 
         });
 
-        it('should be able to shadow parent property', () => {
+        it('should be able to shadow parent properties', () => {
 
             const child = $scope.$new();
 
@@ -1069,7 +1104,7 @@ describe('Scope', () => {
 
         });
 
-        it('should not shadow members of parent property', () => {
+        it('should not shadow members of parent properties', () => {
 
             const child = $scope.$new();
 
@@ -1109,7 +1144,7 @@ describe('Scope', () => {
 
         });
 
-        it('should not be able to watch parent attributes', () => {
+        it('should not be able to watch parent properties', () => {
 
             const child = $scope.$new(true);
 

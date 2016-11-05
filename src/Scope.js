@@ -332,6 +332,7 @@ export default class Scope {
         if (isolated) {
 
             $child = new Scope();
+            $child.$root = this.$root;
 
         } else {
 
