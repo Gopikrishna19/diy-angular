@@ -1025,6 +1025,21 @@ describe('Scope', () => {
 
         });
 
+        it('should not $digest its parent(s)', () => {
+
+            const parent = new Scope();
+            const child = parent.$new();
+
+            parent.$watch(
+                watchFn,
+                (newValue, oldValue, scope) => scope.aValue = newValue
+            );
+
+            child.$digest();
+            expect(child.aValue).undefined();
+
+        });
+
     });
 
 });
