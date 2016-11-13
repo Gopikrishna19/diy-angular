@@ -1693,58 +1693,39 @@ describe('Scope', () => {
 
     describe('events', () => {
 
-        it('should call the listeners on $emit', () => {
+        ['$emit', '$broadcast'].forEach(method => {
 
-            const listenerFn2 = sandbox.stub();
-            const listenerFn3 = sandbox.stub();
+            it(`should call the listeners on ${method}`, () => {
 
-            $scope.$on('someEvent', listenerFn);
-            $scope.$on('someEvent', listenerFn2);
+                const listenerFn2 = sandbox.stub();
+                const listenerFn3 = sandbox.stub();
 
-            $scope.$on('someOtherEvent', listenerFn3);
+                $scope.$on('someEvent', listenerFn);
+                $scope.$on('someEvent', listenerFn2);
 
-            $scope.$emit('someEvent', 1, 2);
+                $scope.$on('someOtherEvent', listenerFn3);
 
-            sinon.assert.calledOnce(listenerFn);
-            sinon.assert.calledWithExactly(listenerFn, 1, 2);
+                $scope[method]('someEvent');
 
-            sinon.assert.calledOnce(listenerFn2);
-            sinon.assert.calledWithExactly(listenerFn2, 1, 2);
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn);
 
-            sinon.assert.notCalled(listenerFn3);
+                sinon.assert.calledOnce(listenerFn2);
+                sinon.assert.calledWithExactly(listenerFn2);
 
-        });
+                sinon.assert.notCalled(listenerFn3);
 
-        it('should call the listeners on $broadcast', () => {
+            });
 
-            const listenerFn2 = sandbox.stub();
-            const listenerFn3 = sandbox.stub();
+            it('should only call the listeners matching the event name', () => {
 
-            $scope.$on('someEvent', listenerFn);
-            $scope.$on('someEvent', listenerFn2);
+                $scope.$on('someEvent', listenerFn);
 
-            $scope.$on('someOtherEvent', listenerFn3);
+                $scope[method]('someOtherEvent');
 
-            $scope.$broadcast('someEvent', 1, 2);
+                sinon.assert.notCalled(listenerFn);
 
-            sinon.assert.calledOnce(listenerFn);
-            sinon.assert.calledWithExactly(listenerFn, 1, 2);
-
-            sinon.assert.calledOnce(listenerFn2);
-            sinon.assert.calledWithExactly(listenerFn2, 1, 2);
-
-            sinon.assert.notCalled(listenerFn3);
-
-        });
-
-        it('should only call the listeners matching the event name', () => {
-
-            $scope.$on('someEvent', listenerFn);
-
-            $scope.$broadcast('someOtherEvent');
-            $scope.$emit('someOtherEvent');
-
-            sinon.assert.notCalled(listenerFn);
+            });
 
         });
 

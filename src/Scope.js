@@ -128,6 +128,12 @@ export default class Scope {
 
     }
 
+    static $$fireEvent($scope, event, args) {
+
+        ($$listeners.get($scope)[event] || []).forEach(listener => listener(...args));
+
+    }
+
     static $$flushApplyAsync($scope) {
 
         const applyAsyncId = $$applyAsyncId.get($scope.$root);
@@ -283,7 +289,7 @@ export default class Scope {
 
     $broadcast(event, ...args) {
 
-        ($$listeners.get(this)[event] || []).forEach(listener => listener(...args));
+        Scope.$$fireEvent(this, event, args);
 
     }
 
@@ -335,7 +341,7 @@ export default class Scope {
 
     $emit(event, ...args) {
 
-        ($$listeners.get(this)[event] || []).forEach(listener => listener(...args));
+        Scope.$$fireEvent(this, event, args);
 
     }
 
