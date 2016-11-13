@@ -358,11 +358,18 @@ export default class Scope {
 
     $emit(event, ...args) {
 
+        let $scope = this,
+            isPropagationStopped;
+
         const $event = {
             name: event,
+            stopPropagation() {
+
+                isPropagationStopped = true;
+
+            },
             targetScope: this
         };
-        let $scope = this;
 
         do {
 
@@ -372,7 +379,7 @@ export default class Scope {
 
             $scope = $scope.$parent;
 
-        } while ($scope);
+        } while ($scope && !isPropagationStopped);
 
         delete $event.currentScope;
 

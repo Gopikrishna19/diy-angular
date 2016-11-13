@@ -1847,6 +1847,25 @@ describe('Scope', () => {
 
             });
 
+            it('should allow stopping event propagation to parent', () => {
+
+                const child = $scope.$new();
+                const childListenerFn = sandbox.spy(ev => ev.stopPropagation());
+                const childListenerFn1 = sandbox.stub();
+
+                $scope.$on(eventName, listenerFn);
+                child.$on(eventName, childListenerFn);
+                child.$on(eventName, childListenerFn1);
+
+                child.$emit(eventName);
+
+                sinon.assert.calledOnce(childListenerFn);
+                sinon.assert.calledOnce(childListenerFn1);
+
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
         });
 
         describe('$broadcast', () => {
