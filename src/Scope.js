@@ -128,15 +128,9 @@ export default class Scope {
 
     }
 
-    static $$fireEvent($scope, event, args) {
-
-        const $event = {
-            name: event
-        };
+    static $$fireEvent($scope, $event, event, args) {
 
         forEachRight(($$listeners.get($scope)[event] || []), listener => listener($event, ...args));
-
-        return $event;
 
     }
 
@@ -295,7 +289,13 @@ export default class Scope {
 
     $broadcast(event, ...args) {
 
-        return Scope.$$fireEvent(this, event, args);
+        const $event = {
+            name: event
+        };
+
+        Scope.$$fireEvent(this, $event, event, args);
+
+        return $event;
 
     }
 
@@ -347,7 +347,20 @@ export default class Scope {
 
     $emit(event, ...args) {
 
-        return Scope.$$fireEvent(this, event, args);
+        const $event = {
+            name: event
+        };
+        let $scope = this;
+
+        do {
+
+            Scope.$$fireEvent($scope, $event, event, args);
+
+            $scope = $scope.$parent;
+
+        } while ($scope);
+
+        return $event;
 
     }
 
