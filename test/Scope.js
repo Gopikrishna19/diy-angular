@@ -1024,7 +1024,7 @@ describe('Scope', () => {
 
     describe('$watchCollection', () => {
 
-        describe('when watching primitive values', () => {
+        describe('watching primitive values', () => {
 
             it('should fall back to $watch', () => {
 
@@ -1065,7 +1065,7 @@ describe('Scope', () => {
 
             });
 
-            it('should detect type changing to an array', () => {
+            it('should detect becoming an array', () => {
 
                 $scope.$watchCollection(
                     () => $scope.array,
@@ -1086,7 +1086,7 @@ describe('Scope', () => {
 
             });
 
-            it('should detect type changing to an object', () => {
+            it('should detect becoming an object', () => {
 
                 $scope.$watchCollection(
                     () => $scope.object,
@@ -1151,7 +1151,7 @@ describe('Scope', () => {
 
         });
 
-        describe('when watching arrays', () => {
+        describe('watching arrays', () => {
 
             it('should detect adding or removing values', () => {
 
@@ -1237,7 +1237,7 @@ describe('Scope', () => {
 
         });
 
-        describe('when watching array like objects', () => {
+        describe('watching array like objects', () => {
 
             it('should detect changed values', () => {
 
@@ -1293,7 +1293,7 @@ describe('Scope', () => {
 
         });
 
-        describe('when watching objects', () => {
+        describe('watching objects', () => {
 
             it('should detect adding or changing or removing properties', () => {
 
