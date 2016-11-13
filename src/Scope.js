@@ -296,19 +296,15 @@ export default class Scope {
 
         Scope.$$everyScope(this, $scope => {
 
-            Scope.$$fireEvent(
-                $scope,
-                {
-                    ...$event,
-                    currentScope: $scope
-                },
-                event,
-                args
-            );
+            $event.currentScope = $scope;
+
+            Scope.$$fireEvent($scope, $event, event, args);
 
             return true;
 
         });
+
+        delete $event.currentScope;
 
         return $event;
 
@@ -370,19 +366,15 @@ export default class Scope {
 
         do {
 
-            Scope.$$fireEvent(
-                $scope,
-                {
-                    ...$event,
-                    currentScope: $scope
-                },
-                event,
-                args
-            );
+            $event.currentScope = $scope;
+
+            Scope.$$fireEvent($scope, $event, event, args);
 
             $scope = $scope.$parent;
 
         } while ($scope);
+
+        delete $event.currentScope;
 
         return $event;
 

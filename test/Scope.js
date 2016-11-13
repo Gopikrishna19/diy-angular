@@ -1693,18 +1693,11 @@ describe('Scope', () => {
 
     describe('event', () => {
 
-        const event = 'someEvent';
-        const otherEvent = 'someOtherEvent';
+        const eventName = 'someEvent';
+        const otherEventName = 'someOtherEvent';
         let $event;
 
-        beforeEach(() => {
-
-            $event = {
-                name: event,
-                targetScope: $scope
-            };
-
-        });
+        afterEach(() => $event = null);
 
         ['$emit', '$broadcast'].forEach(method => {
 
@@ -1715,12 +1708,12 @@ describe('Scope', () => {
                     const listenerFn2 = sandbox.stub();
                     const listenerFn3 = sandbox.stub();
 
-                    $scope.$on(event, listenerFn);
-                    $scope.$on(event, listenerFn2);
+                    $scope.$on(eventName, listenerFn);
+                    $scope.$on(eventName, listenerFn2);
 
-                    $scope.$on(otherEvent, listenerFn3);
+                    $scope.$on(otherEventName, listenerFn3);
 
-                    $scope[method](event);
+                    $scope[method](eventName);
 
                     sinon.assert.calledOnce(listenerFn);
                     sinon.assert.calledOnce(listenerFn2);
@@ -1731,9 +1724,9 @@ describe('Scope', () => {
 
                 it('should only call the listeners matching the event name', () => {
 
-                    $scope.$on(event, listenerFn);
+                    $scope.$on(eventName, listenerFn);
 
-                    $scope[method](otherEvent);
+                    $scope[method](otherEventName);
 
                     sinon.assert.notCalled(listenerFn);
 
@@ -1741,48 +1734,49 @@ describe('Scope', () => {
 
                 it('should pass event object to the listeners', () => {
 
-                    $scope.$on(event, listenerFn);
+                    $scope.$on(eventName, listenerFn = sandbox.spy(event => $event = event));
 
-                    $scope[method](event);
+                    $scope[method](eventName);
 
-                    $event.currentScope = $scope;
                     sinon.assert.calledOnce(listenerFn);
-                    sinon.assert.calledWithExactly(listenerFn, $event);
+                    expect($event.name).equals(eventName);
+                    expect($event.targetScope).equals($scope);
+                    expect($event.currentScope).not.exist();
 
                 });
 
                 it('should pass on additional arguments', () => {
 
-                    $scope.$on(event, listenerFn);
+                    $scope.$on(eventName, listenerFn);
 
-                    $scope[method](event, 1, 2);
+                    $scope[method](eventName, 1, 2);
 
-                    $event.currentScope = $scope;
                     sinon.assert.calledOnce(listenerFn);
-                    sinon.assert.calledWithExactly(listenerFn, $event, 1, 2);
+                    sinon.assert.calledWithExactly(listenerFn, sandbox.match.any, 1, 2);
 
                 });
 
                 it('should return an $event object', () => {
 
-                    $scope.$on(event, listenerFn);
+                    $scope.$on(eventName, listenerFn);
 
-                    const eventObj = $scope[method](event);
+                    $event = $scope[method](eventName);
 
-                    expect(eventObj).equals($event);
+                    expect($event.name).equals(eventName);
+                    expect($event.targetScope).equals($scope);
 
                 });
 
                 it('should not call unregistered listeners', () => {
 
                     const listenerFn2 = sandbox.stub();
-                    const unhook = $scope.$on(event, listenerFn);
+                    const unhook = $scope.$on(eventName, listenerFn);
 
-                    $scope.$on(event, listenerFn2);
+                    $scope.$on(eventName, listenerFn2);
 
                     unhook();
 
-                    $scope[method](event);
+                    $scope[method](eventName);
 
                     sinon.assert.notCalled(listenerFn);
                     sinon.assert.calledOnce(listenerFn2);
@@ -1792,14 +1786,14 @@ describe('Scope', () => {
                 it('should not throw on removing listeners multiple times', () => {
 
                     const listenerFn2 = sandbox.stub();
-                    const unhook = $scope.$on(event, listenerFn);
+                    const unhook = $scope.$on(eventName, listenerFn);
 
-                    $scope.$on(event, listenerFn2);
+                    $scope.$on(eventName, listenerFn2);
 
                     unhook();
                     unhook();
 
-                    $scope[method](event);
+                    $scope[method](eventName);
 
                     sinon.assert.notCalled(listenerFn);
                     sinon.assert.calledOnce(listenerFn2);
@@ -1808,11 +1802,11 @@ describe('Scope', () => {
 
                 it('should not skip the next listener when a listener is removed', () => {
 
-                    const unhook = $scope.$on(event, () => unhook());
+                    const unhook = $scope.$on(eventName, () => unhook());
 
-                    $scope.$on(event, listenerFn);
+                    $scope.$on(eventName, listenerFn);
 
-                    $scope[method](event);
+                    $scope[method](eventName);
 
                     sinon.assert.calledOnce(listenerFn);
 
@@ -1826,30 +1820,30 @@ describe('Scope', () => {
 
             it('should propagate up the $scope hierarchy', () => {
 
+                let currentChildScope = null,
+                    currentGrandchildScope = null,
+                    currentParentScope = null;
+
                 const child = $scope.$new();
                 const grandchild = child.$new(true);
-                const childListenerFn = sandbox.stub();
-                const grandchildListenerFn = sandbox.stub();
+                const parentListenerFn = sandbox.spy(event => currentParentScope = event.currentScope);
+                const childListenerFn = sandbox.spy(event => currentChildScope = event.currentScope);
+                const grandchildListenerFn = sandbox.spy(event => currentGrandchildScope = event.currentScope);
 
-                $event.targetScope = grandchild;
+                $scope.$on(eventName, parentListenerFn);
+                child.$on(eventName, childListenerFn);
+                grandchild.$on(eventName, grandchildListenerFn);
 
-                $scope.$on(event, listenerFn);
-                child.$on(event, childListenerFn);
-                grandchild.$on(event, grandchildListenerFn);
+                grandchild.$emit(eventName);
 
-                grandchild.$emit(event);
-
-                $event.currentScope = grandchild;
                 sinon.assert.calledOnce(grandchildListenerFn);
-                sinon.assert.calledWithExactly(grandchildListenerFn, $event);
+                expect(currentGrandchildScope).equals(grandchild);
 
-                $event.currentScope = child;
                 sinon.assert.calledOnce(childListenerFn);
-                sinon.assert.calledWithExactly(childListenerFn, $event);
+                expect(currentChildScope).equals(child);
 
-                $event.currentScope = $scope;
-                sinon.assert.calledOnce(listenerFn);
-                sinon.assert.calledWithExactly(listenerFn, $event);
+                sinon.assert.calledOnce(parentListenerFn);
+                expect(currentParentScope).equals($scope);
 
             });
 
@@ -1859,28 +1853,30 @@ describe('Scope', () => {
 
             it('should propagate down the $scope hierarchy', () => {
 
+                let currentChildScope = null,
+                    currentGrandchildScope = null,
+                    currentParentScope = null;
+
                 const child = $scope.$new();
                 const grandchild = child.$new(true);
-                const childListenerFn = sandbox.stub();
-                const grandchildListenerFn = sandbox.stub();
+                const parentListenerFn = sandbox.spy(event => currentParentScope = event.currentScope);
+                const childListenerFn = sandbox.spy(event => currentChildScope = event.currentScope);
+                const grandchildListenerFn = sandbox.spy(event => currentGrandchildScope = event.currentScope);
 
-                $scope.$on(event, listenerFn);
-                child.$on(event, childListenerFn);
-                grandchild.$on(event, grandchildListenerFn);
+                $scope.$on(eventName, parentListenerFn);
+                child.$on(eventName, childListenerFn);
+                grandchild.$on(eventName, grandchildListenerFn);
 
-                $scope.$broadcast(event);
+                grandchild.$emit(eventName);
 
-                $event.currentScope = $scope;
-                sinon.assert.calledOnce(listenerFn);
-                sinon.assert.calledWithExactly(listenerFn, $event);
+                sinon.assert.calledOnce(parentListenerFn);
+                expect(currentParentScope).equals($scope);
 
-                $event.currentScope = child;
                 sinon.assert.calledOnce(childListenerFn);
-                sinon.assert.calledWithExactly(childListenerFn, $event);
+                expect(currentChildScope).equals(child);
 
-                $event.currentScope = grandchild;
                 sinon.assert.calledOnce(grandchildListenerFn);
-                sinon.assert.calledWithExactly(grandchildListenerFn, $event);
+                expect(currentGrandchildScope).equals(grandchild);
 
             });
 
