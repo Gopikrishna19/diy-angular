@@ -152,9 +152,29 @@ export default class Lexer {
 
             if (escape) {
 
-                const escapedChar = literals.ESCAPES[char];
+                if (char === 'u') {
 
-                string += escapedChar ? escapedChar : char;
+                    const hexLength = 4;
+                    const radix = 16;
+                    const hex = text.substring(this.index + 1, this.index + hexLength + 1);
+
+                    if (!/[\da-f]{4}/i.test(hex)) {
+
+                        throw new Error(literals.INVALID_UNICODE);
+
+                    }
+
+                    this.index += hexLength;
+
+                    string += String.fromCharCode(parseInt(hex, radix));
+
+                } else {
+
+                    const escapedChar = literals.ESCAPES[char];
+
+                    string += escapedChar ? escapedChar : char;
+
+                }
 
                 escape = false;
 
@@ -181,7 +201,7 @@ export default class Lexer {
 
         }
 
-        return Lexer.throwUnexpectedCharError(char);
+        throw new Error(literals.MISMATCHED_QUOTES);
 
     }
 

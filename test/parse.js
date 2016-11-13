@@ -138,6 +138,16 @@ describe('parsing', () => {
 
         });
 
+        it('should parse unicode characters', () => {
+
+            const fn = parse('"\\u00A0"');
+            const parsedValue = '\u00A0';
+
+            expect(fn).function();
+            expect(fn()).equals(parsedValue);
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
@@ -145,7 +155,8 @@ describe('parsing', () => {
         expect(() => parse('1a')).throw(`${literals.UNEXPECTED_CHARACTER} a`);
         expect(() => parse('12e-')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
-        expect(() => parse('"def')).throw(`${literals.UNEXPECTED_CHARACTER} f`);
+        expect(() => parse('"def')).throw(literals.MISMATCHED_QUOTES);
+        expect(() => parse('"\\u0T00"')).throw(literals.INVALID_UNICODE);
 
     });
 
