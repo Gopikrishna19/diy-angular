@@ -290,7 +290,8 @@ export default class Scope {
     $broadcast(event, ...args) {
 
         const $event = {
-            name: event
+            name: event,
+            targetScope: this
         };
 
         Scope.$$everyScope(this, $scope => {
@@ -354,7 +355,8 @@ export default class Scope {
     $emit(event, ...args) {
 
         const $event = {
-            name: event
+            name: event,
+            targetScope: this
         };
         let $scope = this;
 

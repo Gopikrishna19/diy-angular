@@ -1694,8 +1694,17 @@ describe('Scope', () => {
     describe('event', () => {
 
         const event = 'someEvent';
-        const $event = {name: event};
         const otherEvent = 'someOtherEvent';
+        let $event;
+
+        beforeEach(() => {
+
+            $event = {
+                name: event,
+                targetScope: $scope
+            };
+
+        });
 
         ['$emit', '$broadcast'].forEach(method => {
 
@@ -1819,6 +1828,8 @@ describe('Scope', () => {
                 const grandchild = child.$new(true);
                 const childListenerFn = sandbox.stub();
                 const grandchildListenerFn = sandbox.stub();
+
+                $event.targetScope = grandchild;
 
                 $scope.$on(event, listenerFn);
                 child.$on(event, childListenerFn);
