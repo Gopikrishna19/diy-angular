@@ -141,6 +141,7 @@ export default class Lexer {
     readString(text, quote) {
 
         let char,
+            escape = false,
             string = '';
 
         this.index += 1;
@@ -149,7 +150,15 @@ export default class Lexer {
 
             char = text.charAt(this.index);
 
-            if (char === quote) {
+            if (escape) {
+
+                const escapedChar = literals.ESCAPES[char];
+
+                string += escapedChar ? escapedChar : char;
+
+                escape = false;
+
+            } else if (char === quote) {
 
                 this.index += 1;
 
@@ -158,9 +167,16 @@ export default class Lexer {
                     value: string
                 };
 
+            } else if (char === '\\') {
+
+                escape = true;
+
+            } else {
+
+                string += char;
+
             }
 
-            string += char;
             this.index += 1;
 
         }

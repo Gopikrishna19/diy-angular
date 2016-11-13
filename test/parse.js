@@ -128,6 +128,16 @@ describe('parsing', () => {
 
         });
 
+        it('should parse escaped characters', () => {
+
+            const fn = parse('"a\\\"\\t\\v\\f\\\``\\\'\'\\n\\r\\eb"');
+            const parsedValue = 'a\"\t\v\f\``\'\'\n\reb';
+
+            expect(fn).function();
+            expect(fn()).equals(parsedValue);
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {

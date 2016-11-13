@@ -4,7 +4,16 @@ export default class ASTCompiler {
 
     static escape(value) {
 
-        return typeof value === 'string' ? `'${value}'` : value;
+        const radix = 16;
+        const start = -4;
+
+        return typeof value === 'string' ? `'${
+            value.replace(/[^ a-zA-Z0-9]/g, char => `\\u${
+                (`0000${
+                    char.charCodeAt(0).toString(radix)
+                    }`).slice(start)
+                }`)
+            }'` : value;
 
     }
 
