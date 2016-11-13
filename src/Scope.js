@@ -431,7 +431,7 @@ export default class Scope {
 
                     newValue.forEach((value, index) => {
 
-                        if (value !== oldValue[index]) {
+                        if (!Scope.testNaN(value, oldValue[index]) && value !== oldValue[index]) {
 
                             count += 1;
                             oldValue[index] = value;

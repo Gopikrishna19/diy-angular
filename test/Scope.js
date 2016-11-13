@@ -1118,6 +1118,20 @@ describe('Scope', () => {
 
             });
 
+            it('should watch for NaNs', () => {
+
+                $scope.array = [1, NaN, 2];
+
+                $scope.$watchCollection(
+                    () => $scope.array,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+            });
+
         });
 
     });
