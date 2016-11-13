@@ -71,9 +71,8 @@ class ASTCompiler {
             },
             [ASTBuilder.LITERAL]: () => ast.value
         };
-        const nodeFn = nodeTypes[ast.type];
 
-        return nodeFn ? nodeFn() : null;
+        return nodeTypes[ast.type]();
 
     }
 
