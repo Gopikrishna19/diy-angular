@@ -1218,6 +1218,22 @@ describe('Scope', () => {
 
             });
 
+            it('should watch for NaNs', () => {
+
+                $scope.object = {
+                    prop: NaN
+                };
+
+                $scope.$watchCollection(
+                    () => $scope.object,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+            });
+
         });
 
     });
