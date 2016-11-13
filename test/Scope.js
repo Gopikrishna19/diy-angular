@@ -1700,6 +1700,7 @@ describe('Scope', () => {
         beforeEach(() => {
 
             $event = {
+                currentScope: $scope,
                 name: event,
                 targetScope: $scope
             };
@@ -1837,12 +1838,15 @@ describe('Scope', () => {
 
                 grandchild.$emit(event);
 
+                $event.currentScope = grandchild;
                 sinon.assert.calledOnce(grandchildListenerFn);
                 sinon.assert.calledWithExactly(grandchildListenerFn, $event);
 
+                $event.currentScope = child;
                 sinon.assert.calledOnce(childListenerFn);
                 sinon.assert.calledWithExactly(childListenerFn, $event);
 
+                $event.currentScope = $scope;
                 sinon.assert.calledOnce(listenerFn);
                 sinon.assert.calledWithExactly(listenerFn, $event);
 
@@ -1865,12 +1869,15 @@ describe('Scope', () => {
 
                 $scope.$broadcast(event);
 
+                $event.currentScope = $scope;
                 sinon.assert.calledOnce(listenerFn);
                 sinon.assert.calledWithExactly(listenerFn, $event);
 
+                $event.currentScope = child;
                 sinon.assert.calledOnce(childListenerFn);
                 sinon.assert.calledWithExactly(childListenerFn, $event);
 
+                $event.currentScope = grandchild;
                 sinon.assert.calledOnce(grandchildListenerFn);
                 sinon.assert.calledWithExactly(grandchildListenerFn, $event);
 

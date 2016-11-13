@@ -290,13 +290,22 @@ export default class Scope {
     $broadcast(event, ...args) {
 
         const $event = {
+            currentScope: this,
             name: event,
             targetScope: this
         };
 
         Scope.$$everyScope(this, $scope => {
 
-            Scope.$$fireEvent($scope, $event, event, args);
+            Scope.$$fireEvent(
+                $scope,
+                {
+                    ...$event,
+                    currentScope: $scope
+                },
+                event,
+                args
+            );
 
             return true;
 
@@ -355,6 +364,7 @@ export default class Scope {
     $emit(event, ...args) {
 
         const $event = {
+            currentScope: this,
             name: event,
             targetScope: this
         };
@@ -362,7 +372,15 @@ export default class Scope {
 
         do {
 
-            Scope.$$fireEvent($scope, $event, event, args);
+            Scope.$$fireEvent(
+                $scope,
+                {
+                    ...$event,
+                    currentScope: $scope
+                },
+                event,
+                args
+            );
 
             $scope = $scope.$parent;
 
