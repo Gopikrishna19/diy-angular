@@ -1,4 +1,4 @@
-import {cloneDeep, forEachRight, isArray, isEqual, isObject} from 'lodash';
+import {clone, cloneDeep, forEachRight, isArray, isEqual, isObject} from 'lodash';
 import literals from './literals';
 import {log} from './logger';
 
@@ -424,6 +424,7 @@ export default class Scope {
 
         let newValue,
             oldValue,
+            originalValue,
             oldKeysCount,
             count = 0;
 
@@ -530,7 +531,13 @@ export default class Scope {
         };
         const tellListener = () => {
 
-            listenerFn(newValue, oldValue, this);
+            listenerFn(newValue, originalValue, this);
+
+            if (listenerFn.length > 1) {
+
+                originalValue = clone(newValue);
+
+            }
 
         };
 

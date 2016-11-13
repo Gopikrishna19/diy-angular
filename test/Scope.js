@@ -1109,6 +1109,46 @@ describe('Scope', () => {
 
             });
 
+            it('should call listener function with old value when required', () => {
+
+                $scope.aValue = 0;
+
+                $scope.$watchCollection(
+                    () => $scope.aValue,
+                    listenerFn = sandbox.spy((newValue, oldValue) => $scope.oldValue = oldValue)
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, 0, undefined, $scope);
+
+                $scope.aValue = 1;
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, 1, 0, $scope);
+
+            });
+
+            it('should not call listener function with old value when not required', () => {
+
+                $scope.aValue = 0;
+
+                $scope.$watchCollection(
+                    () => $scope.aValue,
+                    listenerFn
+                );
+
+                $scope.$digest();
+
+                $scope.aValue = 1;
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, 1, undefined, $scope);
+
+            });
+
         });
 
         describe('when watching arrays', () => {
@@ -1152,6 +1192,46 @@ describe('Scope', () => {
 
                 $scope.$digest();
                 sinon.assert.calledOnce(listenerFn);
+
+            });
+
+            it('should call listener function with old value when required', () => {
+
+                $scope.array = [1];
+
+                $scope.$watchCollection(
+                    () => $scope.array,
+                    listenerFn = sandbox.spy((newValue, oldValue) => $scope.oldValue = oldValue)
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, [1], undefined, $scope);
+
+                $scope.array.push(2);
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, [1, 2], [1], $scope);
+
+            });
+
+            it('should not call listener function with old value when not required', () => {
+
+                $scope.array = [1];
+
+                $scope.$watchCollection(
+                    () => $scope.array,
+                    listenerFn
+                );
+
+                $scope.$digest();
+
+                $scope.array.push(2);
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, [1, 2], undefined, $scope);
 
             });
 
@@ -1261,6 +1341,52 @@ describe('Scope', () => {
 
                 $scope.$digest();
                 sinon.assert.calledOnce(listenerFn);
+
+            });
+
+            it('should call listener function with old value when required', () => {
+
+                $scope.object = {a: 1};
+
+                $scope.$watchCollection(
+                    () => $scope.object,
+                    listenerFn = sandbox.spy((newValue, oldValue) => $scope.oldValue = oldValue)
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, {a: 1}, undefined, $scope);
+
+                $scope.object.b = 2;
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, {
+                    a: 1,
+                    b: 2
+                }, {a: 1}, $scope);
+
+            });
+
+            it('should not call listener function with old value when not required', () => {
+
+                $scope.object = {a: 1};
+
+                $scope.$watchCollection(
+                    () => $scope.object,
+                    listenerFn
+                );
+
+                $scope.$digest();
+
+                $scope.object.b = 2;
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, {
+                    a: 1,
+                    b: 2
+                }, undefined, $scope);
 
             });
 
