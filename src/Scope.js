@@ -417,6 +417,7 @@ export default class Scope {
 
         let newValue,
             oldValue,
+            oldKeysCount,
             count = 0;
 
         const callWatcher = scope => {
@@ -454,34 +455,54 @@ export default class Scope {
 
                 } else {
 
+                    let newKeysCount = 0;
+
                     if (!isObject(oldValue) || Scope.isArrayLike(oldValue)) {
 
                         count += 1;
                         oldValue = {};
+                        oldKeysCount = 0;
 
                     }
 
                     Object.keys(newValue).forEach(key => {
 
-                        if (!Scope.testNaN(newValue[key], oldValue[key]) && oldValue[key] !== newValue[key]) {
+                        newKeysCount += 1;
+
+                        if (oldValue.hasOwnProperty(key)) {
+
+                            if (!Scope.testNaN(newValue[key], oldValue[key]) && oldValue[key] !== newValue[key]) {
+
+                                count += 1;
+                                oldValue[key] = newValue[key];
+
+                            }
+
+                        } else {
 
                             count += 1;
+                            oldKeysCount += 1;
                             oldValue[key] = newValue[key];
 
                         }
 
                     });
 
-                    Object.keys(oldValue).forEach(key => {
+                    if (oldKeysCount > newKeysCount) {
 
-                        if (!newValue.hasOwnProperty(key)) {
+                        Object.keys(oldValue).forEach(key => {
 
-                            count += 1;
-                            delete oldValue[key];
+                            if (!newValue.hasOwnProperty(key)) {
 
-                        }
+                                count += 1;
+                                oldKeysCount -= 1;
+                                delete oldValue[key];
 
-                    });
+                            }
+
+                        });
+
+                    }
 
                 }
 
