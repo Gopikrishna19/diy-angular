@@ -1,4 +1,4 @@
-import {cloneDeep, forEachRight, isEqual} from 'lodash';
+import {cloneDeep, forEachRight, isArray, isEqual, isObject} from 'lodash';
 import literals from './literals';
 import {log} from './logger';
 
@@ -411,9 +411,35 @@ export default class Scope {
 
             newValue = watchFn(scope);
 
-            if (!Scope.$$areEqual(newValue, oldValue, false)) {
+            if (isObject(newValue)) {
 
-                count += 1;
+                if (isArray(newValue)) {
+
+                    if (!isArray(oldValue)) {
+
+                        count += 1;
+                        oldValue = [];
+
+                    }
+
+                    if (newValue.length !== oldValue.length) {
+
+                        count += 1;
+                        oldValue.length = newValue.length;
+
+                    }
+
+                } else {
+
+                }
+
+            } else {
+
+                if (!Scope.$$areEqual(newValue, oldValue, false)) {
+
+                    count += 1;
+
+                }
 
             }
 

@@ -1024,42 +1024,67 @@ describe('Scope', () => {
 
     describe('$watchCollection', () => {
 
-        it('should fall back to $watch for non-collections', () => {
+        describe('when watching primitive values', () => {
 
-            $scope.aValue = 'abc';
+            it('should fall back to $watch', () => {
 
-            $scope.$watchCollection(
-                () => $scope.aValue,
-                listenerFn = sandbox.spy(newValue => $scope.newValue = newValue)
-            );
+                $scope.aValue = 'abc';
 
-            $scope.$digest();
-            sinon.assert.calledOnce(listenerFn);
-            expect($scope.newValue).equals($scope.aValue);
+                $scope.$watchCollection(
+                    () => $scope.aValue,
+                    listenerFn = sandbox.spy(newValue => $scope.newValue = newValue)
+                );
 
-            $scope.aValue = 'def';
-            listenerFn.reset();
-            $scope.$digest();
-            sinon.assert.calledOnce(listenerFn);
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                expect($scope.newValue).equals($scope.aValue);
 
-            listenerFn.reset();
-            $scope.$digest();
-            sinon.assert.notCalled(listenerFn);
+                $scope.aValue = 'def';
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
 
-        });
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
 
-        it('should watch for NaNs', () => {
+            });
 
-            $scope.$watchCollection(
-                watchFn.returns(NaN),
-                listenerFn
-            );
+            it('should watch for NaNs', () => {
 
-            $scope.$digest();
-            sinon.assert.calledOnce(listenerFn);
+                $scope.$watchCollection(
+                    watchFn.returns(NaN),
+                    listenerFn
+                );
 
-            $scope.$digest();
-            sinon.assert.calledOnce(listenerFn);
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+            });
+
+            it('should detect type changing to an array', () => {
+
+                $scope.$watchCollection(
+                    () => $scope.array,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.array = [1, 2];
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
 
         });
 
