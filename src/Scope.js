@@ -134,7 +134,7 @@ export default class Scope {
             name: event
         };
 
-        ($$listeners.get($scope)[event] || []).forEach(listener => listener($event, ...args));
+        forEachRight(($$listeners.get($scope)[event] || []), listener => listener($event, ...args));
 
         return $event;
 

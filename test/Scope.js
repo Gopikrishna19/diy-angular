@@ -1791,6 +1791,18 @@ describe('Scope', () => {
 
                 });
 
+                it('should not skip the next listener when a listener is removed', () => {
+
+                    const unhook = $scope.$on('someEvent', () => unhook());
+
+                    $scope.$on('someEvent', listenerFn);
+
+                    $scope[method]('someEvent');
+
+                    sinon.assert.calledOnce(listenerFn);
+
+                });
+
             });
 
         });
