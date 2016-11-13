@@ -208,6 +208,18 @@ export default class Scope {
 
     }
 
+    static isArrayLike(object) {
+
+        if (!object) {
+
+            return false;
+
+        }
+
+        return typeof object.length === 'number';
+
+    }
+
     static testNaN(newValue, oldValue) {
 
         return [
@@ -413,7 +425,7 @@ export default class Scope {
 
             if (isObject(newValue)) {
 
-                if (isArray(newValue)) {
+                if (Scope.isArrayLike(newValue)) {
 
                     if (!isArray(oldValue)) {
 
@@ -429,7 +441,7 @@ export default class Scope {
 
                     }
 
-                    newValue.forEach((value, index) => {
+                    Array.from(newValue).forEach((value, index) => {
 
                         if (!Scope.testNaN(value, oldValue[index]) && value !== oldValue[index]) {
 

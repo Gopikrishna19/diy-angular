@@ -1134,6 +1134,37 @@ describe('Scope', () => {
 
         });
 
+        describe('when watching array like objects', () => {
+
+            it('should detect replaced values', () => {
+
+                $scope.arrayLike = {
+                    0: 1,
+                    1: 2,
+                    length: 2
+                };
+
+                $scope.$watchCollection(
+                    () => $scope.arrayLike,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.arrayLike[1] = 0;
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
+        });
+
     });
 
     describe('child scope', () => {
