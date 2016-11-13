@@ -80,23 +80,29 @@ class ASTCompiler {
 
 class Lexer {
 
-    static hasDecimals(char) {
-
-        return char === '.' || Lexer.isNumeric(char);
-
-    }
-
     static isFloating(text, index) {
 
         const char = text[index];
 
-        return Lexer.isNumeric(char) || (char === '.' && Lexer.isNumeric(Lexer.peek(text, index)));
+        return Lexer.isNumber(char) || (char === '.' && Lexer.isNumber(Lexer.peek(text, index)));
+
+    }
+
+    static isNumber(char) {
+
+        return char >= '0' && char <= '9';
 
     }
 
     static isNumeric(char) {
 
-        return char >= '0' && char <= '9';
+        return [
+            char === '.',
+            char === '+',
+            char === '-',
+            char === 'e',
+            Lexer.isNumber(char)
+        ].some(condition => condition);
 
     }
 
@@ -140,9 +146,9 @@ class Lexer {
 
         while (this.index < text.length) {
 
-            char = text.charAt(this.index);
+            char = text.charAt(this.index).toLowerCase();
 
-            if (Lexer.hasDecimals(char)) {
+            if (Lexer.isNumeric(char)) {
 
                 number += char;
 
