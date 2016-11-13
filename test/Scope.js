@@ -1088,6 +1088,38 @@ describe('Scope', () => {
 
         });
 
+        describe('when watching arrays', () => {
+
+            it('should detect adding or removing values', () => {
+
+                $scope.array = [1, 2];
+
+                $scope.$watchCollection(
+                    () => $scope.array,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.array.push(1);
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.array.shift(1);
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
+        });
+
     });
 
     describe('child scope', () => {

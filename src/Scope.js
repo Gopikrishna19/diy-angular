@@ -429,6 +429,17 @@ export default class Scope {
 
                     }
 
+                    newValue.forEach((value, index) => {
+
+                        if (value !== oldValue[index]) {
+
+                            count += 1;
+                            oldValue[index] = value;
+
+                        }
+
+                    });
+
                 } else {
 
                 }
@@ -441,9 +452,9 @@ export default class Scope {
 
                 }
 
-            }
+                oldValue = newValue;
 
-            oldValue = newValue;
+            }
 
             return count;
 
