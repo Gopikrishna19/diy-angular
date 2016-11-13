@@ -291,6 +291,11 @@ export default class Scope {
 
         const $event = {
             name: event,
+            preventDefault() {
+
+                $event.defaultPrevented = true;
+
+            },
             targetScope: this
         };
 
@@ -363,6 +368,11 @@ export default class Scope {
 
         const $event = {
             name: event,
+            preventDefault() {
+
+                $event.defaultPrevented = true;
+
+            },
             stopPropagation() {
 
                 isPropagationStopped = true;

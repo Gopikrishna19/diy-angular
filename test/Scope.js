@@ -1812,6 +1812,17 @@ describe('Scope', () => {
 
                 });
 
+                it('should allow preventing default action', () => {
+
+                    $scope.$on(eventName, listenerFn = sandbox.spy(event => event.preventDefault()));
+
+                    $event = $scope[method](eventName);
+
+                    sinon.assert.calledOnce(listenerFn);
+                    expect($event.defaultPrevented).true();
+
+                });
+
             });
 
         });
