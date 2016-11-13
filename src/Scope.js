@@ -293,7 +293,13 @@ export default class Scope {
             name: event
         };
 
-        Scope.$$fireEvent(this, $event, event, args);
+        Scope.$$everyScope(this, $scope => {
+
+            Scope.$$fireEvent($scope, $event, event, args);
+
+            return true;
+
+        });
 
         return $event;
 

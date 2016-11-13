@@ -1816,18 +1816,52 @@ describe('Scope', () => {
             it('should propagate up the $scope hierarchy', () => {
 
                 const child = $scope.$new();
+                const grandchild = child.$new(true);
                 const childListenerFn = sandbox.stub();
+                const grandchildListenerFn = sandbox.stub();
 
                 $scope.$on(event, listenerFn);
                 child.$on(event, childListenerFn);
+                grandchild.$on(event, grandchildListenerFn);
 
-                child.$emit(event);
+                grandchild.$emit(event);
+
+                sinon.assert.calledOnce(grandchildListenerFn);
+                sinon.assert.calledWithExactly(grandchildListenerFn, $event);
+
+                sinon.assert.calledOnce(childListenerFn);
+                sinon.assert.calledWithExactly(childListenerFn, $event);
+
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, $event);
+
+            });
+
+        });
+
+        describe('$broadcast', () => {
+
+            it('should propagate down the $scope hierarchy', () => {
+
+                const child = $scope.$new();
+                const grandchild = child.$new(true);
+                const childListenerFn = sandbox.stub();
+                const grandchildListenerFn = sandbox.stub();
+
+                $scope.$on(event, listenerFn);
+                child.$on(event, childListenerFn);
+                grandchild.$on(event, grandchildListenerFn);
+
+                $scope.$broadcast(event);
 
                 sinon.assert.calledOnce(listenerFn);
                 sinon.assert.calledWithExactly(listenerFn, $event);
 
                 sinon.assert.calledOnce(childListenerFn);
                 sinon.assert.calledWithExactly(childListenerFn, $event);
+
+                sinon.assert.calledOnce(grandchildListenerFn);
+                sinon.assert.calledWithExactly(grandchildListenerFn, $event);
 
             });
 
