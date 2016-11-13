@@ -1022,6 +1022,49 @@ describe('Scope', () => {
 
     });
 
+    describe('$watchCollection', () => {
+
+        it('should fall back to $watch for non-collections', () => {
+
+            $scope.aValue = 'abc';
+
+            $scope.$watchCollection(
+                () => $scope.aValue,
+                listenerFn = sandbox.spy(newValue => $scope.newValue = newValue)
+            );
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+            expect($scope.newValue).equals($scope.aValue);
+
+            $scope.aValue = 'def';
+            listenerFn.reset();
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+            listenerFn.reset();
+            $scope.$digest();
+            sinon.assert.notCalled(listenerFn);
+
+        });
+
+        it('should watch for NaNs', () => {
+
+            $scope.$watchCollection(
+                watchFn.returns(NaN),
+                listenerFn
+            );
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+        });
+
+    });
+
     describe('child scope', () => {
 
         it('should be constructed with parent properties', () => {

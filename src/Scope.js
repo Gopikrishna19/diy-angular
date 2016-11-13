@@ -401,6 +401,37 @@ export default class Scope {
 
     }
 
+    $watchCollection(watchFn, listenerFn) {
+
+        let newValue,
+            oldValue,
+            count = 0;
+
+        const callWatcher = scope => {
+
+            newValue = watchFn(scope);
+
+            if (!Scope.$$areEqual(newValue, oldValue, false)) {
+
+                count += 1;
+
+            }
+
+            oldValue = newValue;
+
+            return count;
+
+        };
+        const tellListener = () => {
+
+            listenerFn(newValue, oldValue, this);
+
+        };
+
+        return this.$watch(callWatcher, tellListener);
+
+    }
+
     $watchGroup(array, listenerFn) {
 
         const newValues = new Array(array.length);
