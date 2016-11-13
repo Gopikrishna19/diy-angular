@@ -8,6 +8,7 @@ const $$children = new WeakMap();
 const $$evalAsyncQueue = new WeakMap();
 const $$initialWatchValue = Symbol.for('$$initialWatchValue');
 const $$lastDirtyWatch = new WeakMap();
+const $$listeners = new WeakMap();
 const $$phase = new WeakMap();
 const $$watchers = new WeakMap();
 
@@ -18,6 +19,7 @@ function initialize($scope) {
     $$children.set($scope, []);
     $$evalAsyncQueue.set($scope, []);
     $$lastDirtyWatch.set($scope.$root, null);
+    $$listeners.set($scope, {});
     $$watchers.set($scope, []);
 
     Scope.$$clearPhase($scope);
@@ -279,6 +281,12 @@ export default class Scope {
 
     }
 
+    $broadcast(event, ...args) {
+
+        ($$listeners.get(this)[event] || []).forEach(listener => listener(...args));
+
+    }
+
     $destroy() {
 
         if (this.$parent) {
@@ -322,6 +330,12 @@ export default class Scope {
         } while (dirty);
 
         Scope.$$clearPhase(this);
+
+    }
+
+    $emit(event, ...args) {
+
+        ($$listeners.get(this)[event] || []).forEach(listener => listener(...args));
 
     }
 
@@ -384,6 +398,20 @@ export default class Scope {
         $child.$parent = $parent;
 
         return $child;
+
+    }
+
+    $on(event, listenerFn) {
+
+        const listeners = $$listeners.get(this);
+
+        if (!listeners[event]) {
+
+            listeners[event] = [];
+
+        }
+
+        listeners[event].push(listenerFn);
 
     }
 
