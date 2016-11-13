@@ -210,12 +210,6 @@ export default class Scope {
 
     static isArrayLike(object) {
 
-        if (!object) {
-
-            return false;
-
-        }
-
         const length = object.length;
 
         return length === 0 ||
