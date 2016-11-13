@@ -1297,7 +1297,9 @@ describe('Scope', () => {
 
             it('should detect adding or changing or removing properties', () => {
 
-                $scope.object = {};
+                $scope.object = {
+                    prop: 'test'
+                };
 
                 $scope.$watchCollection(
                     () => $scope.object,
@@ -1307,18 +1309,18 @@ describe('Scope', () => {
                 $scope.$digest();
                 sinon.assert.calledOnce(listenerFn);
 
-                $scope.object.prop = 1;
+                $scope.object.anotherProp = 1;
                 listenerFn.reset();
                 $scope.$digest();
                 sinon.assert.calledOnce(listenerFn);
 
                 listenerFn.reset();
-                $scope.object.prop = 2;
+                $scope.object.anotherProp = 2;
                 $scope.$digest();
                 sinon.assert.calledOnce(listenerFn);
 
                 listenerFn.reset();
-                delete $scope.object.prop;
+                delete $scope.object.anotherProp;
                 $scope.$digest();
                 sinon.assert.calledOnce(listenerFn);
 
@@ -1599,13 +1601,31 @@ describe('Scope', () => {
 
     describe('$destroy', () => {
 
-        it('should remove watchers', () => {
+        it('should remove all watchers', () => {
 
             $scope.$watch(watchFn);
 
             $scope.$destroy();
             $scope.$digest();
             sinon.assert.notCalled(watchFn);
+
+        });
+
+        it('should not throw when called multiple times', () => {
+
+            const child = $scope.$new();
+
+            child.$watch(watchFn, listenerFn);
+
+            $scope.$digest();
+            sinon.assert.calledOnce(listenerFn);
+
+            child.$destroy();
+            child.$destroy();
+
+            listenerFn.reset();
+            $scope.$digest();
+            sinon.assert.notCalled(listenerFn);
 
         });
 
