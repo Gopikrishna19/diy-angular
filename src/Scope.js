@@ -454,6 +454,13 @@ export default class Scope {
 
                 } else {
 
+                    if (!isObject(oldValue) || Scope.isArrayLike(oldValue)) {
+
+                        count += 1;
+                        oldValue = {};
+
+                    }
+
                 }
 
             } else {

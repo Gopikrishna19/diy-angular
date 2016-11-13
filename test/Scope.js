@@ -1086,6 +1086,29 @@ describe('Scope', () => {
 
             });
 
+            it('should detect type changing to an object', () => {
+
+                $scope.$watchCollection(
+                    () => $scope.object,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.object = {
+                    prop: 'test'
+                };
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
         });
 
         describe('when watching arrays', () => {
