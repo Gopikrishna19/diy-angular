@@ -130,7 +130,11 @@ export default class Scope {
 
     static $$fireEvent($scope, event, args) {
 
-        ($$listeners.get($scope)[event] || []).forEach(listener => listener(...args));
+        const $event = {
+            name: event
+        };
+
+        ($$listeners.get($scope)[event] || []).forEach(listener => listener($event, ...args));
 
     }
 

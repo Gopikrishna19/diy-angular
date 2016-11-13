@@ -1695,7 +1695,7 @@ describe('Scope', () => {
 
         ['$emit', '$broadcast'].forEach(method => {
 
-            it(`should call the listeners on ${method}`, () => {
+            it(`should call all the listeners on ${method}`, () => {
 
                 const listenerFn2 = sandbox.stub();
                 const listenerFn3 = sandbox.stub();
@@ -1708,10 +1708,7 @@ describe('Scope', () => {
                 $scope[method]('someEvent');
 
                 sinon.assert.calledOnce(listenerFn);
-                sinon.assert.calledWithExactly(listenerFn);
-
                 sinon.assert.calledOnce(listenerFn2);
-                sinon.assert.calledWithExactly(listenerFn2);
 
                 sinon.assert.notCalled(listenerFn3);
 
@@ -1724,6 +1721,28 @@ describe('Scope', () => {
                 $scope[method]('someOtherEvent');
 
                 sinon.assert.notCalled(listenerFn);
+
+            });
+
+            it('should pass event object to the listeners', () => {
+
+                $scope.$on('someEvent', listenerFn);
+
+                $scope[method]('someEvent');
+
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, {name: 'someEvent'});
+
+            });
+
+            it('should pass on additional arguments', () => {
+
+                $scope.$on('someEvent', listenerFn);
+
+                $scope[method]('someEvent', 1, 2);
+
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, {name: 'someEvent'}, 1, 2);
 
             });
 
