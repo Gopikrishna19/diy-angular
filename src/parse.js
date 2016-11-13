@@ -102,7 +102,7 @@ class Lexer {
 
     static peek(text, index) {
 
-        return index < text.length - 1 ? text.charAt(index + 1) : false;
+        return text.charAt(index + 1);
 
     }
 
