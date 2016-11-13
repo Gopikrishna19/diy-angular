@@ -1392,6 +1392,30 @@ describe('Scope', () => {
 
             });
 
+            it('should detect only shallow changes', () => {
+
+                $scope.object = {};
+
+                $scope.$watchCollection(
+                    () => $scope.object,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.object.child = {prop: 1};
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.object.child.prop = 2;
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
         });
 
     });
