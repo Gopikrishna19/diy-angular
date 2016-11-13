@@ -2,6 +2,12 @@ import ASTBuilder from './ASTBuilder';
 
 export default class ASTCompiler {
 
+    static escape(value) {
+
+        return typeof value === 'string' ? `'${value}'` : value;
+
+    }
+
     constructor(astBuilder) {
 
         this.astBuilder = astBuilder;
@@ -30,7 +36,7 @@ export default class ASTCompiler {
                 this.state.body.push('return ', this.recurse(ast.body), ';');
 
             },
-            [ASTBuilder.LITERAL]: () => ast.value
+            [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value)
         };
 
         return nodeTypes[ast.type]();

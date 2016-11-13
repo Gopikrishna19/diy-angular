@@ -96,11 +96,45 @@ describe('parsing', () => {
 
     });
 
+    describe('strings', () => {
+
+        it('should return the value in double quotes', () => {
+
+            const fn = parse('"abc"');
+            const parsedValue = 'abc';
+
+            expect(fn).function();
+            expect(fn()).equals(parsedValue);
+
+        });
+
+        it('should return the value in single quotes', () => {
+
+            const fn = parse('\'abc\'');
+            const parsedValue = 'abc';
+
+            expect(fn).function();
+            expect(fn()).equals(parsedValue);
+
+        });
+
+        it('should return the value in back ticks', () => {
+
+            const fn = parse('`abc`');
+            const parsedValue = 'abc';
+
+            expect(fn).function();
+            expect(fn()).equals(parsedValue);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
-        expect(() => parse('1a')).throw(`${literals.UNEXPECTED_NEXT_CHAR} a`);
-        expect(() => parse('12e-')).throw(`${literals.UNEXPECTED_NEXT_CHAR} -`);
-        expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_NEXT_CHAR} -`);
+        expect(() => parse('1a')).throw(`${literals.UNEXPECTED_CHARACTER} a`);
+        expect(() => parse('12e-')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
+        expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
 
     });
 

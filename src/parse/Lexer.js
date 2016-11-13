@@ -3,6 +3,15 @@ import literals from '../literals';
 /* eslint-disable complexity */
 export default class Lexer {
 
+    static hasDecimals(char) {
+
+        return [
+            char === '.',
+            Lexer.isNumber(char)
+        ].some(condition => condition);
+
+    }
+
     static isFloating(text, index) {
 
         const char = text[index];
@@ -17,11 +26,12 @@ export default class Lexer {
 
     }
 
-    static isNumeric(char) {
+    static isQuote(char) {
 
         return [
-            char === '.',
-            Lexer.isNumber(char)
+            char === '\'',
+            char === '"',
+            char === '`'
         ].some(condition => condition);
 
     }
@@ -42,9 +52,9 @@ export default class Lexer {
 
     }
 
-    static throwUnexpectedNextCharError(char) {
+    static throwUnexpectedCharError(char) {
 
-        throw new Error(`${literals.UNEXPECTED_NEXT_CHAR} ${char}`);
+        throw new Error(`${literals.UNEXPECTED_CHARACTER} ${char}`);
 
     }
 
@@ -63,9 +73,13 @@ export default class Lexer {
 
                 tokens.push(this.readNumber(text));
 
+            } else if (Lexer.isQuote(char)) {
+
+                tokens.push(this.readString(text, char));
+
             } else {
 
-                Lexer.throwUnexpectedNextCharError(char);
+                Lexer.throwUnexpectedCharError(char);
 
             }
 
@@ -84,7 +98,7 @@ export default class Lexer {
 
             char = text.charAt(this.index).toLowerCase();
 
-            if (Lexer.isNumeric(char)) {
+            if (Lexer.hasDecimals(char)) {
 
                 number += char;
 
@@ -103,7 +117,7 @@ export default class Lexer {
 
                 } else if (Lexer.isValidExpOperator(char) && prevChar === 'e' && (!nextChar || !Lexer.isNumber(nextChar))) {
 
-                    Lexer.throwUnexpectedNextCharError(char);
+                    Lexer.throwUnexpectedCharError(char);
 
                 } else {
 
@@ -121,6 +135,37 @@ export default class Lexer {
             text: number,
             value: Number(number)
         };
+
+    }
+
+    readString(text, quote) {
+
+        let char,
+            string = '';
+
+        this.index += 1;
+
+        while (this.index < text.length) {
+
+            char = text.charAt(this.index);
+
+            if (char === quote) {
+
+                this.index += 1;
+
+                return {
+                    text: string,
+                    value: string
+                };
+
+            }
+
+            string += char;
+            this.index += 1;
+
+        }
+
+        return Lexer.throwUnexpectedCharError(char);
 
     }
 
