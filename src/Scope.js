@@ -216,7 +216,14 @@ export default class Scope {
 
         }
 
-        return typeof object.length === 'number';
+        const length = object.length;
+
+        return length === 0 ||
+            [
+                typeof length === 'number',
+                length > 0,
+                (length - 1) in object
+            ].every(condition => condition);
 
     }
 

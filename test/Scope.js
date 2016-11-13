@@ -1186,6 +1186,31 @@ describe('Scope', () => {
 
             });
 
+            it('should not consider any object with length as an array', () => {
+
+                $scope.object = {
+                    length: 2
+                };
+
+                $scope.$watchCollection(
+                    () => $scope.object,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.object.prop = 'test';
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
         });
 
         describe('when watching objects', () => {
