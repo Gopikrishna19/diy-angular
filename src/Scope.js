@@ -461,6 +461,17 @@ export default class Scope {
 
                     }
 
+                    Object.keys(newValue).forEach(key => {
+
+                        if (oldValue[key] !== newValue[key]) {
+
+                            count += 1;
+                            oldValue[key] = newValue[key];
+
+                        }
+
+                    });
+
                 }
 
             } else {

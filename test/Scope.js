@@ -1188,6 +1188,38 @@ describe('Scope', () => {
 
         });
 
+        describe('when watching objects', () => {
+
+            it('should detect adding or changing properties', () => {
+
+                $scope.object = {};
+
+                $scope.$watchCollection(
+                    () => $scope.object,
+                    listenerFn
+                );
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                $scope.object.prop = 1;
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.object.prop = 2;
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
+        });
+
     });
 
     describe('child scope', () => {
