@@ -1611,6 +1611,16 @@ describe('Scope', () => {
 
         });
 
+        it('should remove all collection watchers', () => {
+
+            $scope.$watchCollection(watchFn);
+
+            $scope.$destroy();
+            $scope.$digest();
+            sinon.assert.notCalled(watchFn);
+
+        });
+
         it('should not throw when called multiple times', () => {
 
             const child = $scope.$new();
