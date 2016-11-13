@@ -80,6 +80,12 @@ class ASTCompiler {
 
 class Lexer {
 
+    static isFloating(char) {
+
+        return char === '.' || Lexer.isNumeric(char);
+
+    }
+
     static isNumeric(char) {
 
         return char >= '0' && char <= '9';
@@ -122,7 +128,7 @@ class Lexer {
 
             char = text.charAt(this.index);
 
-            if (Lexer.isNumeric(char)) {
+            if (Lexer.isFloating(char)) {
 
                 number += char;
 

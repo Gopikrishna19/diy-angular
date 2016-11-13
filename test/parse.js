@@ -4,22 +4,29 @@ import parse from '../src/parse';
 
 describe('parse', () => {
 
-    describe('integer', () => {
+    it('should parse integers', () => {
 
-        it('should return the value', () => {
+        const fn = parse('12');
+        const parsedValue = 12;
 
-            const fn = parse('1');
+        expect(fn).function();
+        expect(fn()).equals(parsedValue);
 
-            expect(fn).function();
-            expect(fn()).equals(1);
+    });
 
-        });
+    it('should parse floating points', () => {
 
-        it('should throw on invalid expression', () => {
+        const fn = parse('1.2');
+        const parsedValue = 1.2;
 
-            expect(() => parse('1a')).throw(`${literals.UNEXPECTED_NEXT_CHAR} a`);
+        expect(fn).function();
+        expect(fn()).equals(parsedValue);
 
-        });
+    });
+
+    it('should throw on invalid expression', () => {
+
+        expect(() => parse('1a')).throw(`${literals.UNEXPECTED_NEXT_CHAR} a`);
 
     });
 
