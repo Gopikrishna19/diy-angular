@@ -136,6 +136,8 @@ export default class Scope {
 
         ($$listeners.get($scope)[event] || []).forEach(listener => listener($event, ...args));
 
+        return $event;
+
     }
 
     static $$flushApplyAsync($scope) {
@@ -293,7 +295,7 @@ export default class Scope {
 
     $broadcast(event, ...args) {
 
-        Scope.$$fireEvent(this, event, args);
+        return Scope.$$fireEvent(this, event, args);
 
     }
 
@@ -345,7 +347,7 @@ export default class Scope {
 
     $emit(event, ...args) {
 
-        Scope.$$fireEvent(this, event, args);
+        return Scope.$$fireEvent(this, event, args);
 
     }
 

@@ -1746,6 +1746,16 @@ describe('Scope', () => {
 
             });
 
+            it('should return an $event object', () => {
+
+                $scope.$on('someEvent', listenerFn);
+
+                const $event = $scope[method]('someEvent');
+
+                expect($event).equals({name: 'someEvent'});
+
+            });
+
         });
 
     });
