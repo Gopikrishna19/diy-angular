@@ -1691,68 +1691,105 @@ describe('Scope', () => {
 
     });
 
-    describe('events', () => {
+    describe('event', () => {
 
         ['$emit', '$broadcast'].forEach(method => {
 
-            it(`should call all the listeners on ${method}`, () => {
+            describe(`${method}`, () => {
 
-                const listenerFn2 = sandbox.stub();
-                const listenerFn3 = sandbox.stub();
+                it('should call all the listeners', () => {
 
-                $scope.$on('someEvent', listenerFn);
-                $scope.$on('someEvent', listenerFn2);
+                    const listenerFn2 = sandbox.stub();
+                    const listenerFn3 = sandbox.stub();
 
-                $scope.$on('someOtherEvent', listenerFn3);
+                    $scope.$on('someEvent', listenerFn);
+                    $scope.$on('someEvent', listenerFn2);
 
-                $scope[method]('someEvent');
+                    $scope.$on('someOtherEvent', listenerFn3);
 
-                sinon.assert.calledOnce(listenerFn);
-                sinon.assert.calledOnce(listenerFn2);
+                    $scope[method]('someEvent');
 
-                sinon.assert.notCalled(listenerFn3);
+                    sinon.assert.calledOnce(listenerFn);
+                    sinon.assert.calledOnce(listenerFn2);
 
-            });
+                    sinon.assert.notCalled(listenerFn3);
 
-            it('should only call the listeners matching the event name', () => {
+                });
 
-                $scope.$on('someEvent', listenerFn);
+                it('should only call the listeners matching the event name', () => {
 
-                $scope[method]('someOtherEvent');
+                    $scope.$on('someEvent', listenerFn);
 
-                sinon.assert.notCalled(listenerFn);
+                    $scope[method]('someOtherEvent');
 
-            });
+                    sinon.assert.notCalled(listenerFn);
 
-            it('should pass event object to the listeners', () => {
+                });
 
-                $scope.$on('someEvent', listenerFn);
+                it('should pass event object to the listeners', () => {
 
-                $scope[method]('someEvent');
+                    $scope.$on('someEvent', listenerFn);
 
-                sinon.assert.calledOnce(listenerFn);
-                sinon.assert.calledWithExactly(listenerFn, {name: 'someEvent'});
+                    $scope[method]('someEvent');
 
-            });
+                    sinon.assert.calledOnce(listenerFn);
+                    sinon.assert.calledWithExactly(listenerFn, {name: 'someEvent'});
 
-            it('should pass on additional arguments', () => {
+                });
 
-                $scope.$on('someEvent', listenerFn);
+                it('should pass on additional arguments', () => {
 
-                $scope[method]('someEvent', 1, 2);
+                    $scope.$on('someEvent', listenerFn);
 
-                sinon.assert.calledOnce(listenerFn);
-                sinon.assert.calledWithExactly(listenerFn, {name: 'someEvent'}, 1, 2);
+                    $scope[method]('someEvent', 1, 2);
 
-            });
+                    sinon.assert.calledOnce(listenerFn);
+                    sinon.assert.calledWithExactly(listenerFn, {name: 'someEvent'}, 1, 2);
 
-            it('should return an $event object', () => {
+                });
 
-                $scope.$on('someEvent', listenerFn);
+                it('should return an $event object', () => {
 
-                const $event = $scope[method]('someEvent');
+                    $scope.$on('someEvent', listenerFn);
 
-                expect($event).equals({name: 'someEvent'});
+                    const $event = $scope[method]('someEvent');
+
+                    expect($event).equals({name: 'someEvent'});
+
+                });
+
+                it('should not call unregistered listeners', () => {
+
+                    const listenerFn2 = sandbox.stub();
+                    const unhook = $scope.$on('someEvent', listenerFn);
+
+                    $scope.$on('someEvent', listenerFn2);
+
+                    unhook();
+
+                    $scope[method]('someEvent');
+
+                    sinon.assert.notCalled(listenerFn);
+                    sinon.assert.calledOnce(listenerFn2);
+
+                });
+
+                it('should not throw on removing listeners multiple times', () => {
+
+                    const listenerFn2 = sandbox.stub();
+                    const unhook = $scope.$on('someEvent', listenerFn);
+
+                    $scope.$on('someEvent', listenerFn2);
+
+                    unhook();
+                    unhook();
+
+                    $scope[method]('someEvent');
+
+                    sinon.assert.notCalled(listenerFn);
+                    sinon.assert.calledOnce(listenerFn2);
+
+                });
 
             });
 

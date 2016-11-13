@@ -425,6 +425,18 @@ export default class Scope {
 
         listeners[event].push(listenerFn);
 
+        return () => {
+
+            const index = listeners[event].indexOf(listenerFn);
+
+            if (index >= 0) {
+
+                listeners[event].splice(index, 1);
+
+            }
+
+        };
+
     }
 
     $watch(watchFn, listenerFn = (() => {}), compareValues = false) {
