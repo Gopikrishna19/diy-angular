@@ -1689,6 +1689,21 @@ describe('Scope', () => {
 
         });
 
+        it('should $broadcast `$destroy` event', () => {
+
+            const child = $scope.$new();
+            const childListenerFn = sandbox.stub();
+
+            $scope.$on('$destroy', listenerFn);
+            child.$on('$destroy', childListenerFn);
+
+            $scope.$destroy();
+
+            sinon.assert.calledOnce(listenerFn);
+            sinon.assert.calledOnce(childListenerFn);
+
+        });
+
     });
 
     describe('event', () => {
@@ -1820,6 +1835,17 @@ describe('Scope', () => {
 
                     sinon.assert.calledOnce(listenerFn);
                     expect($event.defaultPrevented).true();
+
+                });
+
+                it('should not call listeners of destroyed $scope', () => {
+
+                    $scope.$on(eventName, listenerFn);
+
+                    $scope.$destroy();
+
+                    $scope.$emit(eventName);
+                    sinon.assert.notCalled(listenerFn);
 
                 });
 

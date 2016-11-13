@@ -317,6 +317,8 @@ export default class Scope {
 
     $destroy() {
 
+        this.$broadcast('$destroy');
+
         if (this.$parent) {
 
             const siblings = $$children.get(this.$parent);
@@ -331,6 +333,7 @@ export default class Scope {
         }
 
         $$watchers.set(this, null);
+        $$listeners.set(this, {});
 
     }
 
