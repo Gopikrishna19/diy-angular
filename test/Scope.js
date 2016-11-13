@@ -1700,7 +1700,6 @@ describe('Scope', () => {
         beforeEach(() => {
 
             $event = {
-                currentScope: $scope,
                 name: event,
                 targetScope: $scope
             };
@@ -1746,6 +1745,7 @@ describe('Scope', () => {
 
                     $scope[method](event);
 
+                    $event.currentScope = $scope;
                     sinon.assert.calledOnce(listenerFn);
                     sinon.assert.calledWithExactly(listenerFn, $event);
 
@@ -1757,6 +1757,7 @@ describe('Scope', () => {
 
                     $scope[method](event, 1, 2);
 
+                    $event.currentScope = $scope;
                     sinon.assert.calledOnce(listenerFn);
                     sinon.assert.calledWithExactly(listenerFn, $event, 1, 2);
 
