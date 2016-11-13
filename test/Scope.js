@@ -1737,6 +1737,17 @@ describe('Scope', () => {
 
         });
 
+        it('should only call the listeners matching the event name', () => {
+
+            $scope.$on('someEvent', listenerFn);
+
+            $scope.$broadcast('someOtherEvent');
+            $scope.$emit('someOtherEvent');
+
+            sinon.assert.notCalled(listenerFn);
+
+        });
+
     });
 
 });
