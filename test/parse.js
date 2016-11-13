@@ -99,6 +99,8 @@ describe('parsing', () => {
     it('should throw on invalid expression', () => {
 
         expect(() => parse('1a')).throw(`${literals.UNEXPECTED_NEXT_CHAR} a`);
+        expect(() => parse('12e-')).throw(`${literals.UNEXPECTED_NEXT_CHAR} -`);
+        expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_NEXT_CHAR} -`);
 
     });
 

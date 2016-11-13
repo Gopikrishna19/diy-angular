@@ -1,5 +1,6 @@
 import literals from '../literals';
 
+/* eslint-disable complexity */
 export default class Lexer {
 
     static isFloating(text, index) {
@@ -20,9 +21,16 @@ export default class Lexer {
 
         return [
             char === '.',
+            Lexer.isNumber(char)
+        ].some(condition => condition);
+
+    }
+
+    static isValidExpOperator(char) {
+
+        return [
             char === '+',
             char === '-',
-            char === 'e',
             Lexer.isNumber(char)
         ].some(condition => condition);
 
@@ -31,6 +39,12 @@ export default class Lexer {
     static peek(text, index) {
 
         return text.charAt(index + 1);
+
+    }
+
+    static throwUnexpectedNextCharError(char) {
+
+        throw new Error(`${literals.UNEXPECTED_NEXT_CHAR} ${char}`);
 
     }
 
@@ -51,7 +65,7 @@ export default class Lexer {
 
             } else {
 
-                throw new Error(`${literals.UNEXPECTED_NEXT_CHAR} ${char}`);
+                Lexer.throwUnexpectedNextCharError(char);
 
             }
 
@@ -76,7 +90,26 @@ export default class Lexer {
 
             } else {
 
-                break;
+                const nextChar = Lexer.peek(text, this.index);
+                const prevChar = number.charAt(number.length - 1);
+
+                if (char === 'e' && Lexer.isValidExpOperator(nextChar)) {
+
+                    number += char;
+
+                } else if (Lexer.isValidExpOperator(char) && prevChar === 'e' && nextChar && Lexer.isNumber(nextChar)) {
+
+                    number += char;
+
+                } else if (Lexer.isValidExpOperator(char) && prevChar === 'e' && (!nextChar || !Lexer.isNumber(nextChar))) {
+
+                    Lexer.throwUnexpectedNextCharError(char);
+
+                } else {
+
+                    break;
+
+                }
 
             }
 
