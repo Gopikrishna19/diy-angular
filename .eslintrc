@@ -30,7 +30,10 @@
         ],
         "indent": [
             2,
-            4
+            4,
+            {
+                "SwitchCase": 1
+            }
         ],
         "keyword-spacing": 2,
         "new-cap": 2,
