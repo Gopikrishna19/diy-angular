@@ -130,7 +130,19 @@ export default class Scope {
 
     static $$fireEvent($scope, $event, event, args) {
 
-        forEachRight(($$listeners.get($scope)[event] || []), listener => listener($event, ...args));
+        forEachRight(($$listeners.get($scope)[event] || []), listener => {
+
+            try {
+
+                listener($event, ...args);
+
+            } catch (error) {
+
+                log('error', error);
+
+            }
+
+        });
 
     }
 

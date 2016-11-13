@@ -1849,6 +1849,24 @@ describe('Scope', () => {
 
                 });
 
+                it('should log and continue on exception', () => {
+
+                    $scope.$on(eventName, () => {
+
+                        throw error;
+
+                    });
+                    $scope.$on(eventName, listenerFn);
+
+                    $scope[method](eventName);
+
+                    sinon.assert.calledOnce(logger.log);
+                    sinon.assert.calledWithExactly(logger.log, 'error', error);
+
+                    sinon.assert.calledOnce(listenerFn);
+
+                });
+
             });
 
         });
