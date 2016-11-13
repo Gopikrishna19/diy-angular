@@ -422,107 +422,144 @@ export default class Scope {
             oldKeysCount,
             count = 0;
 
-        const callWatcher = scope => {
+        const initOldArray = () => {
 
-            newValue = watchFn(scope);
+            if (!isArray(oldValue)) {
 
-            if (isObject(newValue)) {
-
-                if (Scope.isArrayLike(newValue)) {
-
-                    if (!isArray(oldValue)) {
-
-                        count += 1;
-                        oldValue = [];
-
-                    }
-
-                    if (newValue.length !== oldValue.length) {
-
-                        count += 1;
-                        oldValue.length = newValue.length;
-
-                    }
-
-                    Array.from(newValue).forEach((value, index) => {
-
-                        if (!Scope.testNaN(value, oldValue[index]) && value !== oldValue[index]) {
-
-                            count += 1;
-                            oldValue[index] = value;
-
-                        }
-
-                    });
-
-                } else {
-
-                    let newKeysCount = 0;
-
-                    if (!isObject(oldValue) || Scope.isArrayLike(oldValue)) {
-
-                        count += 1;
-                        oldValue = {};
-                        oldKeysCount = 0;
-
-                    }
-
-                    Object.keys(newValue).forEach(key => {
-
-                        newKeysCount += 1;
-
-                        if (oldValue.hasOwnProperty(key)) {
-
-                            if (!Scope.testNaN(newValue[key], oldValue[key]) && oldValue[key] !== newValue[key]) {
-
-                                count += 1;
-                                oldValue[key] = newValue[key];
-
-                            }
-
-                        } else {
-
-                            count += 1;
-                            oldKeysCount += 1;
-                            oldValue[key] = newValue[key];
-
-                        }
-
-                    });
-
-                    if (oldKeysCount > newKeysCount) {
-
-                        Object.keys(oldValue).forEach(key => {
-
-                            if (!newValue.hasOwnProperty(key)) {
-
-                                count += 1;
-                                oldKeysCount -= 1;
-                                delete oldValue[key];
-
-                            }
-
-                        });
-
-                    }
-
-                }
-
-            } else {
-
-                if (!Scope.$$areEqual(newValue, oldValue, false)) {
-
-                    count += 1;
-
-                }
-
-                oldValue = newValue;
+                count += 1;
+                oldValue = [];
 
             }
+
+            if (newValue.length !== oldValue.length) {
+
+                count += 1;
+                oldValue.length = newValue.length;
+
+            }
+
+        };
+
+        const initOldObject = () => {
+
+            if (!isObject(oldValue) || Scope.isArrayLike(oldValue)) {
+
+                count += 1;
+                oldValue = {};
+                oldKeysCount = 0;
+
+            }
+
+        };
+
+        const removeStaleKeys = newKeysCount => {
+
+            if (oldKeysCount > newKeysCount) {
+
+                Object.keys(oldValue).forEach(key => {
+
+                    if (!newValue.hasOwnProperty(key)) {
+
+                        count += 1;
+                        oldKeysCount -= 1;
+                        delete oldValue[key];
+
+                    }
+
+                });
+
+            }
+
+        };
+
+        const getArrayLikeObjectChanges = () => {
+
+            initOldArray();
+
+            Array.from(newValue).forEach((value, index) => {
+
+                if (!Scope.testNaN(value, oldValue[index]) && value !== oldValue[index]) {
+
+                    count += 1;
+                    oldValue[index] = value;
+
+                }
+
+            });
 
             return count;
 
         };
+
+        const getObjectChanges = () => {
+
+            let newKeysCount = 0;
+
+            initOldObject();
+
+            Object.keys(newValue).forEach(key => {
+
+                newKeysCount += 1;
+
+                if (oldValue.hasOwnProperty(key)) {
+
+                    if (!Scope.testNaN(newValue[key], oldValue[key]) && oldValue[key] !== newValue[key]) {
+
+                        count += 1;
+                        oldValue[key] = newValue[key];
+
+                    }
+
+                } else {
+
+                    count += 1;
+                    oldKeysCount += 1;
+                    oldValue[key] = newValue[key];
+
+                }
+
+            });
+
+            removeStaleKeys(newKeysCount);
+
+            return count;
+
+        };
+
+        const getCollectionChanges = () => {
+
+            if (Scope.isArrayLike(newValue)) {
+
+                return getArrayLikeObjectChanges();
+
+            }
+
+            return getObjectChanges();
+
+        };
+
+        const getPrimitiveChanges = () => {
+
+            if (!Scope.$$areEqual(newValue, oldValue, false)) {
+
+                count += 1;
+
+            }
+
+            oldValue = newValue;
+
+            return count;
+
+        };
+
+        const getChanges = scope => {
+
+            newValue = watchFn(scope);
+
+            return (isObject(newValue) ? getCollectionChanges : getPrimitiveChanges)();
+
+        };
+
         const tellListener = () => {
 
             listenerFn(newValue, originalValue, this);
@@ -535,7 +572,7 @@ export default class Scope {
 
         };
 
-        return this.$watch(callWatcher, tellListener);
+        return this.$watch(getChanges, tellListener);
 
     }
 
