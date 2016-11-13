@@ -135,6 +135,7 @@ describe('parsing', () => {
         expect(() => parse('1a')).throw(`${literals.UNEXPECTED_CHARACTER} a`);
         expect(() => parse('12e-')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
+        expect(() => parse('"def')).throw(`${literals.UNEXPECTED_CHARACTER} f`);
 
     });
 
