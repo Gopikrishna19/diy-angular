@@ -472,6 +472,17 @@ export default class Scope {
 
                     });
 
+                    Object.keys(oldValue).forEach(key => {
+
+                        if (!newValue.hasOwnProperty(key)) {
+
+                            count += 1;
+                            delete oldValue[key];
+
+                        }
+
+                    });
+
                 }
 
             } else {

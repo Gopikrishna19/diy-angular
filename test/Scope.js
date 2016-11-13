@@ -1159,7 +1159,7 @@ describe('Scope', () => {
 
         describe('when watching array like objects', () => {
 
-            it('should detect replaced values', () => {
+            it('should detect changed values', () => {
 
                 $scope.arrayLike = {
                     0: 1,
@@ -1190,7 +1190,7 @@ describe('Scope', () => {
 
         describe('when watching objects', () => {
 
-            it('should detect adding or changing properties', () => {
+            it('should detect adding or changing or removing properties', () => {
 
                 $scope.object = {};
 
@@ -1209,6 +1209,11 @@ describe('Scope', () => {
 
                 listenerFn.reset();
                 $scope.object.prop = 2;
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+
+                listenerFn.reset();
+                delete $scope.object.prop;
                 $scope.$digest();
                 sinon.assert.calledOnce(listenerFn);
 
