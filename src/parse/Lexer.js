@@ -1,6 +1,5 @@
 import literals from '../literals';
 
-/* eslint-disable complexity */
 export default class Lexer {
 
     static ESCAPES = {
@@ -58,6 +57,15 @@ export default class Lexer {
 
     }
 
+    static isBrackets(char) {
+
+        return [
+            char === '[',
+            char === ']'
+        ].some(condition => condition);
+
+    }
+
     static isValidExpOperator(char) {
 
         return [
@@ -111,6 +119,14 @@ export default class Lexer {
             } else if (Lexer.isQuote(char)) {
 
                 tokens.push(this.readString(text, char));
+
+            } else if (Lexer.isBrackets(char)) {
+
+                tokens.push({
+                    text: char
+                });
+
+                this.index += 1;
 
             } else if (Lexer.isIdentifier(char)) {
 

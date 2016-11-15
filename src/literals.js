@@ -3,5 +3,6 @@ export default {
     INVALID_UNICODE: 'Invalid unicode',
     MISMATCHED_QUOTES: 'Mismatched quotes',
     PHASE_ALREADY_IN_PROGRESS: 'already in progress',
-    UNEXPECTED_CHARACTER: 'Unexpected character:'
+    UNEXPECTED_CHARACTER: 'Unexpected character:',
+    UNEXPECTED_EXPECTED: 'Unexpected. Expecting:'
 };

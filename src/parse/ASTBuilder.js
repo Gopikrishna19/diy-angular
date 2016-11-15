@@ -1,7 +1,9 @@
+import literals from '../literals';
+
 export default class ASTBuilder {
 
+    static ARRAY = Symbol.for('ARRAY');
     static LITERAL = Symbol.for('LITERAL');
-    static PROGRAM = Symbol.for('PROGRAM');
     static LITERALS = {
         'false': {
             type: ASTBuilder.LITERAL,
@@ -16,6 +18,7 @@ export default class ASTBuilder {
             value: true
         }
     };
+    static PROGRAM = Symbol.for('PROGRAM');
 
     constructor(lexer) {
 
@@ -40,9 +43,59 @@ export default class ASTBuilder {
 
     }
 
+    consume(text) {
+
+        const token = this.expect(text);
+
+        if (!token) {
+
+            throw `${literals.UNEXPECTED_EXPECTED} ${text}`;
+
+        }
+
+        return token;
+
+    }
+
+    declareArray() {
+
+        this.consume(']');
+
+        return {
+            type: ASTBuilder.ARRAY
+        };
+
+    }
+
+    expect(text) {
+
+        if (this.tokens.length) {
+
+            if (this.tokens[0].text === text || !text) {
+
+                return this.tokens.shift();
+
+            }
+
+        }
+
+        return null;
+
+    }
+
     primary() {
 
-        return ASTBuilder.LITERALS[this.tokens[0].text] || this.constant();
+        if (this.expect('[')) {
+
+            return this.declareArray();
+
+        } else if (ASTBuilder.LITERALS[this.tokens[0].text]) {
+
+            return ASTBuilder.LITERALS[this.tokens[0].text];
+
+        }
+
+        return this.constant();
 
     }
 
