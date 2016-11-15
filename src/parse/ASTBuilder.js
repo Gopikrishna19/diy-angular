@@ -2,6 +2,20 @@ export default class ASTBuilder {
 
     static LITERAL = Symbol.for('LITERAL');
     static PROGRAM = Symbol.for('PROGRAM');
+    static LITERALS = {
+        'false': {
+            type: ASTBuilder.LITERAL,
+            value: false
+        },
+        'null': {
+            type: ASTBuilder.LITERAL,
+            value: null
+        },
+        'true': {
+            type: ASTBuilder.LITERAL,
+            value: true
+        }
+    };
 
     constructor(lexer) {
 
@@ -26,10 +40,16 @@ export default class ASTBuilder {
 
     }
 
+    primary() {
+
+        return ASTBuilder.LITERALS[this.tokens[0].text] || this.constant();
+
+    }
+
     program() {
 
         return {
-            body: this.constant(),
+            body: this.primary(),
             type: ASTBuilder.PROGRAM
         };
 

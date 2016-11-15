@@ -31,6 +31,17 @@ export default class Lexer {
 
     }
 
+    static isIdentifier(char) {
+
+        return [
+            char >= 'a' && char <= 'z',
+            char >= 'A' && char <= 'Z',
+            char === '_',
+            char === '$'
+        ].some(condition => condition);
+
+    }
+
     static isNumber(char) {
 
         return char >= '0' && char <= '9';
@@ -88,6 +99,10 @@ export default class Lexer {
 
                 tokens.push(this.readString(text, char));
 
+            } else if (Lexer.isIdentifier(char)) {
+
+                tokens.push(this.readIdentifier(text));
+
             } else {
 
                 Lexer.throwUnexpectedCharError(char);
@@ -97,6 +112,35 @@ export default class Lexer {
         }
 
         return tokens;
+
+    }
+
+    readIdentifier(text) {
+
+        let char,
+            identifier = '';
+
+        while (this.index < text.length) {
+
+            char = text.charAt(this.index);
+
+            if (Lexer.isIdentifier(char) || Lexer.isNumber(char)) {
+
+                identifier += char;
+
+            } else {
+
+                break;
+
+            }
+
+            this.index += 1;
+
+        }
+
+        return {
+            text: identifier
+        };
 
     }
 

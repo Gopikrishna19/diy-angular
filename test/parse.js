@@ -155,9 +155,49 @@ describe('parsing', () => {
 
     });
 
+    describe('literals', () => {
+
+        it('should parse null', () => {
+
+            fn = parse('null');
+
+            expect(fn).function();
+            expect(fn()).null();
+
+        });
+
+        it('should parse true', () => {
+
+            fn = parse('true');
+
+            expect(fn).function();
+            expect(fn()).true();
+
+        });
+
+        it('should parse false', () => {
+
+            fn = parse('false');
+
+            expect(fn).function();
+            expect(fn()).false();
+
+        });
+
+        it('should parse identifiers', () => {
+
+            fn = parse('abc123');
+
+            expect(fn).function();
+            expect(fn()).undefined();
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
-        expect(() => parse('1a')).throw(`${literals.UNEXPECTED_CHARACTER} a`);
+        expect(() => parse('-1a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('12e-')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('"def')).throw(literals.MISMATCHED_QUOTES);

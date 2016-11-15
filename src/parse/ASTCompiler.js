@@ -7,13 +7,23 @@ export default class ASTCompiler {
         const radix = 16;
         const start = -4;
 
-        return typeof value === 'string' ? `'${
-            value.replace(/[^ a-zA-Z0-9]/g, char => `\\u${
-                (`0000${
-                    char.charCodeAt(0).toString(radix)
-                    }`).slice(start)
-                }`)
-            }'` : value;
+        if (typeof value === 'string') {
+
+            return `'${
+                value.replace(/[^ a-zA-Z0-9]/g, char => `\\u${
+                    (`0000${
+                        char.charCodeAt(0).toString(radix)
+                        }`).slice(start)
+                    }`)
+                }'`;
+
+        } else if (value === null) {
+
+            return 'null';
+
+        }
+
+        return value;
 
     }
 
