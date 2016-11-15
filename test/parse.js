@@ -221,6 +221,24 @@ describe('parsing', () => {
 
         });
 
+        it('should parse arrays with values', () => {
+
+            fn = parse('[0, 1, 2]');
+
+            expect(fn).function();
+            expect(fn()).equals([0, 1, 2]);
+
+        });
+
+        it('should parse arrays with complex values', () => {
+
+            fn = parse('[0, "abc", [null,true], false]');
+
+            expect(fn).function();
+            expect(fn()).equals([0, 'abc', [null, true], false]);
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
@@ -230,7 +248,7 @@ describe('parsing', () => {
         expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('"def')).throw(literals.MISMATCHED_QUOTES);
         expect(() => parse('"\\u0T00"')).throw(literals.INVALID_UNICODE);
-        expect(() => parse('[')).throw(`${literals.UNEXPECTED_EXPECTED} ]`);
+        expect(() => parse('[1')).throw(`${literals.UNEXPECTED_EXPECTED} ]`);
 
     });
 

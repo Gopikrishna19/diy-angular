@@ -120,7 +120,7 @@ export default class Lexer {
 
                 tokens.push(this.readString(text, char));
 
-            } else if (Lexer.isBrackets(char)) {
+            } else if (Lexer.isBrackets(char) || char === ',') {
 
                 tokens.push({
                     text: char

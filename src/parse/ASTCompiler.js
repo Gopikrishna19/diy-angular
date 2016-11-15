@@ -50,7 +50,9 @@ export default class ASTCompiler {
     recurse(ast) {
 
         const nodeTypes = {
-            [ASTBuilder.ARRAY]: () => '[]',
+            [ASTBuilder.ARRAY]: () => `[${
+                ast.elements.map(element => this.recurse(element)).join(',')
+                }]`,
             [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value),
             [ASTBuilder.PROGRAM]: () => {
 

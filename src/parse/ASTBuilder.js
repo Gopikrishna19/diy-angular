@@ -38,7 +38,7 @@ export default class ASTBuilder {
 
         return {
             type: ASTBuilder.LITERAL,
-            value: this.tokens[0].value
+            value: this.consume().value
         };
 
     }
@@ -59,9 +59,22 @@ export default class ASTBuilder {
 
     declareArray() {
 
+        const elements = [];
+
+        if (!this.peek(']')) {
+
+            do {
+
+                elements.push((this.primary()));
+
+            } while (this.expect(','));
+
+        }
+
         this.consume(']');
 
         return {
+            elements,
             type: ASTBuilder.ARRAY
         };
 
@@ -69,11 +82,23 @@ export default class ASTBuilder {
 
     expect(text) {
 
+        if (this.peek(text)) {
+
+            return this.tokens.shift();
+
+        }
+
+        return null;
+
+    }
+
+    peek(text) {
+
         if (this.tokens.length) {
 
             if (this.tokens[0].text === text || !text) {
 
-                return this.tokens.shift();
+                return this.tokens[0];
 
             }
 
@@ -91,7 +116,7 @@ export default class ASTBuilder {
 
         } else if (ASTBuilder.LITERALS[this.tokens[0].text]) {
 
-            return ASTBuilder.LITERALS[this.tokens[0].text];
+            return ASTBuilder.LITERALS[this.consume().text];
 
         }
 
