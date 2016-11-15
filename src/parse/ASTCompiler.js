@@ -55,7 +55,9 @@ export default class ASTCompiler {
                 }]`,
             [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value),
             [ASTBuilder.OBJECT]: () => `{${
-                ast.properties.map(property => `${ASTCompiler.escape(property.key.value)}:${this.recurse(property.value)}`)
+                ast.properties.map(({key, value}) => `${
+                    key.type === ASTBuilder.IDENTIFIER ? key.name : ASTCompiler.escape(key.value)
+                    }: ${this.recurse(value)}`)
                 }}`,
             [ASTBuilder.PROGRAM]: () => {
 

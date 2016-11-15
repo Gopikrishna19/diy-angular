@@ -265,6 +265,23 @@ describe('parsing', () => {
 
         });
 
+        it('should parse objects with complex properties', () => {
+
+            fn = parse('{array: [{a: 1}, 2], object: {a: [true, false]}}');
+
+            expect(fn).function();
+            expect(fn()).equals({
+                array: [
+                    {a: 1},
+                    2
+                ],
+                object: {
+                    a: [true, false]
+                }
+            });
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
@@ -275,6 +292,8 @@ describe('parsing', () => {
         expect(() => parse('"def')).throw(literals.MISMATCHED_QUOTES);
         expect(() => parse('"\\u0T00"')).throw(literals.INVALID_UNICODE);
         expect(() => parse('[1')).throw(`${literals.UNEXPECTED_EXPECTED} ]`);
+        expect(() => parse('{1')).throw(`${literals.UNEXPECTED_EXPECTED} :`);
+        expect(() => parse('{1:1')).throw(`${literals.UNEXPECTED_EXPECTED} }`);
 
     });
 

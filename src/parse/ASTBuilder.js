@@ -3,6 +3,7 @@ import literals from '../literals';
 export default class ASTBuilder {
 
     static ARRAY = Symbol.for('ARRAY');
+    static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
     static LITERALS = {
         'false': {
@@ -100,7 +101,7 @@ export default class ASTBuilder {
                     type: ASTBuilder.OBJECT_PROPERTY
                 };
 
-                property.key = this.constant();
+                property.key = this.peek().identifier ? this.identifier() : this.constant();
                 this.consume(':');
                 property.value = this.primary();
 
@@ -128,6 +129,15 @@ export default class ASTBuilder {
         }
 
         return null;
+
+    }
+
+    identifier() {
+
+        return {
+            name: this.consume().text,
+            type: ASTBuilder.IDENTIFIER
+        };
 
     }
 

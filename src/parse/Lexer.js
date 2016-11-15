@@ -162,6 +162,7 @@ export default class Lexer {
         }
 
         return {
+            identifier: true,
             text: identifier
         };
 
