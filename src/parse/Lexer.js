@@ -68,6 +68,19 @@ export default class Lexer {
 
     }
 
+    static isWhitespace(char) {
+
+        return [
+            char === ' ',
+            char === '\r',
+            char === '\t',
+            char === '\n',
+            char === '\v',
+            char === '\u00A0'
+        ].some(condition => condition);
+
+    }
+
     static peek(text, index) {
 
         return text.charAt(index + 1);
@@ -102,6 +115,10 @@ export default class Lexer {
             } else if (Lexer.isIdentifier(char)) {
 
                 tokens.push(this.readIdentifier(text));
+
+            } else if (Lexer.isWhitespace(char)) {
+
+                this.index += 1;
 
             } else {
 

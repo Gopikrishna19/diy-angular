@@ -195,6 +195,21 @@ describe('parsing', () => {
 
     });
 
+    describe('whitespace', () => {
+
+        it('should ignore whitespaces', () => {
+
+            const parsedValue = 12;
+
+            fn = parse(' \n12 ');
+
+            expect(fn).function();
+            expect(fn()).equals(parsedValue);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('-1a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
