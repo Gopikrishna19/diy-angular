@@ -230,6 +230,15 @@ describe('parsing', () => {
 
         });
 
+        it('should parse arrays with trailing commas', () => {
+
+            fn = parse('[0, 1, 2, ]');
+
+            expect(fn).function();
+            expect(fn()).equals([0, 1, 2]);
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {

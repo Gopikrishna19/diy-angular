@@ -65,6 +65,12 @@ export default class ASTBuilder {
 
             do {
 
+                if (this.peek(']')) {
+
+                    break;
+
+                }
+
                 elements.push((this.primary()));
 
             } while (this.expect(','));
