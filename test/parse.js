@@ -252,6 +252,19 @@ describe('parsing', () => {
 
         });
 
+        it('should parse objects with properties', () => {
+
+            fn = parse('{"a key":1, `another-key`: 2, \'zero\': 0}');
+
+            expect(fn).function();
+            expect(fn()).equals({
+                'a key': 1,
+                'another-key': 2,
+                zero: 0
+            });
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {

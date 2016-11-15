@@ -51,10 +51,12 @@ export default class ASTCompiler {
 
         const nodeTypes = {
             [ASTBuilder.ARRAY]: () => `[${
-                ast.elements.map(element => this.recurse(element)).join(',')
+                ast.elements.map(element => this.recurse(element))
                 }]`,
             [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value),
-            [ASTBuilder.OBJECT]: () => '{}',
+            [ASTBuilder.OBJECT]: () => `{${
+                ast.properties.map(property => `${ASTCompiler.escape(property.key.value)}:${this.recurse(property.value)}`)
+                }}`,
             [ASTBuilder.PROGRAM]: () => {
 
                 this.state.body.push('return ', this.recurse(ast.body), ';');

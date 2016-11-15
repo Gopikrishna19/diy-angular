@@ -19,6 +19,7 @@ export default class ASTBuilder {
         }
     };
     static OBJECT = Symbol.for('OBJECT');
+    static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
     static PROGRAM = Symbol.for('PROGRAM');
 
     constructor(lexer) {
@@ -89,9 +90,30 @@ export default class ASTBuilder {
 
     declareObject() {
 
+        const properties = [];
+
+        if (!this.peek('}')) {
+
+            do {
+
+                const property = {
+                    type: ASTBuilder.OBJECT_PROPERTY
+                };
+
+                property.key = this.constant();
+                this.consume(':');
+                property.value = this.primary();
+
+                properties.push(property);
+
+            } while (this.expect(','));
+
+        }
+
         this.consume('}');
 
         return {
+            properties,
             type: ASTBuilder.OBJECT
         };
 
