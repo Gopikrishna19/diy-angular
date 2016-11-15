@@ -184,15 +184,6 @@ describe('parsing', () => {
 
         });
 
-        it('should parse identifiers', () => {
-
-            fn = parse('abc123');
-
-            expect(fn).function();
-            expect(fn()).undefined();
-
-        });
-
     });
 
     describe('whitespace', () => {
