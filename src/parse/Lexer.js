@@ -3,6 +3,17 @@ import literals from '../literals';
 /* eslint-disable complexity */
 export default class Lexer {
 
+    static ESCAPES = {
+        '"': '"',
+        '\'': '\'',
+        '`': '`',
+        f: '\f',
+        n: '\n',
+        r: '\r',
+        t: '\t',
+        v: '\v'
+    };
+
     static hasDecimals(char) {
 
         return [
@@ -170,7 +181,7 @@ export default class Lexer {
 
                 } else {
 
-                    const escapedChar = literals.ESCAPES[char];
+                    const escapedChar = Lexer.ESCAPES[char];
 
                     string += escapedChar ? escapedChar : char;
 
