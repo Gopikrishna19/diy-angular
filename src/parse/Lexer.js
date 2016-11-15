@@ -22,6 +22,12 @@ export default class Lexer {
 
     }
 
+    static is(char, chars) {
+
+        return chars.indexOf(char) >= 0;
+
+    }
+
     static isFloating(text, index) {
 
         const char = text[index];
@@ -35,8 +41,7 @@ export default class Lexer {
         return [
             char >= 'a' && char <= 'z',
             char >= 'A' && char <= 'Z',
-            char === '_',
-            char === '$'
+            Lexer.is(char, '_$')
         ].some(condition => condition);
 
     }
@@ -49,32 +54,20 @@ export default class Lexer {
 
     static isQuote(char) {
 
-        return [
-            char === '\'',
-            char === '"',
-            char === '`'
-        ].some(condition => condition);
+        return Lexer.is(char, '\'"`');
 
     }
 
     static isStructSymbol(char) {
 
-        return [
-            char === '[',
-            char === ']',
-            char === '{',
-            char === '}',
-            char === ':',
-            char === ','
-        ].some(condition => condition);
+        return Lexer.is(char, '[]{}:,');
 
     }
 
     static isValidExpOperator(char) {
 
         return [
-            char === '+',
-            char === '-',
+            Lexer.is(char, '+-'),
             Lexer.isNumber(char)
         ].some(condition => condition);
 
@@ -82,14 +75,7 @@ export default class Lexer {
 
     static isWhitespace(char) {
 
-        return [
-            char === ' ',
-            char === '\r',
-            char === '\t',
-            char === '\n',
-            char === '\v',
-            char === '\u00A0'
-        ].some(condition => condition);
+        return Lexer.is(char, ' \r\t\n\v\u00A0');
 
     }
 

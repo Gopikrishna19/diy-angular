@@ -192,7 +192,7 @@ describe('parsing', () => {
 
             const parsedValue = 12;
 
-            fn = parse(' \n12 ');
+            fn = parse(' \n12\r\v\t\u00A0 ');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
