@@ -212,7 +212,7 @@ describe('parsing', () => {
 
     describe('arrays', () => {
 
-        it('should return the value', () => {
+        it('should parse empty arrays', () => {
 
             fn = parse('[]');
 
@@ -230,6 +230,7 @@ describe('parsing', () => {
         expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('"def')).throw(literals.MISMATCHED_QUOTES);
         expect(() => parse('"\\u0T00"')).throw(literals.INVALID_UNICODE);
+        expect(() => parse('[')).throw(`${literals.UNEXPECTED_EXPECTED} ]`);
 
     });
 

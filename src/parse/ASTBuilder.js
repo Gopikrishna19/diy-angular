@@ -49,7 +49,7 @@ export default class ASTBuilder {
 
         if (!token) {
 
-            throw `${literals.UNEXPECTED_EXPECTED} ${text}`;
+            throw new Error(`${literals.UNEXPECTED_EXPECTED} ${text}`);
 
         }
 
