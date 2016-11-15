@@ -4,12 +4,15 @@ import parse from '../src/parse';
 
 describe('parsing', () => {
 
+    let fn;
+
     describe('integers', () => {
 
         it('should return the value', () => {
 
-            const fn = parse('12');
             const parsedValue = 12;
+
+            fn = parse('12');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -22,8 +25,9 @@ describe('parsing', () => {
 
         it('should return the value', () => {
 
-            const fn = parse('1.2');
             const parsedValue = 1.2;
+
+            fn = parse('1.2');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -32,8 +36,9 @@ describe('parsing', () => {
 
         it('should parse expression without integer part', () => {
 
-            const fn = parse('.2');
             const parsedValue = 0.2;
+
+            fn = parse('.2');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -46,8 +51,9 @@ describe('parsing', () => {
 
         it('should return the value', () => {
 
-            const fn = parse('12e3');
             const parsedValue = 12000;
+
+            fn = parse('12e3');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -56,8 +62,9 @@ describe('parsing', () => {
 
         it('should parse expression with float coefficient', () => {
 
-            const fn = parse('.12e3');
             const parsedValue = 120;
+
+            fn = parse('.12e3');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -66,8 +73,9 @@ describe('parsing', () => {
 
         it('should parse expression with negative exponent', () => {
 
-            const fn = parse('12000e-3');
             const parsedValue = 12;
+
+            fn = parse('12000e-3');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -76,8 +84,9 @@ describe('parsing', () => {
 
         it('should parse expression with signed exponent', () => {
 
-            const fn = parse('12e+3');
             const parsedValue = 12000;
+
+            fn = parse('12e+3');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -86,8 +95,9 @@ describe('parsing', () => {
 
         it('should be case insensitive', () => {
 
-            const fn = parse('12E3');
             const parsedValue = 12000;
+
+            fn = parse('12E3');
 
             expect(fn).function();
             expect(fn()).equals(parsedValue);
@@ -100,51 +110,46 @@ describe('parsing', () => {
 
         it('should return the value in double quotes', () => {
 
-            const fn = parse('"abc"');
-            const parsedValue = 'abc';
+            fn = parse('"abc"');
 
             expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(fn()).equals('abc');
 
         });
 
         it('should return the value in single quotes', () => {
 
-            const fn = parse('\'abc\'');
-            const parsedValue = 'abc';
+            fn = parse('\'abc\'');
 
             expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(fn()).equals('abc');
 
         });
 
         it('should return the value in back ticks', () => {
 
-            const fn = parse('`abc`');
-            const parsedValue = 'abc';
+            fn = parse('`abc`');
 
             expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(fn()).equals('abc');
 
         });
 
         it('should parse escaped characters', () => {
 
-            const fn = parse('"a\\\"\\t\\v\\f\\\``\\\'\'\\n\\r\\eb"');
-            const parsedValue = 'a\"\t\v\f\``\'\'\n\reb';
+            fn = parse('"a\\\"\\t\\v\\f\\\``\\\'\'\\n\\r\\eb"');
 
             expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(fn()).equals('a\"\t\v\f\``\'\'\n\reb');
 
         });
 
         it('should parse unicode characters', () => {
 
-            const fn = parse('"\\u00A0"');
-            const parsedValue = '\u00A0';
+            fn = parse('"\\u00A0"');
 
             expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(fn()).equals('\u00A0');
 
         });
 
