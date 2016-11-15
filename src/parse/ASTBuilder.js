@@ -18,6 +18,7 @@ export default class ASTBuilder {
             value: true
         }
     };
+    static OBJECT = Symbol.for('OBJECT');
     static PROGRAM = Symbol.for('PROGRAM');
 
     constructor(lexer) {
@@ -86,6 +87,16 @@ export default class ASTBuilder {
 
     }
 
+    declareObject() {
+
+        this.consume('}');
+
+        return {
+            type: ASTBuilder.OBJECT
+        };
+
+    }
+
     expect(text) {
 
         if (this.peek(text)) {
@@ -119,6 +130,10 @@ export default class ASTBuilder {
         if (this.expect('[')) {
 
             return this.declareArray();
+
+        } else if (this.expect('{')) {
+
+            return this.declareObject();
 
         } else if (ASTBuilder.LITERALS[this.tokens[0].text]) {
 

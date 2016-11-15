@@ -241,6 +241,19 @@ describe('parsing', () => {
 
     });
 
+    describe('objects', () => {
+
+        it('should parse empty arrays', () => {
+
+            fn = parse('{}');
+
+            expect(fn).function();
+            expect(fn()).equals({});
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('-1a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);

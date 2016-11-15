@@ -54,6 +54,7 @@ export default class ASTCompiler {
                 ast.elements.map(element => this.recurse(element)).join(',')
                 }]`,
             [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value),
+            [ASTBuilder.OBJECT]: () => '{}',
             [ASTBuilder.PROGRAM]: () => {
 
                 this.state.body.push('return ', this.recurse(ast.body), ';');

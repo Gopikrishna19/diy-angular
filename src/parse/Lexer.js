@@ -57,6 +57,15 @@ export default class Lexer {
 
     }
 
+    static isBraces(char) {
+
+        return [
+            char === '{',
+            char === '}'
+        ].some(condition => condition);
+
+    }
+
     static isBrackets(char) {
 
         return [
@@ -121,6 +130,14 @@ export default class Lexer {
                 tokens.push(this.readString(text, char));
 
             } else if (Lexer.isBrackets(char) || char === ',') {
+
+                tokens.push({
+                    text: char
+                });
+
+                this.index += 1;
+
+            } else if (Lexer.isBraces(char) || char === ',') {
 
                 tokens.push({
                     text: char
