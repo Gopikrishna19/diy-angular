@@ -1,5 +1,7 @@
 import ASTBuilder from './ASTBuilder';
 
+const $scope = 's';
+
 export default class ASTCompiler {
 
     get nextVar() {
@@ -90,7 +92,6 @@ export default class ASTCompiler {
     compile(text) {
 
         const ast = this.astBuilder.build(text);
-        const $scope = 's';
 
         this.state = {
             body: []
@@ -110,7 +111,6 @@ export default class ASTCompiler {
 
     recurse(ast) {
 
-        const $scope = 's';
         const nodeTypes = {
             [ASTBuilder.ARRAY]: () => `[${
                 ast.elements.map(element => this.recurse(element))
@@ -119,7 +119,7 @@ export default class ASTCompiler {
 
                 const identifier = this.nextVar;
 
-                this.append = ASTCompiler.iff('s', ASTCompiler.assign(identifier, ASTCompiler.getIdentifier($scope, ast.name)));
+                this.append = ASTCompiler.iff($scope, ASTCompiler.assign(identifier, ASTCompiler.getIdentifier($scope, ast.name)));
 
                 return identifier;
 
@@ -130,7 +130,8 @@ export default class ASTCompiler {
                     key.type === ASTBuilder.IDENTIFIER ? key.name : ASTCompiler.escape(key.value)
                     }: ${this.recurse(value)}`)
                 }}`,
-            [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`
+            [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`,
+            [ASTBuilder.THIS]: () => $scope
         };
 
         return nodeTypes[ast.type]();

@@ -5,6 +5,7 @@ export default class ASTBuilder {
     static ARRAY = Symbol.for('ARRAY');
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
+    static THIS = Symbol.for('THIS');
     static LITERALS = {
         'false': {
             type: ASTBuilder.LITERAL,
@@ -13,6 +14,9 @@ export default class ASTBuilder {
         'null': {
             type: ASTBuilder.LITERAL,
             value: null
+        },
+        'this': {
+            type: ASTBuilder.THIS
         },
         'true': {
             type: ASTBuilder.LITERAL,

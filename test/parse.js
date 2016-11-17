@@ -305,6 +305,21 @@ describe('parsing', () => {
 
     });
 
+    describe('this', () => {
+
+        it('should return $scope', () => {
+
+            const $scope = {};
+
+            fn = parse('this');
+
+            expect(fn($scope)).equals($scope);
+            expect(fn()).undefined();
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('-1a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
