@@ -75,6 +75,21 @@ export default class ASTCompiler {
 
     }
 
+    static setPropertyValue(identifier, object, property) {
+
+        return ASTCompiler.iff(
+            object,
+            ASTCompiler.assign(
+                identifier,
+                ASTCompiler.getIdentifier(
+                    object,
+                    property
+                )
+            )
+        );
+
+    }
+
     static iff(condition, consequent) {
 
         return `if (${condition}) { ${consequent} }`;
@@ -119,7 +134,7 @@ export default class ASTCompiler {
 
                 const identifier = this.nextVar;
 
-                this.append = ASTCompiler.iff($scope, ASTCompiler.assign(identifier, ASTCompiler.getIdentifier($scope, ast.name)));
+                this.append = ASTCompiler.setPropertyValue(identifier, $scope, ast.name);
 
                 return identifier;
 
@@ -130,6 +145,16 @@ export default class ASTCompiler {
                     key.type === ASTBuilder.IDENTIFIER ? key.name : ASTCompiler.escape(key.value)
                     }: ${this.recurse(value)}`)
                 }}`,
+            [ASTBuilder.OBJECT_PROPERTY_EXPRESSION]: () => {
+
+                const identifier = this.nextVar;
+                const object = this.recurse(ast.object);
+
+                this.append = ASTCompiler.setPropertyValue(identifier, object, ast.property.name);
+
+                return identifier;
+
+            },
             [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`,
             [ASTBuilder.THIS]: () => $scope
         };

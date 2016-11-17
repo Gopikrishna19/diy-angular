@@ -282,11 +282,29 @@ describe('parsing', () => {
 
         });
 
+        it('should look up nested properties', () => {
+
+            fn = parse('aKey.anotherKey');
+
+            expect(fn({aKey: {anotherKey: 2}})).equals(2);
+            expect(fn({aKey: {}})).undefined();
+            expect(fn({})).undefined();
+
+        });
+
+        it('looks up properties of an object', () => {
+
+            fn = parse('{aKey: 1}.aKey');
+
+            expect(fn()).equals(1);
+
+        });
+
     });
 
     describe('$scope', () => {
 
-        it('should look up an attribute', () => {
+        it('should look up properties', () => {
 
             fn = parse('aValue');
 
@@ -295,7 +313,7 @@ describe('parsing', () => {
 
         });
 
-        it('should return undefined when looking up an attribute on undefined', () => {
+        it('should return undefined when looking up properties on undefined', () => {
 
             fn = parse('aValue');
 

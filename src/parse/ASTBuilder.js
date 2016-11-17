@@ -25,6 +25,7 @@ export default class ASTBuilder {
     };
     static OBJECT = Symbol.for('OBJECT');
     static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
+    static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
     static PROGRAM = Symbol.for('PROGRAM');
 
     constructor(lexer) {
@@ -163,25 +164,41 @@ export default class ASTBuilder {
 
     primary() {
 
+        let primary;
+
         if (this.expect('[')) {
 
-            return this.declareArray();
+            primary = this.declareArray();
 
         } else if (this.expect('{')) {
 
-            return this.declareObject();
+            primary = this.declareObject();
 
         } else if (ASTBuilder.LITERALS[this.tokens[0].text]) {
 
-            return ASTBuilder.LITERALS[this.consume().text];
+            primary = ASTBuilder.LITERALS[this.consume().text];
 
         } else if (this.peek().identifier) {
 
-            return this.identifier();
+            primary = this.identifier();
+
+        } else {
+
+            primary = this.constant();
 
         }
 
-        return this.constant();
+        if (this.expect('.')) {
+
+            primary = {
+                object: primary,
+                property: this.identifier(),
+                type: ASTBuilder.OBJECT_PROPERTY_EXPRESSION
+            };
+
+        }
+
+        return primary;
 
     }
 
