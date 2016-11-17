@@ -284,6 +284,19 @@ describe('parsing', () => {
 
     });
 
+    describe('$scope', () => {
+
+        it('should look up an attribute', () => {
+
+            fn = parse('aValue');
+
+            expect(fn({aValue: 1})).equals(1);
+            expect(fn({})).undefined();
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('-1a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);

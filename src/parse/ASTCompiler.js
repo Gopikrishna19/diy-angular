@@ -27,6 +27,12 @@ export default class ASTCompiler {
 
     }
 
+    static getIdentifier(context, name) {
+
+        return `(${context})['${name}']`;
+
+    }
+
     constructor(astBuilder) {
 
         this.astBuilder = astBuilder;
@@ -36,6 +42,7 @@ export default class ASTCompiler {
     compile(text) {
 
         const ast = this.astBuilder.build(text);
+        const $scope = 's';
 
         this.state = {
             body: []
@@ -43,16 +50,18 @@ export default class ASTCompiler {
 
         this.recurse(ast);
 
-        return new Function(this.state.body.join(''));
+        return new Function($scope, this.state.body.join(''));
 
     }
 
     recurse(ast) {
 
+        const $scope = 's';
         const nodeTypes = {
             [ASTBuilder.ARRAY]: () => `[${
                 ast.elements.map(element => this.recurse(element))
                 }]`,
+            [ASTBuilder.IDENTIFIER]: () => ASTCompiler.getIdentifier($scope, ast.name),
             [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value),
             [ASTBuilder.OBJECT]: () => `{${
                 ast.properties.map(({key, value}) => `${

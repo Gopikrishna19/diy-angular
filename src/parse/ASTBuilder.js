@@ -171,6 +171,10 @@ export default class ASTBuilder {
 
             return ASTBuilder.LITERALS[this.consume().text];
 
+        } else if (this.peek().identifier) {
+
+            return this.identifier();
+
         }
 
         return this.constant();
