@@ -188,7 +188,7 @@ export default class ASTBuilder {
 
         }
 
-        if (this.expect('.')) {
+        while (this.expect('.')) {
 
             primary = {
                 object: primary,

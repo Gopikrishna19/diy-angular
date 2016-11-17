@@ -292,11 +292,22 @@ describe('parsing', () => {
 
         });
 
-        it('looks up properties of an object', () => {
+        it('should look up properties of an object', () => {
 
             fn = parse('{aKey: 1}.aKey');
 
             expect(fn()).equals(1);
+
+        });
+
+        it('should look up properties at any depth', () => {
+
+            fn = parse('aKey.secondKey.thirdKey.fourthKey');
+
+            expect(fn({aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
+            expect(fn({aKey: {secondKey: {thirdKey: {}}}})).undefined();
+            expect(fn({aKey: {}})).undefined();
+            expect(fn()).undefined();
 
         });
 

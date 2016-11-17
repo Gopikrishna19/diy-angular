@@ -24,11 +24,11 @@ export default class ASTCompiler {
 
         let id = 0;
 
-        while (id >= 0) {
+        do {
 
             yield id += 1;
 
-        }
+        } while (id);
 
     }
 
