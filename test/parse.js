@@ -282,32 +282,11 @@ describe('parsing', () => {
 
         });
 
-        it('should look up nested properties', () => {
-
-            fn = parse('aKey.anotherKey');
-
-            expect(fn({aKey: {anotherKey: 2}})).equals(2);
-            expect(fn({aKey: {}})).undefined();
-            expect(fn({})).undefined();
-
-        });
-
-        it('should look up properties of an object', () => {
+        it('should look up properties', () => {
 
             fn = parse('{aKey: 1}.aKey');
 
             expect(fn()).equals(1);
-
-        });
-
-        it('should look up properties at any depth', () => {
-
-            fn = parse('aKey.secondKey.thirdKey.fourthKey');
-
-            expect(fn({aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
-            expect(fn({aKey: {secondKey: {thirdKey: {}}}})).undefined();
-            expect(fn({aKey: {}})).undefined();
-            expect(fn()).undefined();
 
         });
 
@@ -328,6 +307,71 @@ describe('parsing', () => {
 
             fn = parse('aValue');
 
+            expect(fn()).undefined();
+
+        });
+
+        it('should look up nested properties', () => {
+
+            fn = parse('aKey.anotherKey');
+
+            expect(fn({aKey: {anotherKey: 2}})).equals(2);
+            expect(fn({aKey: {}})).undefined();
+            expect(fn({})).undefined();
+
+        });
+
+        it('should look up properties at any depth', () => {
+
+            fn = parse('aKey.secondKey.thirdKey.fourthKey');
+
+            expect(fn({aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
+            expect(fn({aKey: {secondKey: {thirdKey: {}}}})).undefined();
+            expect(fn({aKey: {}})).undefined();
+            expect(fn()).undefined();
+
+        });
+
+        it('should use $locals as primary values', () => {
+
+            fn = parse('aKey');
+
+            const $scope = {aKey: 1};
+            const $locals = {aKey: 2};
+
+            expect(fn($scope, $locals)).equals(2);
+
+        });
+
+        it('should default to $scope from $locals', () => {
+
+            fn = parse('aKey');
+
+            const $scope = {aKey: 1};
+            const $locals = {anotherKey: 2};
+
+            expect(fn($scope, $locals)).equals(1);
+
+        });
+
+        it('should use $locals to look up properties if the first depth matches', () => {
+
+            fn = parse('aKey.anotherKey');
+
+            const $scope = {aKey: {anotherKey: 1}};
+            const $locals = {aKey: {}};
+
+            expect(fn($scope, $locals)).undefined();
+
+        });
+
+        it('should look up properties at any depth from $local', () => {
+
+            fn = parse('aKey.secondKey.thirdKey.fourthKey');
+
+            expect(fn({}, {aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
+            expect(fn({}, {aKey: {secondKey: {thirdKey: {}}}})).undefined();
+            expect(fn({}, {aKey: {}})).undefined();
             expect(fn()).undefined();
 
         });

@@ -1,6 +1,7 @@
 import ASTBuilder from './ASTBuilder';
 
 const $scope = 's';
+const $locals = 'l';
 
 export default class ASTCompiler {
 
@@ -44,6 +45,12 @@ export default class ASTCompiler {
 
     }
 
+    static elsePath(consequent) {
+
+        return `else { ${consequent} }`;
+
+    }
+
     static escape(value) {
 
         const radix = 16;
@@ -69,16 +76,28 @@ export default class ASTCompiler {
 
     }
 
+    static getHasOwnProperty(context, property) {
+
+        return `${context} && ${ASTCompiler.getIdentifier(context, property)}`;
+
+    }
+
     static getIdentifier(context, name) {
 
-        return `(${context})['${name}']`;
+        return `(${context})[${ASTCompiler.escape(name)}]`;
+
+    }
+
+    static ifPath(condition, consequent) {
+
+        return `if (${condition}) { ${consequent} }`;
 
     }
 
     static setPropertyValue(identifier, object, property) {
 
-        return ASTCompiler.iff(
-            object,
+        return ASTCompiler.ifPath(
+            ASTCompiler.getHasOwnProperty(object, property),
             ASTCompiler.assign(
                 identifier,
                 ASTCompiler.getIdentifier(
@@ -87,12 +106,6 @@ export default class ASTCompiler {
                 )
             )
         );
-
-    }
-
-    static iff(condition, consequent) {
-
-        return `if (${condition}) { ${consequent} }`;
 
     }
 
@@ -120,7 +133,7 @@ export default class ASTCompiler {
 
         }
 
-        return new Function($scope, this.state.body.join(''));
+        return new Function($scope, $locals, this.state.body.join(''));
 
     }
 
@@ -134,7 +147,8 @@ export default class ASTCompiler {
 
                 const identifier = this.nextVar;
 
-                this.append = ASTCompiler.setPropertyValue(identifier, $scope, ast.name);
+                this.append = ASTCompiler.setPropertyValue(identifier, $locals, ast.name);
+                this.append = ASTCompiler.elsePath(ASTCompiler.setPropertyValue(identifier, $scope, ast.name));
 
                 return identifier;
 
