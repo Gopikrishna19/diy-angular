@@ -154,6 +154,7 @@ export default class ASTCompiler {
 
             },
             [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value),
+            [ASTBuilder.LOCALS]: () => $locals,
             [ASTBuilder.OBJECT]: () => `{${
                 ast.properties.map(({key, value}) => `${
                     key.type === ASTBuilder.IDENTIFIER ? key.name : ASTCompiler.escape(key.value)

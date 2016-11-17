@@ -334,10 +334,10 @@ describe('parsing', () => {
 
         it('should use $locals as primary values', () => {
 
-            fn = parse('aKey');
-
             const $scope = {aKey: 1};
             const $locals = {aKey: 2};
+
+            fn = parse('aKey');
 
             expect(fn($scope, $locals)).equals(2);
 
@@ -345,10 +345,10 @@ describe('parsing', () => {
 
         it('should default to $scope from $locals', () => {
 
-            fn = parse('aKey');
-
             const $scope = {aKey: 1};
             const $locals = {anotherKey: 2};
+
+            fn = parse('aKey');
 
             expect(fn($scope, $locals)).equals(1);
 
@@ -356,10 +356,10 @@ describe('parsing', () => {
 
         it('should use $locals to look up properties if the first depth matches', () => {
 
-            fn = parse('aKey.anotherKey');
-
             const $scope = {aKey: {anotherKey: 1}};
             const $locals = {aKey: {}};
+
+            fn = parse('aKey.anotherKey');
 
             expect(fn($scope, $locals)).undefined();
 
@@ -378,6 +378,31 @@ describe('parsing', () => {
 
     });
 
+    describe('$locals', () => {
+
+        it('should return $locals', () => {
+
+            const $locals = {aKey: 2};
+
+            fn = parse('$locals');
+
+            expect(fn({}, $locals)).equals($locals);
+            expect(fn()).undefined();
+
+        });
+
+        it('should look up properties in $locals', () => {
+
+            const $locals = {aKey: 1};
+
+            fn = parse('$locals.aKey');
+
+            expect(fn({}, $locals)).equals(1);
+
+        });
+
+    });
+
     describe('this', () => {
 
         it('should return $scope', () => {
@@ -388,6 +413,16 @@ describe('parsing', () => {
 
             expect(fn($scope)).equals($scope);
             expect(fn()).undefined();
+
+        });
+
+        it('should look up properties in $scope', () => {
+
+            const $scope = {aKey: 1};
+
+            fn = parse('this.aKey');
+
+            expect(fn($scope)).equals(1);
 
         });
 

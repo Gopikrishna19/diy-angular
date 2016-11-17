@@ -5,8 +5,16 @@ export default class ASTBuilder {
     static ARRAY = Symbol.for('ARRAY');
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
+    static LOCALS = Symbol.for('LOCALS');
+    static OBJECT = Symbol.for('OBJECT');
+    static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
+    static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
     static THIS = Symbol.for('THIS');
+
     static LITERALS = {
+        '$locals': {
+            type: ASTBuilder.LOCALS
+        },
         'false': {
             type: ASTBuilder.LITERAL,
             value: false
@@ -23,9 +31,6 @@ export default class ASTBuilder {
             value: true
         }
     };
-    static OBJECT = Symbol.for('OBJECT');
-    static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
-    static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
     static PROGRAM = Symbol.for('PROGRAM');
 
     constructor(lexer) {
