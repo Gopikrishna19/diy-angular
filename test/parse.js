@@ -295,6 +295,14 @@ describe('parsing', () => {
 
         });
 
+        it('should return undefined when looking up an attribute on undefined', () => {
+
+            fn = parse('aValue');
+
+            expect(fn()).undefined();
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
