@@ -239,6 +239,14 @@ describe('parsing', () => {
 
         });
 
+        it('should look up dynamic indices', () => {
+
+            fn = parse('[1,2,3,4][1]');
+
+            expect(fn()).equals(2);
+
+        });
+
     });
 
     describe('objects', () => {
@@ -290,6 +298,14 @@ describe('parsing', () => {
 
         });
 
+        it('should look up dynamic properties', () => {
+
+            fn = parse('{aKey: 1}["aKey"]');
+
+            expect(fn()).equals(1);
+
+        });
+
     });
 
     describe('$scope', () => {
@@ -300,6 +316,44 @@ describe('parsing', () => {
 
             expect(fn({aValue: 1})).equals(1);
             expect(fn({})).undefined();
+
+        });
+
+        it('should look up dynamic indices', () => {
+
+            fn = parse('array[1]');
+
+            expect(fn({array: [1, 2]})).equals(2);
+
+        });
+
+        it('should look up dynamic properties', () => {
+
+            fn = parse('object["aKey"]');
+
+            expect(fn({object: {aKey: 1}})).equals(1);
+
+        });
+
+        it('should look up computed indices', () => {
+
+            fn = parse('array[index]');
+
+            expect(fn({
+                array: [1, 2],
+                index: 1
+            })).equals(2);
+
+        });
+
+        it('should look up computed properties', () => {
+
+            fn = parse('object[key]');
+
+            expect(fn({
+                key: 'aKey',
+                object: {aKey: 1}
+            })).equals(1);
 
         });
 

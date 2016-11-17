@@ -76,15 +76,15 @@ export default class ASTCompiler {
 
     }
 
-    static getHasOwnProperty(context, property) {
+    static getHasOwnProperty(context, property, computed) {
 
-        return `${context} && ${ASTCompiler.getIdentifier(context, property)}`;
+        return `${context} && ${ASTCompiler.getIdentifier(context, property, computed)}`;
 
     }
 
-    static getIdentifier(context, name) {
+    static getIdentifier(context, name, computed = false) {
 
-        return `(${context})[${ASTCompiler.escape(name)}]`;
+        return `(${context})[${computed ? name : ASTCompiler.escape(name)}]`;
 
     }
 
@@ -94,15 +94,16 @@ export default class ASTCompiler {
 
     }
 
-    static setPropertyValue(identifier, object, property) {
+    static setPropertyValue(identifier, object, property, computed) {
 
         return ASTCompiler.ifPath(
-            ASTCompiler.getHasOwnProperty(object, property),
+            ASTCompiler.getHasOwnProperty(object, property, computed),
             ASTCompiler.assign(
                 identifier,
                 ASTCompiler.getIdentifier(
                     object,
-                    property
+                    property,
+                    computed
                 )
             )
         );
@@ -164,8 +165,9 @@ export default class ASTCompiler {
 
                 const identifier = this.nextVar;
                 const object = this.recurse(ast.object);
+                const property = ast.computed ? this.recurse(ast.property) : ast.property.name;
 
-                this.append = ASTCompiler.setPropertyValue(identifier, object, ast.property.name);
+                this.append = ASTCompiler.setPropertyValue(identifier, object, property, ast.computed);
 
                 return identifier;
 
