@@ -130,9 +130,9 @@ export default class ASTBuilder {
 
     }
 
-    expect(text) {
+    expect(...targets) {
 
-        if (this.peek(text)) {
+        if (this.peek(...targets)) {
 
             return this.tokens.shift();
 
@@ -151,11 +151,14 @@ export default class ASTBuilder {
 
     }
 
-    peek(text) {
+    peek(...targets) {
 
         if (this.tokens.length) {
 
-            if (this.tokens[0].text === text || !text) {
+            const text = this.tokens[0].text;
+            const peek = targets.reduce((condition, target) => condition || target === text, false) || !targets.some(target => target);
+
+            if (peek) {
 
                 return this.tokens[0];
 
@@ -169,7 +172,8 @@ export default class ASTBuilder {
 
     primary() {
 
-        let primary;
+        let next,
+            primary;
 
         if (this.expect('[')) {
 
@@ -193,13 +197,26 @@ export default class ASTBuilder {
 
         }
 
-        while (this.expect('.')) {
+        while (next = this.expect('.', '[')) {
 
             primary = {
+                computed: false,
                 object: primary,
-                property: this.identifier(),
                 type: ASTBuilder.OBJECT_PROPERTY_EXPRESSION
             };
+
+            if (next.text === '[') {
+
+                primary.property = this.primary();
+                primary.computed = true;
+
+                this.consume(']');
+
+            } else {
+
+                primary.property = this.identifier();
+
+            }
 
         }
 
