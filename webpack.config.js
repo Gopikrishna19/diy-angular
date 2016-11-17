@@ -2,7 +2,10 @@ const packageName = require('./package.json').name;
 
 module.exports = {
     devtool: 'source-map',
-    entry: './index',
+    entry: [
+        'babel-polyfill',
+        './index'
+    ],
     module: {
         loaders: [
             {
