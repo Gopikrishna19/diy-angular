@@ -4,21 +4,17 @@ export default class ASTCompiler {
 
     get nextVar() {
 
-        return `v${this.variableGenerator.next().value}`;
+        const variable = `v${this.variableGenerator.next().value}`;
+
+        this.variables.push(variable);
+
+        return variable;
 
     }
 
     set append(value) {
 
-        if (value instanceof Array) {
-
-            this.state.body.push(...value);
-
-        } else {
-
-            this.state.body.push(value);
-
-        }
+        this.state.body.push(value);
 
     }
 
@@ -40,9 +36,9 @@ export default class ASTCompiler {
 
     }
 
-    static declare(name) {
+    static declare(variables) {
 
-        return `var ${name};`;
+        return `var ${variables};`;
 
     }
 
@@ -87,6 +83,7 @@ export default class ASTCompiler {
 
         this.astBuilder = astBuilder;
         this.variableGenerator = ASTCompiler.nextVar();
+        this.variables = [];
 
     }
 
@@ -100,6 +97,12 @@ export default class ASTCompiler {
         };
 
         this.recurse(ast);
+
+        if (this.variables.length) {
+
+            this.state.body.unshift(ASTCompiler.declare(this.variables));
+
+        }
 
         return new Function($scope, this.state.body.join(''));
 
@@ -116,7 +119,6 @@ export default class ASTCompiler {
 
                 const identifier = this.nextVar;
 
-                this.append = ASTCompiler.declare(identifier);
                 this.append = ASTCompiler.iff('s', ASTCompiler.assign(identifier, ASTCompiler.getIdentifier($scope, ast.name)));
 
                 return identifier;
@@ -128,7 +130,7 @@ export default class ASTCompiler {
                     key.type === ASTBuilder.IDENTIFIER ? key.name : ASTCompiler.escape(key.value)
                     }: ${this.recurse(value)}`)
                 }}`,
-            [ASTBuilder.PROGRAM]: () => this.append = ['return ', this.recurse(ast.body), ';']
+            [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`
         };
 
         return nodeTypes[ast.type]();
