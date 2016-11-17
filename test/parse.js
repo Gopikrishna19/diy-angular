@@ -308,6 +308,18 @@ describe('parsing', () => {
 
     });
 
+    describe('functions', () => {
+
+        it('should return the result', () => {
+
+            fn = parse('call()');
+
+            expect(fn({call: () => 2})).equals(2);
+
+        });
+
+    });
+
     describe('$scope', () => {
 
         it('should look up properties', () => {

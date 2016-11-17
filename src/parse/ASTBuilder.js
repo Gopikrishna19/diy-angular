@@ -3,6 +3,7 @@ import literals from '../literals';
 export default class ASTBuilder {
 
     static ARRAY = Symbol.for('ARRAY');
+    static FUNCTION = Symbol.for('FUNCTION');
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
     static LOCALS = Symbol.for('LOCALS');
@@ -197,24 +198,36 @@ export default class ASTBuilder {
 
         }
 
-        while (next = this.expect('.', '[')) {
-
-            primary = {
-                computed: false,
-                object: primary,
-                type: ASTBuilder.OBJECT_PROPERTY_EXPRESSION
-            };
+        while (next = this.expect('.', '[', '(')) {
 
             if (next.text === '[') {
 
-                primary.property = this.primary();
-                primary.computed = true;
+                primary = {
+                    computed: true,
+                    object: primary,
+                    property: this.primary(),
+                    type: ASTBuilder.OBJECT_PROPERTY_EXPRESSION
+                };
 
                 this.consume(']');
 
+            } else if (next.text === '.') {
+
+                primary = {
+                    computed: false,
+                    object: primary,
+                    property: this.identifier(),
+                    type: ASTBuilder.OBJECT_PROPERTY_EXPRESSION
+                };
+
             } else {
 
-                primary.property = this.identifier();
+                primary = {
+                    callee: primary,
+                    type: ASTBuilder.FUNCTION
+                };
+
+                this.consume(')');
 
             }
 

@@ -144,6 +144,13 @@ export default class ASTCompiler {
             [ASTBuilder.ARRAY]: () => `[${
                 ast.elements.map(element => this.recurse(element))
                 }]`,
+            [ASTBuilder.FUNCTION]: () => {
+
+                const callee = this.recurse(ast.callee);
+
+                return `${callee} && ${callee}()`;
+
+            },
             [ASTBuilder.IDENTIFIER]: () => {
 
                 const identifier = this.nextVar;
