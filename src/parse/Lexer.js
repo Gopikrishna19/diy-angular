@@ -60,7 +60,7 @@ export default class Lexer {
 
     static isStructSymbol(char) {
 
-        return Lexer.is(char, '[]{}:,.()');
+        return Lexer.is(char, '[]{}:,.()=');
 
     }
 

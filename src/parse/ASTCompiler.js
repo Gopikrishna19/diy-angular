@@ -140,7 +140,7 @@ export default class ASTCompiler {
 
         }
 
-        return new Function($scope, $locals, this.state.body.join(''));
+        return new Function($scope, $locals, this.state.body.join('').replace(/;+/g, ';'));
 
     }
 
@@ -150,6 +150,18 @@ export default class ASTCompiler {
             [ASTBuilder.ARRAY]: () => `[${
                 ast.elements.map(element => this.recurse(element))
                 }]`,
+            [ASTBuilder.ASSIGNMENT]: () => {
+
+                const assignContext = {};
+
+                this.recurse(ast.name, assignContext);
+
+                return ASTCompiler.assign(
+                    ASTCompiler.getIdentifier(assignContext.context, assignContext.name, assignContext.computed),
+                    this.recurse(ast.value)
+                );
+
+            },
             [ASTBuilder.FUNCTION]: () => {
 
                 const callContext = {};

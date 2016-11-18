@@ -638,6 +638,77 @@ describe('parsing', () => {
 
     });
 
+    describe('assignments', () => {
+
+        it('should put bare values in $scope', () => {
+
+            const $scope = {};
+
+            parse('a = 1')($scope);
+
+            expect($scope.a).equals(1);
+
+        });
+
+        it('should allow assignments from a function call', () => {
+
+            const $scope = {call: () => 1};
+
+            parse('a = call()')($scope);
+
+            expect($scope.a).equals(1);
+
+        });
+
+        it('should allow assignments to nested properties', () => {
+
+            const $scope = {
+                a: {},
+                call: () => 1
+            };
+
+            parse('a.b = 1')($scope);
+
+            expect($scope.a.b).equals(1);
+
+        });
+
+        it('should allow assignments to computed properties', () => {
+
+            const $scope = {a: {b: {}}};
+
+            parse('a.b["c"] = 1')($scope);
+
+            expect($scope.a.b.c).equals(1);
+
+        });
+
+        it('should allow assignments to complex properties', () => {
+
+            const $scope = {
+                a: [{}],
+                call: () => 1
+            };
+
+            parse('a[0].b = 1')($scope);
+
+            expect($scope.a[0].b).equals(1);
+
+        });
+
+        it('should allow multiple assignments', () => {
+
+            const $scope = {};
+
+            parse('a = b = 1')($scope);
+
+            expect($scope.a).equals(1);
+            expect($scope.b).equals(1);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('-1a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);

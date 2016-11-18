@@ -3,6 +3,7 @@ import literals from '../literals';
 export default class ASTBuilder {
 
     static ARRAY = Symbol.for('ARRAY');
+    static ASSIGNMENT = Symbol.for('ASSIGNMENT');
     static FUNCTION = Symbol.for('FUNCTION');
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
@@ -37,6 +38,24 @@ export default class ASTBuilder {
     constructor(lexer) {
 
         this.lexer = lexer;
+
+    }
+
+    assign() {
+
+        const name = this.primary();
+
+        if (this.expect('=')) {
+
+            return {
+                name,
+                type: ASTBuilder.ASSIGNMENT,
+                value: this.assign()
+            };
+
+        }
+
+        return name;
 
     }
 
@@ -79,7 +98,7 @@ export default class ASTBuilder {
 
             do {
 
-                args.push((this.primary()));
+                args.push((this.assign()));
 
             } while (this.expect(','));
 
@@ -103,7 +122,7 @@ export default class ASTBuilder {
 
                 }
 
-                elements.push((this.primary()));
+                elements.push((this.assign()));
 
             } while (this.expect(','));
 
@@ -132,7 +151,7 @@ export default class ASTBuilder {
 
                 property.key = this.peek().identifier ? this.identifier() : this.constant();
                 this.consume(':');
-                property.value = this.primary();
+                property.value = this.assign();
 
                 properties.push(property);
 
@@ -223,7 +242,7 @@ export default class ASTBuilder {
                 primary = {
                     computed: true,
                     object: primary,
-                    property: this.primary(),
+                    property: this.assign(),
                     type: ASTBuilder.OBJECT_PROPERTY_EXPRESSION
                 };
 
@@ -259,7 +278,7 @@ export default class ASTBuilder {
     program() {
 
         return {
-            body: this.primary(),
+            body: this.assign(),
             type: ASTBuilder.PROGRAM
         };
 
