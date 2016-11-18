@@ -306,6 +306,68 @@ describe('parsing', () => {
 
         });
 
+        it('should not allow access to __proto__', () => {
+
+            const prop = '__proto__';
+
+            expect(() => {
+
+                fn = parse(`a.${prop}`);
+
+                fn({a: {}});
+
+            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+
+        });
+
+        it('should not allow access to __defineGetter__', () => {
+
+            const prop = '__defineGetter__';
+
+            expect(() => {
+
+                fn = parse(`a.${prop}("b", call)`);
+
+                fn({
+                    a: {},
+                    call: () => {}
+                });
+
+            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+
+        });
+
+        it('should not allow access to __defineSetter__', () => {
+
+            const prop = '__defineSetter__';
+
+            expect(() => {
+
+                fn = parse(`a.${prop}("b", call)`);
+
+                fn({
+                    a: {},
+                    call: () => {}
+                });
+
+            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+
+        });
+
+        it('should not allow access to __lookupGetter__', () => {
+
+            const prop = '__lookupGetter__';
+
+            expect(() => {
+
+                fn = parse(`a.${prop}("b")`);
+
+                fn({a: {}});
+
+            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+
+        });
+
     });
 
     describe('functions', () => {
@@ -392,6 +454,14 @@ describe('parsing', () => {
 
         });
 
+        it('should look up complex methods in $scope', () => {
+
+            fn = parse('a.call(1)()');
+
+            expect(fn({a: {call: a => () => a}})).equals(1);
+
+        });
+
         it('should look up methods in context', () => {
 
             const $scope = {
@@ -459,6 +529,20 @@ describe('parsing', () => {
             fn = parse('call()');
 
             expect(fn({}, $locals)).equals($locals);
+
+        });
+
+        it('should not allow access to constructor', () => {
+
+            const prop = 'constructor';
+
+            expect(() => {
+
+                fn = parse(`call.${prop}("return 1")()`);
+
+                fn({call: () => {}});
+
+            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
 
         });
 
@@ -715,14 +799,14 @@ describe('parsing', () => {
 
     it('should throw on invalid expression', () => {
 
-        expect(() => parse('-1a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
-        expect(() => parse('12e-')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
-        expect(() => parse('12e-a')).throw(`${literals.UNEXPECTED_CHARACTER} -`);
-        expect(() => parse('"def')).throw(literals.MISMATCHED_QUOTES);
-        expect(() => parse('"\\u0T00"')).throw(literals.INVALID_UNICODE);
-        expect(() => parse('[1')).throw(`${literals.UNEXPECTED_EXPECTED} ]`);
-        expect(() => parse('{1')).throw(`${literals.UNEXPECTED_EXPECTED} :`);
-        expect(() => parse('{1:1')).throw(`${literals.UNEXPECTED_EXPECTED} }`);
+        expect(() => parse('-1a')).throws(`${literals.UNEXPECTED_CHARACTER} -`);
+        expect(() => parse('12e-')).throws(`${literals.UNEXPECTED_CHARACTER} -`);
+        expect(() => parse('12e-a')).throws(`${literals.UNEXPECTED_CHARACTER} -`);
+        expect(() => parse('"def')).throws(literals.MISMATCHED_QUOTES);
+        expect(() => parse('"\\u0T00"')).throws(literals.INVALID_UNICODE);
+        expect(() => parse('[1')).throws(`${literals.UNEXPECTED_EXPECTED} ]`);
+        expect(() => parse('{1')).throws(`${literals.UNEXPECTED_EXPECTED} :`);
+        expect(() => parse('{1:1')).throws(`${literals.UNEXPECTED_EXPECTED} }`);
 
     });
 

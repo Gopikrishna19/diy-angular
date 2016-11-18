@@ -1,4 +1,5 @@
 import ASTBuilder from './ASTBuilder';
+import literals from '../literals';
 
 const $scope = 's';
 const $locals = 'l';
@@ -30,6 +31,16 @@ export default class ASTCompiler {
             yield id += 1;
 
         } while (id);
+
+    }
+
+    static assertMethod(method) {
+
+        if (ASTBuilder.INSECURE_METHODS.indexOf(method) >= 0) {
+
+            throw new Error(`${literals.PROPERTY_ACCESS_DENIED} ${method}`);
+
+        }
 
     }
 
@@ -172,15 +183,20 @@ export default class ASTCompiler {
 
                 const callContext = {};
                 const args = ast.args.map(arg => this.recurse(arg));
+                let name = this.recurse(ast.callee, callContext);
 
-                this.recurse(ast.callee, callContext);
+                if (callContext.name) {
 
-                const name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
+                    name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
+
+                }
 
                 return ASTCompiler.func(name, args);
 
             },
             [ASTBuilder.IDENTIFIER]: () => {
+
+                ASTCompiler.assertMethod(ast.name);
 
                 const identifier = this.nextVar;
 
@@ -215,6 +231,12 @@ export default class ASTCompiler {
                 const identifier = this.nextVar;
                 const object = this.recurse(ast.object, null, sync);
                 const property = ast.computed ? this.recurse(ast.property) : ast.property.name;
+
+                if (!ast.computed) {
+
+                    ASTCompiler.assertMethod(property);
+
+                }
 
                 if (context) {
 

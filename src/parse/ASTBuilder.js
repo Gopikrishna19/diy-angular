@@ -11,6 +11,7 @@ export default class ASTBuilder {
     static OBJECT = Symbol.for('OBJECT');
     static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
     static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
+    static PROGRAM = Symbol.for('PROGRAM');
     static THIS = Symbol.for('THIS');
 
     static LITERALS = {
@@ -33,7 +34,15 @@ export default class ASTBuilder {
             value: true
         }
     };
-    static PROGRAM = Symbol.for('PROGRAM');
+
+    static INSECURE_METHODS = [
+        'constructor',
+        '__proto__',
+        '__defineGetter__',
+        '__defineSetter__',
+        '__lookupGetter__',
+        '__lookupSetter__'
+    ];
 
     constructor(lexer) {
 
