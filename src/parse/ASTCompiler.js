@@ -144,7 +144,7 @@ export default class ASTCompiler {
 
     }
 
-    recurse(ast) {
+    recurse(ast, context) {
 
         const nodeTypes = {
             [ASTBuilder.ARRAY]: () => `[${
@@ -152,8 +152,15 @@ export default class ASTCompiler {
                 }]`,
             [ASTBuilder.FUNCTION]: () => {
 
-                const name = this.recurse(ast.callee);
+                const callContext = {};
                 const args = ast.args.map(arg => this.recurse(arg));
+                let name = this.recurse(ast.callee, callContext);
+
+                if (callContext.name) {
+
+                    name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
+
+                }
 
                 return ASTCompiler.func(name, args);
 
@@ -180,6 +187,14 @@ export default class ASTCompiler {
                 const identifier = this.nextVar;
                 const object = this.recurse(ast.object);
                 const property = ast.computed ? this.recurse(ast.property) : ast.property.name;
+
+                if (context) {
+
+                    context.computed = ast.computed;
+                    context.context = object;
+                    context.name = property;
+
+                }
 
                 this.append = ASTCompiler.setPropertyValue(identifier, object, property, ast.computed);
 

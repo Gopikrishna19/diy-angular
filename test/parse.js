@@ -362,6 +362,74 @@ describe('parsing', () => {
 
         });
 
+        it('should look up methods in $scope', () => {
+
+            const $scope = {
+                object: {
+                    call: () => $scope.object.n,
+                    n: 1
+                }
+            };
+
+            fn = parse('object.call()');
+
+            expect(fn($scope)).equals(1);
+
+        });
+
+        it('should look up computed methods in $scope', () => {
+
+            const $scope = {
+                object: {
+                    call: () => $scope.object.n,
+                    n: 1
+                }
+            };
+
+            fn = parse('object["call"]()');
+
+            expect(fn($scope)).equals(1);
+
+        });
+
+        it('should look up methods in context', () => {
+
+            const $scope = {
+                object: {
+                    call() {
+
+                        return this.n;
+
+                    },
+                    n: 1
+                }
+            };
+
+            fn = parse('object.call()');
+
+            expect(fn($scope)).equals(1);
+
+        });
+
+        it('should look up computed methods in context', () => {
+
+            const $scope = {
+                object: {
+                    call() {
+
+                        return this.n;
+
+                    },
+                    n: 1
+                }
+            };
+
+            fn = parse('object["call"]()');
+
+            expect(fn($scope)).equals(1);
+
+        });
+
     });
 
     describe('$scope', () => {
