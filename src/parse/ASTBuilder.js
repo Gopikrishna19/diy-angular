@@ -71,6 +71,24 @@ export default class ASTBuilder {
 
     }
 
+    buildArguments() {
+
+        const args = [];
+
+        if (!this.peek(')')) {
+
+            do {
+
+                args.push((this.primary()));
+
+            } while (this.expect(','));
+
+        }
+
+        return args;
+
+    }
+
     declareArray() {
 
         const elements = [];
@@ -223,6 +241,7 @@ export default class ASTBuilder {
             } else {
 
                 primary = {
+                    args: this.buildArguments(),
                     callee: primary,
                     type: ASTBuilder.FUNCTION
                 };

@@ -76,6 +76,12 @@ export default class ASTCompiler {
 
     }
 
+    static func(name, args) {
+
+        return `${name} && ${name}(${args})`;
+
+    }
+
     static getHasOwnProperty(context, property, computed) {
 
         return `${context} && ${ASTCompiler.getIdentifier(context, property, computed)}`;
@@ -146,9 +152,10 @@ export default class ASTCompiler {
                 }]`,
             [ASTBuilder.FUNCTION]: () => {
 
-                const callee = this.recurse(ast.callee);
+                const name = this.recurse(ast.callee);
+                const args = ast.args.map(arg => this.recurse(arg));
 
-                return `${callee} && ${callee}()`;
+                return ASTCompiler.func(name, args);
 
             },
             [ASTBuilder.IDENTIFIER]: () => {

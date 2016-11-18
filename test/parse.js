@@ -318,6 +318,50 @@ describe('parsing', () => {
 
         });
 
+        it('should parse calls with arguments', () => {
+
+            fn = parse('call(1)');
+
+            expect(fn({call: a => a + 1})).equals(2);
+
+        });
+
+        it('should parse calls with computed arguments', () => {
+
+            fn = parse('call(n)');
+
+            expect(fn({
+                call: a => a + 1,
+                n: 1
+            })).equals(2);
+
+        });
+
+        it('should parse calls with functional arguments', () => {
+
+            fn = parse('call(args())');
+
+            expect(fn({
+                args: () => 1,
+                call: a => a + 1
+            })).equals(2);
+
+        });
+
+        it('should parse calls with multiple arguments', () => {
+
+            const parsedValue = 4;
+
+            fn = parse('call(1, n, args())');
+
+            expect(fn({
+                args: () => 1,
+                call: (a, b, c) => a + b + c + 1,
+                n: 1
+            })).equals(parsedValue);
+
+        });
+
     });
 
     describe('$scope', () => {
