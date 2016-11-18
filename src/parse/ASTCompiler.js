@@ -44,6 +44,12 @@ export default class ASTCompiler {
 
     }
 
+    static assertComputedMethod(method) {
+
+        return `assertMethod(${method});`;
+
+    }
+
     static assign(name, value) {
 
         return `${name} = ${value};`;
@@ -157,7 +163,10 @@ export default class ASTCompiler {
 
         }
 
-        return new Function($scope, $locals, this.state.body.join('').replace(/;+/g, ';'));
+        return new Function(
+            'assertMethod',
+            `return function(${$scope}, ${$locals}) { ${this.state.body.join('').replace(/;+/g, ';')} }`
+        )(ASTCompiler.assertMethod);
 
     }
 
@@ -232,7 +241,11 @@ export default class ASTCompiler {
                 const object = this.recurse(ast.object, null, sync);
                 const property = ast.computed ? this.recurse(ast.property) : ast.property.name;
 
-                if (!ast.computed) {
+                if (ast.computed) {
+
+                    this.append = ASTCompiler.assertComputedMethod(property);
+
+                } else {
 
                     ASTCompiler.assertMethod(property);
 

@@ -368,6 +368,20 @@ describe('parsing', () => {
 
         });
 
+        it('should not allow access to computed descriptors', () => {
+
+            const prop = '__lookupSetter__';
+
+            expect(() => {
+
+                fn = parse(`a["${prop}"]("b")`);
+
+                fn({a: {}});
+
+            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+
+        });
+
     });
 
     describe('functions', () => {

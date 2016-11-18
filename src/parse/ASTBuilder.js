@@ -230,7 +230,7 @@ export default class ASTBuilder {
 
             primary = this.declareObject();
 
-        } else if (ASTBuilder.LITERALS[this.tokens[0].text]) {
+        } else if (ASTBuilder.LITERALS.hasOwnProperty(this.tokens[0].text)) {
 
             primary = ASTBuilder.LITERALS[this.consume().text];
 
