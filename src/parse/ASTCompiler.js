@@ -100,6 +100,12 @@ export default class ASTCompiler {
 
     }
 
+    static not(condition) {
+
+        return `!(${condition})`;
+
+    }
+
     static setPropertyValue(identifier, object, property, computed) {
 
         return ASTCompiler.ifPath(
@@ -144,7 +150,7 @@ export default class ASTCompiler {
 
     }
 
-    recurse(ast, context) {
+    recurse(ast, context = null, sync = false) {
 
         const nodeTypes = {
             [ASTBuilder.ARRAY]: () => `[${
@@ -154,7 +160,7 @@ export default class ASTCompiler {
 
                 const assignContext = {};
 
-                this.recurse(ast.name, assignContext);
+                this.recurse(ast.name, assignContext, true);
 
                 return ASTCompiler.assign(
                     ASTCompiler.getIdentifier(assignContext.context, assignContext.name, assignContext.computed),
@@ -179,7 +185,12 @@ export default class ASTCompiler {
                 const identifier = this.nextVar;
 
                 this.append = ASTCompiler.setPropertyValue(identifier, $locals, ast.name);
-                this.append = ASTCompiler.elsePath(ASTCompiler.setPropertyValue(identifier, $scope, ast.name));
+                this.append = ASTCompiler.elsePath(
+                    (sync ? ASTCompiler.ifPath(
+                        ASTCompiler.not(ASTCompiler.getHasOwnProperty($scope, ast.name)),
+                        ASTCompiler.assign(ASTCompiler.getIdentifier($scope, ast.name, ast.computed), '{}')
+                    ) : '') + ASTCompiler.setPropertyValue(identifier, $scope, ast.name)
+                );
 
                 if (context) {
 
@@ -202,7 +213,7 @@ export default class ASTCompiler {
             [ASTBuilder.OBJECT_PROPERTY_EXPRESSION]: () => {
 
                 const identifier = this.nextVar;
-                const object = this.recurse(ast.object);
+                const object = this.recurse(ast.object, null, sync);
                 const property = ast.computed ? this.recurse(ast.property) : ast.property.name;
 
                 if (context) {
@@ -210,6 +221,17 @@ export default class ASTCompiler {
                     context.computed = ast.computed;
                     context.context = object;
                     context.name = property;
+
+                }
+
+                if (sync) {
+
+                    const propertyPath = ASTCompiler.getIdentifier(object, property, ast.computed);
+
+                    this.append = ASTCompiler.ifPath(
+                        ASTCompiler.not(propertyPath),
+                        ASTCompiler.assign(propertyPath, '{}')
+                    );
 
                 }
 

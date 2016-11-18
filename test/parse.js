@@ -662,10 +662,7 @@ describe('parsing', () => {
 
         it('should allow assignments to nested properties', () => {
 
-            const $scope = {
-                a: {},
-                call: () => 1
-            };
+            const $scope = {a: {}};
 
             parse('a.b = 1')($scope);
 
@@ -685,10 +682,7 @@ describe('parsing', () => {
 
         it('should allow assignments to complex properties', () => {
 
-            const $scope = {
-                a: [{}],
-                call: () => 1
-            };
+            const $scope = {a: [{}]};
 
             parse('a[0].b = 1')($scope);
 
@@ -704,6 +698,16 @@ describe('parsing', () => {
 
             expect($scope.a).equals(1);
             expect($scope.b).equals(1);
+
+        });
+
+        it('should sync path before assigning', () => {
+
+            const $scope = {};
+
+            parse('a[0].b = 1')($scope);
+
+            expect($scope.a[0].b).equals(1);
 
         });
 
