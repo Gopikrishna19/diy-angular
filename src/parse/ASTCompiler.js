@@ -154,13 +154,10 @@ export default class ASTCompiler {
 
                 const callContext = {};
                 const args = ast.args.map(arg => this.recurse(arg));
-                let name = this.recurse(ast.callee, callContext);
 
-                if (callContext.name) {
+                this.recurse(ast.callee, callContext);
 
-                    name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
-
-                }
+                const name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
 
                 return ASTCompiler.func(name, args);
 
@@ -171,6 +168,14 @@ export default class ASTCompiler {
 
                 this.append = ASTCompiler.setPropertyValue(identifier, $locals, ast.name);
                 this.append = ASTCompiler.elsePath(ASTCompiler.setPropertyValue(identifier, $scope, ast.name));
+
+                if (context) {
+
+                    context.computed = false;
+                    context.context = `${ASTCompiler.getHasOwnProperty($locals, ast.name)} ? ${$locals}: ${$scope}`;
+                    context.name = ast.name;
+
+                }
 
                 return identifier;
 

@@ -430,6 +430,38 @@ describe('parsing', () => {
 
         });
 
+        it('should bind bare functions to $scope', () => {
+
+            const $scope = {
+                call() {
+
+                    return this;
+
+                }
+            };
+
+            fn = parse('call()');
+
+            expect(fn($scope)).equals($scope);
+
+        });
+
+        it('should bind bare functions to $locals', () => {
+
+            const $locals = {
+                call() {
+
+                    return this;
+
+                }
+            };
+
+            fn = parse('call()');
+
+            expect(fn({}, $locals)).equals($locals);
+
+        });
+
     });
 
     describe('$scope', () => {
