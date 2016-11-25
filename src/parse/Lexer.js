@@ -1,3 +1,4 @@
+import ASTBuilder from './ASTBuilder';
 import literals from '../literals';
 
 export default class Lexer {
@@ -49,6 +50,12 @@ export default class Lexer {
     static isNumber(char) {
 
         return char >= '0' && char <= '9';
+
+    }
+
+    static isOperator(char) {
+
+        return Lexer.is(char, ASTBuilder.OPERATORS.join(''));
 
     }
 
@@ -112,9 +119,7 @@ export default class Lexer {
 
             } else if (Lexer.isStructSymbol(char)) {
 
-                tokens.push({
-                    text: char
-                });
+                tokens.push({text: char});
 
                 this.index += 1;
 
@@ -123,6 +128,12 @@ export default class Lexer {
                 tokens.push(this.readIdentifier(text));
 
             } else if (Lexer.isWhitespace(char)) {
+
+                this.index += 1;
+
+            } else if (Lexer.isOperator(char)) {
+
+                tokens.push({text: char});
 
                 this.index += 1;
 

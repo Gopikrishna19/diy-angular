@@ -344,7 +344,8 @@ export default class ASTCompiler {
 
             },
             [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`,
-            [ASTBuilder.THIS]: () => $scope
+            [ASTBuilder.THIS]: () => $scope,
+            [ASTBuilder.UNARY]: () => `${ast.operator}(${this.recurse(ast.operand)})`
         };
 
         return nodeTypes[ast.type]();

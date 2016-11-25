@@ -13,6 +13,7 @@ export default class ASTBuilder {
     static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
     static PROGRAM = Symbol.for('PROGRAM');
     static THIS = Symbol.for('THIS');
+    static UNARY = Symbol.for('UNARY');
 
     static LITERALS = {
         '$locals': {
@@ -44,6 +45,8 @@ export default class ASTBuilder {
         '__lookupSetter__'
     ];
 
+    static OPERATORS = ['+'];
+
     constructor(lexer) {
 
         this.lexer = lexer;
@@ -52,14 +55,14 @@ export default class ASTBuilder {
 
     assign() {
 
-        const name = this.primary();
+        const name = this.unary();
 
         if (this.expect('=')) {
 
             return {
                 name,
                 type: ASTBuilder.ASSIGNMENT,
-                value: this.assign()
+                value: this.unary()
             };
 
         }
@@ -290,6 +293,16 @@ export default class ASTBuilder {
             body: this.assign(),
             type: ASTBuilder.PROGRAM
         };
+
+    }
+
+    unary() {
+
+        return this.expect('+') ? {
+            operand: this.primary(),
+            operator: '+',
+            type: ASTBuilder.UNARY
+        } : this.primary();
 
     }
 

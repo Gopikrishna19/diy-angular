@@ -940,6 +940,17 @@ describe('parsing', () => {
 
     });
 
+    describe('unary operators', () => {
+
+        it('should parse unary +', () => {
+
+            expect(parse('+2')()).equals(2);
+            expect(parse('+a')({a: 2})).equals(2);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('-1a')).throws(`${literals.UNEXPECTED_CHARACTER} -`);
