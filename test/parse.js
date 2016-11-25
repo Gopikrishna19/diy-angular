@@ -418,13 +418,21 @@ describe('parsing', () => {
                     find: () => {},
                     prop: {}
                 }
-            })).throws();
+            })).throws(literals.DOM_ACCESS_DENIED);
             expect(() => fn({
                 el: {
                     children: [],
                     nodeName: 'DIV'
                 }
-            })).throws();
+            })).throws(literals.DOM_ACCESS_DENIED);
+
+        });
+
+        it('should not allow access to Object', () => {
+
+            fn = parse('object.create({})');
+
+            expect(() => fn({object: Object})).throws(literals.OBJECT_ACCESS_DENIED);
 
         });
 
