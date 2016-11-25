@@ -208,7 +208,7 @@ export default class ASTCompiler {
 
                 return ASTCompiler.assign(
                     ASTCompiler.getIdentifier(assignContext.context, assignContext.name, assignContext.computed),
-                    this.recurse(ast.value)
+                    ASTCompiler.assertComputedObject(this.recurse(ast.value))
                 );
 
             },

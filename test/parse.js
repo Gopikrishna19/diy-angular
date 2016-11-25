@@ -850,17 +850,6 @@ describe('parsing', () => {
 
         });
 
-        it('should allow multiple assignments', () => {
-
-            const $scope = {};
-
-            parse('a = b = 1')($scope);
-
-            expect($scope.a).equals(1);
-            expect($scope.b).equals(1);
-
-        });
-
         it('should sync path before assigning', () => {
 
             const $scope = {};
@@ -868,6 +857,19 @@ describe('parsing', () => {
             parse('a[0].b = 1')($scope);
 
             expect($scope.a[0].b).equals(1);
+
+        });
+
+        it('should not allow window to be assigned', () => {
+
+            global.window = {};
+            global.window.window = window;
+
+            fn = parse('wnd = obj');
+
+            expect(() => fn({
+                obj: window
+            })).throws(literals.WINDOW_ACCESS_DENIED);
 
         });
 
