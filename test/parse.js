@@ -647,13 +647,46 @@ describe('parsing', () => {
 
         });
 
-        it('should allow window to be returned', () => {
+        it('should not allow window to be returned', () => {
 
             fn = parse('func()');
 
             expect(() => fn({
                 func: () => window
             })).throws(literals.WINDOW_ACCESS_DENIED);
+
+        });
+
+        it('should not allow `.apply`', () => {
+
+            fn = parse('func.apply(obj)');
+
+            expect(() => fn({
+                func: () => {},
+                obj: {}
+            })).throws(literals.APPLY_BIND_CALL_ACCESS_DENIED);
+
+        });
+
+        it('should not allow `.bind`', () => {
+
+            fn = parse('func.bind(obj)');
+
+            expect(() => fn({
+                func: () => {},
+                obj: {}
+            })).throws(literals.APPLY_BIND_CALL_ACCESS_DENIED);
+
+        });
+
+        it('should not allow `.call`', () => {
+
+            fn = parse('func.call(obj)');
+
+            expect(() => fn({
+                func: () => {},
+                obj: {}
+            })).throws(literals.APPLY_BIND_CALL_ACCESS_DENIED);
 
         });
 

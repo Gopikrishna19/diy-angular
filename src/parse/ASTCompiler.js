@@ -34,6 +34,24 @@ export default class ASTCompiler {
 
     }
 
+    static assertFunction(object) {
+
+        if (
+            [
+                object === Function.prototype.apply,
+                object === Function.prototype.bind,
+                object === Function.prototype.call
+            ].some(condition => condition)
+        ) {
+
+            throw new Error(literals.APPLY_BIND_CALL_ACCESS_DENIED);
+
+        }
+
+        return object;
+
+    }
+
     static assertMethod(method) {
 
         if (ASTBuilder.INSECURE_METHODS.indexOf(method) >= 0) {
@@ -46,7 +64,7 @@ export default class ASTCompiler {
 
     static assertObject(object) {
 
-        if (object && object.window === object) {
+        if (object.window === object) {
 
             throw new Error(literals.WINDOW_ACCESS_DENIED);
 
@@ -65,6 +83,12 @@ export default class ASTCompiler {
         }
 
         return object;
+
+    }
+
+    static assertComputedFunction(method) {
+
+        return `assertFunction(${method});`;
 
     }
 
@@ -196,10 +220,12 @@ export default class ASTCompiler {
         }
 
         return new Function(
+            'assertFunction',
             'assertMethod',
             'assertObject',
             `return function(${$scope}, ${$locals}) { ${this.state.body.join('').replace(/;+/g, ';')} }`
         )(
+            ASTCompiler.assertFunction,
             ASTCompiler.assertMethod,
             ASTCompiler.assertObject
         );
@@ -237,6 +263,8 @@ export default class ASTCompiler {
                     name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
 
                 }
+
+                this.append = ASTCompiler.assertComputedFunction(name);
 
                 return ASTCompiler.func(name, args);
 

@@ -1,4 +1,5 @@
 export default {
+    APPLY_BIND_CALL_ACCESS_DENIED: 'References to apply, bind or call are not allowed',
     DOM_ACCESS_DENIED: 'References to DOM elements are not allowed',
     INFINITE_DIGESTION: 'Infinite Digestion! 10 digest iterations reached.',
     INVALID_UNICODE: 'Invalid unicode',
