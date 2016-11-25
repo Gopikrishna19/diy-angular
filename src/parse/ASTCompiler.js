@@ -50,6 +50,10 @@ export default class ASTCompiler {
 
             throw new Error(literals.WINDOW_ACCESS_DENIED);
 
+        } else if (object.children && (object.nodeName || (object.prop && object.attr && object.find))) {
+
+            throw new Error(literals.DOM_ACCESS_DENIED);
+
         }
 
         return object;

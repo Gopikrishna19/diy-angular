@@ -1,4 +1,5 @@
 export default {
+    DOM_ACCESS_DENIED: 'References to DOM elements are not allowed',
     INFINITE_DIGESTION: 'Infinite Digestion! 10 digest iterations reached.',
     INVALID_UNICODE: 'Invalid unicode',
     MISMATCHED_QUOTES: 'Mismatched quotes',

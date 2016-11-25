@@ -407,6 +407,27 @@ describe('parsing', () => {
 
         });
 
+        it('should not allow access to DOM element as a property', () => {
+
+            fn = parse('el.setAttribute("attr", "val")');
+
+            expect(() => fn({
+                el: {
+                    attr: 'attr',
+                    children: [],
+                    find: () => {},
+                    prop: {}
+                }
+            })).throws();
+            expect(() => fn({
+                el: {
+                    children: [],
+                    nodeName: 'DIV'
+                }
+            })).throws();
+
+        });
+
     });
 
     describe('functions', () => {
