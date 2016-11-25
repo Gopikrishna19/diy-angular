@@ -6,7 +6,7 @@ import sinon from 'sinon';
 
 describe('Scope', () => {
 
-    const delay = 50;
+    const delay = 25;
     const error = new Error('error');
     let $scope,
         listenerFn,
