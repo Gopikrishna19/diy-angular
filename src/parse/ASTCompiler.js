@@ -44,9 +44,27 @@ export default class ASTCompiler {
 
     }
 
+    static assertObject(object) {
+
+        if (object && object.window === object) {
+
+            throw new Error(literals.WINDOW_ACCESS_DENIED);
+
+        }
+
+        return object;
+
+    }
+
     static assertComputedMethod(method) {
 
         return `assertMethod(${method});`;
+
+    }
+
+    static assertComputedObject(object) {
+
+        return `assertObject(${object});`;
 
     }
 
@@ -129,10 +147,12 @@ export default class ASTCompiler {
             ASTCompiler.getHasOwnProperty(object, property, computed),
             ASTCompiler.assign(
                 identifier,
-                ASTCompiler.getIdentifier(
-                    object,
-                    property,
-                    computed
+                ASTCompiler.assertComputedObject(
+                    ASTCompiler.getIdentifier(
+                        object,
+                        property,
+                        computed
+                    )
                 )
             )
         );
@@ -165,8 +185,12 @@ export default class ASTCompiler {
 
         return new Function(
             'assertMethod',
+            'assertObject',
             `return function(${$scope}, ${$locals}) { ${this.state.body.join('').replace(/;+/g, ';')} }`
-        )(ASTCompiler.assertMethod);
+        )(
+            ASTCompiler.assertMethod,
+            ASTCompiler.assertObject
+        );
 
     }
 

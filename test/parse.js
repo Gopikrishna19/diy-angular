@@ -382,6 +382,28 @@ describe('parsing', () => {
 
         });
 
+        it('should not allow access to window as a property', () => {
+
+            global.window = {};
+            global.window.window = window;
+
+            fn = parse('object.wnd');
+
+            expect(() => fn({object: {wnd: window}})).throws(literals.WINDOW_ACCESS_DENIED);
+
+        });
+
+        it('should not allow access to window as a computed property', () => {
+
+            global.window = {};
+            global.window.window = window;
+
+            fn = parse('object["wnd"]');
+
+            expect(() => fn({object: {wnd: window}})).throws(literals.WINDOW_ACCESS_DENIED);
+
+        });
+
     });
 
     describe('functions', () => {
