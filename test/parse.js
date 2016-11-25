@@ -582,6 +582,46 @@ describe('parsing', () => {
 
         });
 
+        it('should not allow window as a parameter', () => {
+
+            global.window = {};
+            global.window.window = window;
+
+            fn = parse('func(wnd)');
+
+            expect(() => fn({
+                func: () => {},
+                wnd: window
+            })).throws(literals.WINDOW_ACCESS_DENIED);
+
+        });
+
+        it('should not allow calling window methods', () => {
+
+            global.window = {};
+            global.window.window = window;
+
+            fn = parse('wnd.scrollTo(0)');
+
+            expect(() => fn({
+                wnd: window
+            })).throws(literals.WINDOW_ACCESS_DENIED);
+
+        });
+
+        it('should allow window to be returned', () => {
+
+            global.window = {};
+            global.window.window = window;
+
+            fn = parse('func()');
+
+            expect(() => fn({
+                func: () => window
+            })).throws(literals.WINDOW_ACCESS_DENIED);
+
+        });
+
     });
 
     describe('$scope', () => {

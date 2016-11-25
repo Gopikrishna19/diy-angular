@@ -62,9 +62,9 @@ export default class ASTCompiler {
 
     }
 
-    static assertComputedObject(object) {
+    static assertComputedObject(object, end = true) {
 
-        return `assertObject(${object});`;
+        return `assertObject(${object})${end ? ';' : ''}`;
 
     }
 
@@ -113,7 +113,7 @@ export default class ASTCompiler {
 
     static func(name, args) {
 
-        return `${name} && ${name}(${args})`;
+        return `${name} && ${ASTCompiler.assertComputedObject(`${name}(${args})`, false)}`;
 
     }
 
@@ -219,6 +219,8 @@ export default class ASTCompiler {
                 let name = this.recurse(ast.callee, callContext);
 
                 if (callContext.name) {
+
+                    this.append = ASTCompiler.assertComputedObject(callContext.context);
 
                     name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
 
