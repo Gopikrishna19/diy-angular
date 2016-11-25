@@ -45,7 +45,7 @@ export default class ASTBuilder {
         '__lookupSetter__'
     ];
 
-    static OPERATORS = ['+'];
+    static OPERATORS = ['+', '!'];
 
     constructor(lexer) {
 
@@ -298,9 +298,11 @@ export default class ASTBuilder {
 
     unary() {
 
-        return this.expect('+') ? {
-            operand: this.primary(),
-            operator: '+',
+        const token = this.expect(...ASTBuilder.OPERATORS);
+
+        return token ? {
+            operand: this.unary(),
+            operator: token.text,
             type: ASTBuilder.UNARY
         } : this.primary();
 

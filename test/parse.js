@@ -949,6 +949,15 @@ describe('parsing', () => {
 
         });
 
+        it('should parse unary !', () => {
+
+            expect(parse('!true')()).false();
+            expect(parse('!2')()).false();
+            expect(parse('!a')({a: false})).true();
+            expect(parse('!!a')({a: false})).false();
+
+        });
+
         it('should default to zero', () => {
 
             expect(parse('+a')()).equals(0);
