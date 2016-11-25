@@ -54,6 +54,10 @@ export default class ASTCompiler {
 
             throw new Error(literals.DOM_ACCESS_DENIED);
 
+        } else if (object.constructor === object) {
+
+            throw new Error(`${literals.PROPERTY_ACCESS_DENIED} constructor`);
+
         }
 
         return object;

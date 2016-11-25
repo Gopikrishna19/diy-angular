@@ -606,6 +606,18 @@ describe('parsing', () => {
 
         });
 
+        it('should not allow access to aliased constructor', () => {
+
+            expect(() => {
+
+                fn = parse('call()');
+
+                fn({call: (() => {}).constructor});
+
+            }).throws(`${literals.PROPERTY_ACCESS_DENIED} constructor`);
+
+        });
+
         it('should not allow window as a parameter', () => {
 
             fn = parse('func(wnd)');
