@@ -153,6 +153,12 @@ export default class ASTCompiler {
 
     }
 
+    static getDefaultValue(value, defaultValue) {
+
+        return typeof value === 'undefined' ? defaultValue : value;
+
+    }
+
     static getHasOwnProperty(context, property, computed) {
 
         return `${context} && ${ASTCompiler.getIdentifier(context, property, computed)}`;
@@ -195,6 +201,12 @@ export default class ASTCompiler {
 
     }
 
+    static unary(operator, operand) {
+
+        return `${operator}(getDefaultValue(${operand}, 0))`;
+
+    }
+
     constructor(astBuilder) {
 
         this.astBuilder = astBuilder;
@@ -223,11 +235,13 @@ export default class ASTCompiler {
             'assertFunction',
             'assertMethod',
             'assertObject',
+            'getDefaultValue',
             `return function(${$scope}, ${$locals}) { ${this.state.body.join('').replace(/;+/g, ';')} }`
         )(
             ASTCompiler.assertFunction,
             ASTCompiler.assertMethod,
-            ASTCompiler.assertObject
+            ASTCompiler.assertObject,
+            ASTCompiler.getDefaultValue
         );
 
     }
@@ -345,7 +359,7 @@ export default class ASTCompiler {
             },
             [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`,
             [ASTBuilder.THIS]: () => $scope,
-            [ASTBuilder.UNARY]: () => `${ast.operator}(${this.recurse(ast.operand)})`
+            [ASTBuilder.UNARY]: () => ASTCompiler.unary(ast.operator, this.recurse(ast.operand))
         };
 
         return nodeTypes[ast.type]();

@@ -949,6 +949,12 @@ describe('parsing', () => {
 
         });
 
+        it('should default to zero', () => {
+
+            expect(parse('+a')()).equals(0);
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
