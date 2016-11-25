@@ -6,6 +6,15 @@ describe('parsing', () => {
 
     let fn;
 
+    beforeEach(() => {
+
+        global.window = {};
+        global.window.window = window;
+
+    });
+
+    afterEach(() => delete global.window);
+
     describe('integers', () => {
 
         it('should return the value', () => {
@@ -384,9 +393,6 @@ describe('parsing', () => {
 
         it('should not allow access to window as a property', () => {
 
-            global.window = {};
-            global.window.window = window;
-
             fn = parse('object.wnd');
 
             expect(() => fn({object: {wnd: window}})).throws(literals.WINDOW_ACCESS_DENIED);
@@ -394,9 +400,6 @@ describe('parsing', () => {
         });
 
         it('should not allow access to window as a computed property', () => {
-
-            global.window = {};
-            global.window.window = window;
 
             fn = parse('object["wnd"]');
 
@@ -584,9 +587,6 @@ describe('parsing', () => {
 
         it('should not allow window as a parameter', () => {
 
-            global.window = {};
-            global.window.window = window;
-
             fn = parse('func(wnd)');
 
             expect(() => fn({
@@ -598,9 +598,6 @@ describe('parsing', () => {
 
         it('should not allow calling window methods', () => {
 
-            global.window = {};
-            global.window.window = window;
-
             fn = parse('wnd.scrollTo(0)');
 
             expect(() => fn({
@@ -610,9 +607,6 @@ describe('parsing', () => {
         });
 
         it('should allow window to be returned', () => {
-
-            global.window = {};
-            global.window.window = window;
 
             fn = parse('func()');
 
@@ -862,9 +856,6 @@ describe('parsing', () => {
 
         it('should not allow window to be assigned', () => {
 
-            global.window = {};
-            global.window.window = window;
-
             fn = parse('wnd = obj');
 
             expect(() => fn({
@@ -885,6 +876,7 @@ describe('parsing', () => {
         expect(() => parse('[1')).throws(`${literals.UNEXPECTED_EXPECTED} ]`);
         expect(() => parse('{1')).throws(`${literals.UNEXPECTED_EXPECTED} :`);
         expect(() => parse('{1:1')).throws(`${literals.UNEXPECTED_EXPECTED} }`);
+        expect(() => parse('wnd')({wnd: window})).throws(literals.WINDOW_ACCESS_DENIED);
 
     });
 

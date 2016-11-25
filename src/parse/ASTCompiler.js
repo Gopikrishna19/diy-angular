@@ -251,6 +251,8 @@ export default class ASTCompiler {
 
                 }
 
+                this.append = ASTCompiler.assertComputedMethod(identifier);
+
                 return identifier;
 
             },
