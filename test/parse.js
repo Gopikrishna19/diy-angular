@@ -1004,7 +1004,7 @@ describe('parsing', () => {
 
         });
 
-        it('should parse with higher precedence', () => {
+        it('should parse with higher precedence than additives', () => {
 
             expect(parse('1 + 2 * 2 - 3')()).equals(2);
 
@@ -1039,6 +1039,48 @@ describe('parsing', () => {
 
             expect(parse('a - 1')()).equals(-1);
             expect(parse('2 - a')()).equals(2);
+
+        });
+
+        it('should parse with higher precedence than relational', () => {
+
+            expect(parse('2 + 3 < 6 - 2')()).false();
+
+        });
+
+    });
+
+    describe('relational operators', () => {
+
+        it('should return the value', function () {
+
+            expect(parse('1 < 2')()).true();
+            expect(parse('1 > 2')()).false();
+            expect(parse('1 <= 2')()).true();
+            expect(parse('2 <= 2')()).true();
+            expect(parse('1 >= 2')()).false();
+            expect(parse('2 >= 2')()).true();
+
+        });
+
+        it('should parse with higher precedence than equality', () => {
+
+            expect(parse('2 == "2" > 2 === "2"')()).false();
+
+        });
+
+    });
+
+    describe('equality operators', () => {
+
+        it('should return the value', () => {
+
+            expect(parse('2 == 2')()).true();
+            expect(parse('2 == "2"')()).true();
+            expect(parse('2 != 2')()).false();
+            expect(parse('2 === 2')()).true();
+            expect(parse('2 === "2"')()).false();
+            expect(parse('2 !== 2')()).false();
 
         });
 

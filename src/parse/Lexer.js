@@ -53,9 +53,18 @@ export default class Lexer {
 
     }
 
-    static isOperator(char) {
+    static isOperator(text, index) {
 
-        return Lexer.is(char, ASTBuilder.OPERATORS.join(''));
+        const char = text[index];
+        const operator1 = char;
+        const operator2 = char + Lexer.peek(text, index);
+        const operator3 = char + Lexer.peek(text, index) + Lexer.peek(text, index + 1);
+
+        return [
+            Lexer.is(operator3, ASTBuilder.OPERATORS),
+            Lexer.is(operator2, ASTBuilder.OPERATORS),
+            Lexer.is(operator1, ASTBuilder.OPERATORS)
+        ].some(condition => condition);
 
     }
 
@@ -67,7 +76,7 @@ export default class Lexer {
 
     static isStructSymbol(char) {
 
-        return Lexer.is(char, '[]{}:,.()=');
+        return Lexer.is(char, '[]{}:,.()');
 
     }
 
@@ -131,11 +140,9 @@ export default class Lexer {
 
                 this.index += 1;
 
-            } else if (Lexer.isOperator(char)) {
+            } else if (Lexer.isOperator(text, this.index)) {
 
-                tokens.push({text: char});
-
-                this.index += 1;
+                tokens.push(this.readOperator(text));
 
             } else {
 
@@ -224,6 +231,33 @@ export default class Lexer {
         return {
             text: number,
             value: Number(number)
+        };
+
+    }
+
+    readOperator(text) {
+
+        const {index} = this;
+        const char = text[index];
+        const operator1 = char;
+        const operator2 = char + Lexer.peek(text, index);
+        const operator3 = char + Lexer.peek(text, index) + Lexer.peek(text, index + 1);
+        let operator = operator1;
+
+        if (Lexer.is(operator3, ASTBuilder.OPERATORS)) {
+
+            operator = operator3;
+
+        } else if (Lexer.is(operator2, ASTBuilder.OPERATORS)) {
+
+            operator = operator2;
+
+        }
+
+        this.index += operator.length;
+
+        return {
+            text: operator
         };
 
     }

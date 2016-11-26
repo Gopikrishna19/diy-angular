@@ -5,7 +5,9 @@ export default class ASTBuilder {
     static ADDITIVES = ['+', '-'];
     static ARRAY = Symbol.for('ARRAY');
     static ASSIGNMENT = Symbol.for('ASSIGNMENT');
+    static ASSIGNMENTS = ['='];
     static BINARY = Symbol.for('BINARY');
+    static EQUALITIES = ['==', '!=', '===', '!=='];
     static FUNCTION = Symbol.for('FUNCTION');
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
@@ -14,10 +16,20 @@ export default class ASTBuilder {
     static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
     static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
     static MULTIPLICATIVES = ['*', '/', '%'];
-    static OPERATORS = [...ASTBuilder.ADDITIVES, '!', ...ASTBuilder.MULTIPLICATIVES];
+    static NEGATIONS = ['!'];
     static PROGRAM = Symbol.for('PROGRAM');
+    static RELATIONALS = ['<', '>', '<=', '>='];
     static THIS = Symbol.for('THIS');
     static UNARY = Symbol.for('UNARY');
+
+    static INSECURE_METHODS = [
+        'constructor',
+        '__proto__',
+        '__defineGetter__',
+        '__defineSetter__',
+        '__lookupGetter__',
+        '__lookupSetter__'
+    ];
 
     static LITERALS = {
         '$locals': {
@@ -40,13 +52,13 @@ export default class ASTBuilder {
         }
     };
 
-    static INSECURE_METHODS = [
-        'constructor',
-        '__proto__',
-        '__defineGetter__',
-        '__defineSetter__',
-        '__lookupGetter__',
-        '__lookupSetter__'
+    static OPERATORS = [
+        ...ASTBuilder.ADDITIVES,
+        ...ASTBuilder.NEGATIONS,
+        ...ASTBuilder.MULTIPLICATIVES,
+        ...ASTBuilder.RELATIONALS,
+        ...ASTBuilder.ASSIGNMENTS,
+        ...ASTBuilder.EQUALITIES,
     ];
 
     constructor(lexer) {
@@ -79,14 +91,14 @@ export default class ASTBuilder {
 
     assign() {
 
-        const name = this.additive();
+        const name = this.equality();
 
         if (this.expect('=')) {
 
             return {
                 name,
                 type: ASTBuilder.ASSIGNMENT,
-                value: this.additive()
+                value: this.equality()
             };
 
         }
@@ -201,6 +213,28 @@ export default class ASTBuilder {
             properties,
             type: ASTBuilder.OBJECT
         };
+
+    }
+
+    equality() {
+
+        let left = this.relational(),
+            token = this.expect(...ASTBuilder.EQUALITIES);
+
+        while (token) {
+
+            left = {
+                left,
+                operator: token.text,
+                right: this.relational(),
+                type: ASTBuilder.BINARY
+            };
+
+            token = this.expect(...ASTBuilder.EQUALITIES);
+
+        }
+
+        return left;
 
     }
 
@@ -339,6 +373,28 @@ export default class ASTBuilder {
             body: this.assign(),
             type: ASTBuilder.PROGRAM
         };
+
+    }
+
+    relational() {
+
+        let left = this.additive(),
+            token = this.expect(...ASTBuilder.RELATIONALS);
+
+        while (token) {
+
+            left = {
+                left,
+                operator: token.text,
+                right: this.additive(),
+                type: ASTBuilder.BINARY
+            };
+
+            token = this.expect(...ASTBuilder.RELATIONALS);
+
+        }
+
+        return left;
 
     }
 
