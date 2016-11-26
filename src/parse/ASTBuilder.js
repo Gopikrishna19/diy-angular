@@ -4,6 +4,7 @@ export default class ASTBuilder {
 
     static ARRAY = Symbol.for('ARRAY');
     static ASSIGNMENT = Symbol.for('ASSIGNMENT');
+    static BINARY = Symbol.for('BINARY');
     static FUNCTION = Symbol.for('FUNCTION');
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
@@ -11,6 +12,8 @@ export default class ASTBuilder {
     static OBJECT = Symbol.for('OBJECT');
     static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
     static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
+    static MULTIPLICATIVES = ['*', '/', '%'];
+    static OPERATORS = ['+', '-', '!', ...ASTBuilder.MULTIPLICATIVES];
     static PROGRAM = Symbol.for('PROGRAM');
     static THIS = Symbol.for('THIS');
     static UNARY = Symbol.for('UNARY');
@@ -45,8 +48,6 @@ export default class ASTBuilder {
         '__lookupSetter__'
     ];
 
-    static OPERATORS = ['+', '-', '!'];
-
     constructor(lexer) {
 
         this.lexer = lexer;
@@ -55,14 +56,14 @@ export default class ASTBuilder {
 
     assign() {
 
-        const name = this.unary();
+        const name = this.multiplicative();
 
         if (this.expect('=')) {
 
             return {
                 name,
                 type: ASTBuilder.ASSIGNMENT,
-                value: this.unary()
+                value: this.multiplicative()
             };
 
         }
@@ -198,6 +199,26 @@ export default class ASTBuilder {
             name: this.consume().text,
             type: ASTBuilder.IDENTIFIER
         };
+
+    }
+
+    multiplicative() {
+
+        const left = this.unary();
+        const token = this.expect(...ASTBuilder.MULTIPLICATIVES);
+
+        if (token) {
+
+            return {
+                left,
+                operator: token.text,
+                right: this.unary(),
+                type: ASTBuilder.BINARY
+            };
+
+        }
+
+        return left;
 
     }
 

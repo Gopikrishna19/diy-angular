@@ -110,6 +110,12 @@ export default class ASTCompiler {
 
     }
 
+    static binary(left, operator, right) {
+
+        return `(${left}) ${operator} (${right});`;
+
+    }
+
     static declare(variables) {
 
         return `var ${variables};`;
@@ -264,6 +270,7 @@ export default class ASTCompiler {
                 );
 
             },
+            [ASTBuilder.BINARY]: () => ASTCompiler.binary(this.recurse(ast.left), ast.operator, this.recurse(ast.right)),
             [ASTBuilder.FUNCTION]: () => {
 
                 const callContext = {};

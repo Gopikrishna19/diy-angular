@@ -978,6 +978,28 @@ describe('parsing', () => {
 
     });
 
+    describe('multiplicative operators', () => {
+
+        it('should parse multiplication', () => {
+
+            expect(parse('1 * 2')()).equals(2);
+
+        });
+
+        it('should parse division', () => {
+
+            expect(parse('4 / 2')()).equals(2);
+
+        });
+
+        it('should parse remainder', () => {
+
+            expect(parse('4 % 3')()).equals(1);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('^1a')).throws(`${literals.UNEXPECTED_CHARACTER} ^`);
