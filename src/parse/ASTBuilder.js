@@ -2,6 +2,7 @@ import literals from '../literals';
 
 export default class ASTBuilder {
 
+    static ADDITIVES = ['+', '-'];
     static ARRAY = Symbol.for('ARRAY');
     static ASSIGNMENT = Symbol.for('ASSIGNMENT');
     static BINARY = Symbol.for('BINARY');
@@ -13,7 +14,7 @@ export default class ASTBuilder {
     static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
     static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
     static MULTIPLICATIVES = ['*', '/', '%'];
-    static OPERATORS = ['+', '-', '!', ...ASTBuilder.MULTIPLICATIVES];
+    static OPERATORS = [...ASTBuilder.ADDITIVES, '!', ...ASTBuilder.MULTIPLICATIVES];
     static PROGRAM = Symbol.for('PROGRAM');
     static THIS = Symbol.for('THIS');
     static UNARY = Symbol.for('UNARY');
@@ -54,16 +55,38 @@ export default class ASTBuilder {
 
     }
 
+    additive() {
+
+        let left = this.multiplicative(),
+            token = this.expect(...ASTBuilder.ADDITIVES);
+
+        while (token) {
+
+            left = {
+                left,
+                operator: token.text,
+                right: this.multiplicative(),
+                type: ASTBuilder.BINARY
+            };
+
+            token = this.expect(...ASTBuilder.ADDITIVES);
+
+        }
+
+        return left;
+
+    }
+
     assign() {
 
-        const name = this.multiplicative();
+        const name = this.additive();
 
         if (this.expect('=')) {
 
             return {
                 name,
                 type: ASTBuilder.ASSIGNMENT,
-                value: this.multiplicative()
+                value: this.additive()
             };
 
         }

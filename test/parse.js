@@ -998,9 +998,37 @@ describe('parsing', () => {
 
         });
 
-        it('should parse with precedence', () => {
+        it('should parse multiple operators', () => {
 
             expect(parse('36 * 2 % 5')()).equals(2);
+
+        });
+
+        it('should parse with higher precedence', () => {
+
+            expect(parse('1 + 2 * 2 - 3')()).equals(2);
+
+        });
+
+    });
+
+    describe('additive operators', () => {
+
+        it('should parse addition', () => {
+
+            expect(parse('0 + 2')()).equals(2);
+
+        });
+
+        it('should parse subtraction', () => {
+
+            expect(parse('4 - 3')()).equals(1);
+
+        });
+
+        it('should parse multiple operators', () => {
+
+            expect(parse('0 + 2 - 1')()).equals(1);
 
         });
 
