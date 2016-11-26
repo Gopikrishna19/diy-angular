@@ -112,7 +112,7 @@ export default class ASTCompiler {
 
     static binary(left, operator, right) {
 
-        return `(${left}) ${operator} (${right});`;
+        return `(${left}) ${operator} (${right})`;
 
     }
 

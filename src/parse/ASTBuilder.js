@@ -204,17 +204,19 @@ export default class ASTBuilder {
 
     multiplicative() {
 
-        const left = this.unary();
-        const token = this.expect(...ASTBuilder.MULTIPLICATIVES);
+        let left = this.unary(),
+            token = this.expect(...ASTBuilder.MULTIPLICATIVES);
 
-        if (token) {
+        while (token) {
 
-            return {
+            left = {
                 left,
                 operator: token.text,
                 right: this.unary(),
                 type: ASTBuilder.BINARY
             };
+
+            token = this.expect(...ASTBuilder.MULTIPLICATIVES);
 
         }
 

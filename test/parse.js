@@ -998,6 +998,12 @@ describe('parsing', () => {
 
         });
 
+        it('should parse with precedence', () => {
+
+            expect(parse('36 * 2 % 5')()).equals(2);
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
