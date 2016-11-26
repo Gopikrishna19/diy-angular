@@ -82,21 +82,25 @@ export default class ASTCompiler {
 
     static assertObject(object) {
 
-        if (object.window === object) {
+        if (object) {
 
-            throw new Error(literals.WINDOW_ACCESS_DENIED);
+            if (object.window === object) {
 
-        } else if (object.children && (object.nodeName || (object.prop && object.attr && object.find))) {
+                throw new Error(literals.WINDOW_ACCESS_DENIED);
 
-            throw new Error(literals.DOM_ACCESS_DENIED);
+            } else if (object.children && (object.nodeName || (object.prop && object.attr && object.find))) {
 
-        } else if (object.constructor === object) {
+                throw new Error(literals.DOM_ACCESS_DENIED);
 
-            throw new Error(`${literals.PROPERTY_ACCESS_DENIED} constructor`);
+            } else if (object.constructor === object) {
 
-        } else if (object === Object) {
+                throw new Error(`${literals.PROPERTY_ACCESS_DENIED} constructor`);
 
-            throw new Error(literals.OBJECT_ACCESS_DENIED);
+            } else if (object === Object) {
+
+                throw new Error(literals.OBJECT_ACCESS_DENIED);
+
+            }
 
         }
 
@@ -335,6 +339,19 @@ export default class ASTCompiler {
             },
             [ASTBuilder.LITERAL]: () => ASTCompiler.escape(ast.value),
             [ASTBuilder.LOCALS]: () => $locals,
+            [ASTBuilder.LOGICAL]: () => {
+
+                const identifier = this.nextVar;
+
+                this.append = ASTCompiler.assign(identifier, this.recurse(ast.left));
+                this.append = ASTCompiler.ifPath(
+                    ast.operator === '&&' ? identifier : ASTCompiler.not(identifier),
+                    ASTCompiler.assign(identifier, this.recurse(ast.right))
+                );
+
+                return identifier;
+
+            },
             [ASTBuilder.OBJECT]: () => `{${
                 ast.properties.map(({key, value}) => `${
                     key.type === ASTBuilder.IDENTIFIER ? key.name : ASTCompiler.escape(key.value)

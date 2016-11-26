@@ -12,6 +12,8 @@ export default class ASTBuilder {
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
     static LOCALS = Symbol.for('LOCALS');
+    static LOGICAL = Symbol.for('LOGICAL');
+    static LOGICAL_OPERATORS = ['&&', '||'];
     static OBJECT = Symbol.for('OBJECT');
     static OBJECT_PROPERTY = Symbol.for('OBJECT_PROPERTY');
     static OBJECT_PROPERTY_EXPRESSION = Symbol.for('OBJECT_PROPERTY_EXPRESSION');
@@ -21,6 +23,15 @@ export default class ASTBuilder {
     static RELATIONALS = ['<', '>', '<=', '>='];
     static THIS = Symbol.for('THIS');
     static UNARY = Symbol.for('UNARY');
+
+    static BINARY_OPERATORS = [
+        ...ASTBuilder.ADDITIVES,
+        ...ASTBuilder.NEGATIONS,
+        ...ASTBuilder.MULTIPLICATIVES,
+        ...ASTBuilder.RELATIONALS,
+        ...ASTBuilder.ASSIGNMENTS,
+        ...ASTBuilder.EQUALITIES
+    ];
 
     static INSECURE_METHODS = [
         'constructor',
@@ -53,12 +64,8 @@ export default class ASTBuilder {
     };
 
     static OPERATORS = [
-        ...ASTBuilder.ADDITIVES,
-        ...ASTBuilder.NEGATIONS,
-        ...ASTBuilder.MULTIPLICATIVES,
-        ...ASTBuilder.RELATIONALS,
-        ...ASTBuilder.ASSIGNMENTS,
-        ...ASTBuilder.EQUALITIES,
+        ...ASTBuilder.BINARY_OPERATORS,
+        ...ASTBuilder.LOGICAL_OPERATORS
     ];
 
     constructor(lexer) {
@@ -91,14 +98,14 @@ export default class ASTBuilder {
 
     assign() {
 
-        const name = this.equality();
+        const name = this.logicalOR();
 
         if (this.expect('=')) {
 
             return {
                 name,
                 type: ASTBuilder.ASSIGNMENT,
-                value: this.equality()
+                value: this.logicalOR()
             };
 
         }
@@ -259,6 +266,50 @@ export default class ASTBuilder {
 
     }
 
+    logicalAND() {
+
+        let left = this.equality(),
+            token = this.expect('&&');
+
+        while (token) {
+
+            left = {
+                left,
+                operator: token.text,
+                right: this.equality(),
+                type: ASTBuilder.LOGICAL
+            };
+
+            token = this.expect('&&');
+
+        }
+
+        return left;
+
+    }
+
+    logicalOR() {
+
+        let left = this.logicalAND(),
+            token = this.expect('||');
+
+        while (token) {
+
+            left = {
+                left,
+                operator: token.text,
+                right: this.logicalAND(),
+                type: ASTBuilder.LOGICAL
+            };
+
+            token = this.expect('||');
+
+        }
+
+        return left;
+
+    }
+
     multiplicative() {
 
         let left = this.unary(),
@@ -400,7 +451,7 @@ export default class ASTBuilder {
 
     unary() {
 
-        const token = this.expect(...ASTBuilder.OPERATORS);
+        const token = this.expect(...ASTBuilder.BINARY_OPERATORS);
 
         return token ? {
             operand: this.unary(),

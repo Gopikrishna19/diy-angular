@@ -1,6 +1,7 @@
 import {expect} from 'code';
 import literals from '../src/literals';
 import parse from '../src/parse';
+import sinon from 'sinon';
 
 describe('parsing', () => {
 
@@ -1081,6 +1082,88 @@ describe('parsing', () => {
             expect(parse('2 === 2')()).true();
             expect(parse('2 === "2"')()).false();
             expect(parse('2 !== 2')()).false();
+
+        });
+
+        it('should parse with higher precedence than logical operators', () => {
+
+            expect(parse('1 === 2 || 2 === 2')()).true();
+
+        });
+
+    });
+
+    describe('logical operators', () => {
+
+        let $scope,
+            sandbox;
+
+        beforeEach(() => {
+
+            sandbox = sinon.sandbox.create();
+
+            $scope = {call: sandbox.stub()};
+
+        });
+
+        afterEach(() => sandbox.restore());
+
+        it('should parse &&', () => {
+
+            expect(parse('true && true')()).true();
+            expect(parse('true && false')()).false();
+
+            parse('true && call()')($scope);
+            sinon.assert.calledOnce($scope.call);
+
+        });
+
+        it('should parse ||', () => {
+
+            expect(parse('true || true')()).true();
+            expect(parse('true || false')()).true();
+            expect(parse('false || false')()).false();
+
+            parse('false || call()')($scope);
+            sinon.assert.calledOnce($scope.call);
+
+        });
+
+        it('should parse multiple &&', () => {
+
+            expect(parse('true && true && true')()).true();
+            expect(parse('true && true && false')()).false();
+
+        });
+
+        it('should parse multiple ||', () => {
+
+            expect(parse('true || true || true')()).true();
+            expect(parse('true || true || false')()).true();
+            expect(parse('false || false || true')()).true();
+            expect(parse('false || false || false')()).false();
+
+        });
+
+        it('should short circuit &&', () => {
+
+            parse('false && call()')($scope);
+
+            sinon.assert.notCalled($scope.call);
+
+        });
+
+        it('should short circuit ||', () => {
+
+            parse('true || call()')($scope);
+
+            sinon.assert.notCalled($scope.call);
+
+        });
+
+        it('should parse && with higher precedence than ||', () => {
+
+            expect(parse('false && true || true')()).true();
 
         });
 
