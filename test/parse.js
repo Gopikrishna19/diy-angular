@@ -949,12 +949,24 @@ describe('parsing', () => {
 
         });
 
+        it('should parse unary -', () => {
+
+            const two = 2;
+
+            expect(parse('-2')()).equals(-two);
+            expect(parse('-a')({a: -two})).equals(two);
+            expect(parse('--a')({a: -two})).equals(-two);
+            expect(parse('-a')({})).shallow.equals(0);
+
+        });
+
         it('should parse unary !', () => {
 
             expect(parse('!true')()).false();
             expect(parse('!2')()).false();
             expect(parse('!a')({a: false})).true();
             expect(parse('!!a')({a: false})).false();
+            expect(parse('"!"')()).equals('!');
 
         });
 
@@ -968,7 +980,7 @@ describe('parsing', () => {
 
     it('should throw on invalid expression', () => {
 
-        expect(() => parse('-1a')).throws(`${literals.UNEXPECTED_CHARACTER} -`);
+        expect(() => parse('^1a')).throws(`${literals.UNEXPECTED_CHARACTER} ^`);
         expect(() => parse('12e-')).throws(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('12e-a')).throws(`${literals.UNEXPECTED_CHARACTER} -`);
         expect(() => parse('"def')).throws(literals.MISMATCHED_QUOTES);

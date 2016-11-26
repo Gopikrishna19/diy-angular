@@ -45,7 +45,7 @@ export default class ASTBuilder {
         '__lookupSetter__'
     ];
 
-    static OPERATORS = ['+', '!'];
+    static OPERATORS = ['+', '-', '!'];
 
     constructor(lexer) {
 

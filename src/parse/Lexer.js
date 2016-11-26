@@ -232,6 +232,7 @@ export default class Lexer {
 
         let char,
             escape = false,
+            original = quote,
             string = '';
 
         this.index += 1;
@@ -239,6 +240,7 @@ export default class Lexer {
         while (this.index < text.length) {
 
             char = text.charAt(this.index);
+            original += char;
 
             if (escape) {
 
@@ -273,7 +275,7 @@ export default class Lexer {
                 this.index += 1;
 
                 return {
-                    text: string,
+                    text: original,
                     value: string
                 };
 
