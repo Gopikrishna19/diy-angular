@@ -1032,6 +1032,16 @@ describe('parsing', () => {
 
         });
 
+        it('should default to 0 when undefined', () => {
+
+            expect(parse('a + 1')()).equals(1);
+            expect(parse('2 + a')()).equals(2);
+
+            expect(parse('a - 1')()).equals(-1);
+            expect(parse('2 - a')()).equals(2);
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {

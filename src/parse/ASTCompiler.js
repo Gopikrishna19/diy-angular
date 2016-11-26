@@ -34,6 +34,24 @@ export default class ASTCompiler {
 
     }
 
+    static assertComputedFunction(method) {
+
+        return `assertFunction(${method});`;
+
+    }
+
+    static assertComputedMethod(method) {
+
+        return `assertMethod(${method});`;
+
+    }
+
+    static assertComputedObject(object, end = true) {
+
+        return `assertObject(${object})${end ? ';' : ''}`;
+
+    }
+
     static assertFunction(object) {
 
         if (
@@ -86,24 +104,6 @@ export default class ASTCompiler {
 
     }
 
-    static assertComputedFunction(method) {
-
-        return `assertFunction(${method});`;
-
-    }
-
-    static assertComputedMethod(method) {
-
-        return `assertMethod(${method});`;
-
-    }
-
-    static assertComputedObject(object, end = true) {
-
-        return `assertObject(${object})${end ? ';' : ''}`;
-
-    }
-
     static assign(name, value) {
 
         return `${name} = ${value};`;
@@ -111,6 +111,16 @@ export default class ASTCompiler {
     }
 
     static binary(left, operator, right) {
+
+        if (ASTBuilder.ADDITIVES.indexOf(operator) >= 0) {
+
+            return `(${
+                ASTCompiler.getComputedDefaultValue(left, 0)
+                }) ${operator} (${
+                ASTCompiler.getComputedDefaultValue(right, 0)
+                })`;
+
+        }
 
         return `(${left}) ${operator} (${right})`;
 
@@ -156,6 +166,12 @@ export default class ASTCompiler {
     static func(name, args) {
 
         return `${name} && ${ASTCompiler.assertComputedObject(`${name}(${args})`, false)}`;
+
+    }
+
+    static getComputedDefaultValue(value, defaultValue) {
+
+        return `getDefaultValue(${value}, ${defaultValue})`;
 
     }
 
@@ -209,7 +225,7 @@ export default class ASTCompiler {
 
     static unary(operator, operand) {
 
-        return `${operator}(getDefaultValue(${operand}, 0))`;
+        return `${operator}(${ASTCompiler.getComputedDefaultValue(operand, 0)})`;
 
     }
 
