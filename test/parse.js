@@ -5,8 +5,6 @@ import sinon from 'sinon';
 
 describe('parsing', () => {
 
-    let fn;
-
     beforeEach(() => {
 
         global.window = {};
@@ -22,10 +20,7 @@ describe('parsing', () => {
 
             const parsedValue = 12;
 
-            fn = parse('12');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('12')()).equals(parsedValue);
 
         });
 
@@ -37,10 +32,7 @@ describe('parsing', () => {
 
             const parsedValue = 1.2;
 
-            fn = parse('1.2');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('1.2')()).equals(parsedValue);
 
         });
 
@@ -48,10 +40,7 @@ describe('parsing', () => {
 
             const parsedValue = 0.2;
 
-            fn = parse('.2');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('.2')()).equals(parsedValue);
 
         });
 
@@ -63,10 +52,7 @@ describe('parsing', () => {
 
             const parsedValue = 12000;
 
-            fn = parse('12e3');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('12e3')()).equals(parsedValue);
 
         });
 
@@ -74,10 +60,7 @@ describe('parsing', () => {
 
             const parsedValue = 120;
 
-            fn = parse('.12e3');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('.12e3')()).equals(parsedValue);
 
         });
 
@@ -85,10 +68,7 @@ describe('parsing', () => {
 
             const parsedValue = 12;
 
-            fn = parse('12000e-3');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('12000e-3')()).equals(parsedValue);
 
         });
 
@@ -96,10 +76,7 @@ describe('parsing', () => {
 
             const parsedValue = 12000;
 
-            fn = parse('12e+3');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('12e+3')()).equals(parsedValue);
 
         });
 
@@ -107,10 +84,7 @@ describe('parsing', () => {
 
             const parsedValue = 12000;
 
-            fn = parse('12E3');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse('12E3')()).equals(parsedValue);
 
         });
 
@@ -120,46 +94,31 @@ describe('parsing', () => {
 
         it('should return the value in double quotes', () => {
 
-            fn = parse('"abc"');
-
-            expect(fn).function();
-            expect(fn()).equals('abc');
+            expect(parse('"abc"')()).equals('abc');
 
         });
 
         it('should return the value in single quotes', () => {
 
-            fn = parse('\'abc\'');
-
-            expect(fn).function();
-            expect(fn()).equals('abc');
+            expect(parse('\'abc\'')()).equals('abc');
 
         });
 
         it('should return the value in back ticks', () => {
 
-            fn = parse('`abc`');
-
-            expect(fn).function();
-            expect(fn()).equals('abc');
+            expect(parse('`abc`')()).equals('abc');
 
         });
 
         it('should parse escaped characters', () => {
 
-            fn = parse('"a\\\"\\t\\v\\f\\\``\\\'\'\\n\\r\\eb"');
-
-            expect(fn).function();
-            expect(fn()).equals('a\"\t\v\f\``\'\'\n\reb');
+            expect(parse('"a\\\"\\t\\v\\f\\\``\\\'\'\\n\\r\\eb"')()).equals('a\"\t\v\f\``\'\'\n\reb');
 
         });
 
         it('should parse unicode characters', () => {
 
-            fn = parse('"\\u00A0"');
-
-            expect(fn).function();
-            expect(fn()).equals('\u00A0');
+            expect(parse('"\\u00A0"')()).equals('\u00A0');
 
         });
 
@@ -169,28 +128,19 @@ describe('parsing', () => {
 
         it('should parse null', () => {
 
-            fn = parse('null');
-
-            expect(fn).function();
-            expect(fn()).null();
+            expect(parse('null')()).null();
 
         });
 
         it('should parse true', () => {
 
-            fn = parse('true');
-
-            expect(fn).function();
-            expect(fn()).true();
+            expect(parse('true')()).true();
 
         });
 
         it('should parse false', () => {
 
-            fn = parse('false');
-
-            expect(fn).function();
-            expect(fn()).false();
+            expect(parse('false')()).false();
 
         });
 
@@ -202,10 +152,7 @@ describe('parsing', () => {
 
             const parsedValue = 12;
 
-            fn = parse(' \n12\r\v\t\u00A0 ');
-
-            expect(fn).function();
-            expect(fn()).equals(parsedValue);
+            expect(parse(' \n12\r\v\t\u00A0 ')()).equals(parsedValue);
 
         });
 
@@ -215,45 +162,31 @@ describe('parsing', () => {
 
         it('should parse empty arrays', () => {
 
-            fn = parse('[]');
-
-            expect(fn).function();
-            expect(fn()).equals([]);
+            expect(parse('[]')()).equals([]);
 
         });
 
         it('should parse arrays with values', () => {
 
-            fn = parse('[0, 1, 2]');
-
-            expect(fn).function();
-            expect(fn()).equals([0, 1, 2]);
+            expect(parse('[0, 1, 2]')()).equals([0, 1, 2]);
 
         });
 
         it('should parse arrays with complex values', () => {
 
-            fn = parse('[0, "abc", [null,true], false]');
-
-            expect(fn).function();
-            expect(fn()).equals([0, 'abc', [null, true], false]);
+            expect(parse('[0, "abc", [null,true], false]')()).equals([0, 'abc', [null, true], false]);
 
         });
 
         it('should parse arrays with trailing commas', () => {
 
-            fn = parse('[0, 1, 2, ]');
-
-            expect(fn).function();
-            expect(fn()).equals([0, 1, 2]);
+            expect(parse('[0, 1, 2, ]')()).equals([0, 1, 2]);
 
         });
 
         it('should look up dynamic indices', () => {
 
-            fn = parse('[1,2,3,4][1]');
-
-            expect(fn()).equals(2);
+            expect(parse('[1,2,3,4][1]')()).equals(2);
 
         });
 
@@ -263,19 +196,13 @@ describe('parsing', () => {
 
         it('should parse empty arrays', () => {
 
-            fn = parse('{}');
-
-            expect(fn).function();
-            expect(fn()).equals({});
+            expect(parse('{}')()).equals({});
 
         });
 
         it('should parse objects with properties', () => {
 
-            fn = parse('{"a key":1, `another-key`: 2, \'zero\': 0}');
-
-            expect(fn).function();
-            expect(fn()).equals({
+            expect(parse('{"a key":1, `another-key`: 2, \'zero\': 0}')()).equals({
                 'a key': 1,
                 'another-key': 2,
                 zero: 0
@@ -285,10 +212,7 @@ describe('parsing', () => {
 
         it('should parse objects with complex properties', () => {
 
-            fn = parse('{array: [{a: 1}, 2], object: {a: [true, false]}}');
-
-            expect(fn).function();
-            expect(fn()).equals({
+            expect(parse('{array: [{a: 1}, 2], object: {a: [true, false]}}')()).equals({
                 array: [
                     {a: 1},
                     2
@@ -302,17 +226,13 @@ describe('parsing', () => {
 
         it('should look up properties', () => {
 
-            fn = parse('{aKey: 1}.aKey');
-
-            expect(fn()).equals(1);
+            expect(parse('{aKey: 1}.aKey')()).equals(1);
 
         });
 
         it('should look up dynamic properties', () => {
 
-            fn = parse('{aKey: 1}["aKey"]');
-
-            expect(fn()).equals(1);
+            expect(parse('{aKey: 1}["aKey"]')()).equals(1);
 
         });
 
@@ -320,13 +240,7 @@ describe('parsing', () => {
 
             const prop = '__proto__';
 
-            expect(() => {
-
-                fn = parse(`a.${prop}`);
-
-                fn({a: {}});
-
-            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+            expect(() => parse(`a.${prop}`)({a: {}})).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
 
         });
 
@@ -334,16 +248,10 @@ describe('parsing', () => {
 
             const prop = '__defineGetter__';
 
-            expect(() => {
-
-                fn = parse(`a.${prop}("b", call)`);
-
-                fn({
-                    a: {},
-                    call: () => {}
-                });
-
-            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+            expect(() => parse(`a.${prop}("b", call)`)({
+                a: {},
+                call: () => {}
+            })).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
 
         });
 
@@ -351,16 +259,10 @@ describe('parsing', () => {
 
             const prop = '__defineSetter__';
 
-            expect(() => {
-
-                fn = parse(`a.${prop}("b", call)`);
-
-                fn({
-                    a: {},
-                    call: () => {}
-                });
-
-            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+            expect(() => parse(`a.${prop}("b", call)`)({
+                a: {},
+                call: () => {}
+            })).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
 
         });
 
@@ -368,13 +270,7 @@ describe('parsing', () => {
 
             const prop = '__lookupGetter__';
 
-            expect(() => {
-
-                fn = parse(`a.${prop}("b")`);
-
-                fn({a: {}});
-
-            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+            expect(() => parse(`a.${prop}("b")`)({a: {}})).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
 
         });
 
@@ -382,37 +278,27 @@ describe('parsing', () => {
 
             const prop = '__lookupSetter__';
 
-            expect(() => {
-
-                fn = parse(`a["${prop}"]("b")`);
-
-                fn({a: {}});
-
-            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+            expect(() => parse(`a["${prop}"]("b")`)({a: {}})).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
 
         });
 
         it('should not allow access to window as a property', () => {
 
-            fn = parse('object.wnd');
-
-            expect(() => fn({object: {wnd: window}})).throws(literals.WINDOW_ACCESS_DENIED);
+            expect(() => parse('object.wnd')({object: {wnd: window}})).throws(literals.WINDOW_ACCESS_DENIED);
 
         });
 
         it('should not allow access to window as a computed property', () => {
 
-            fn = parse('object["wnd"]');
-
-            expect(() => fn({object: {wnd: window}})).throws(literals.WINDOW_ACCESS_DENIED);
+            expect(() => parse('object["wnd"]')({object: {wnd: window}})).throws(literals.WINDOW_ACCESS_DENIED);
 
         });
 
         it('should not allow access to DOM element as a property', () => {
 
-            fn = parse('el.setAttribute("attr", "val")');
+            const parser = parse('el.setAttribute("attr", "val")');
 
-            expect(() => fn({
+            expect(() => parser({
                 el: {
                     attr: 'attr',
                     children: [],
@@ -420,7 +306,7 @@ describe('parsing', () => {
                     prop: {}
                 }
             })).throws(literals.DOM_ACCESS_DENIED);
-            expect(() => fn({
+            expect(() => parser({
                 el: {
                     children: [],
                     nodeName: 'DIV'
@@ -431,9 +317,7 @@ describe('parsing', () => {
 
         it('should not allow access to Object', () => {
 
-            fn = parse('object.create({})');
-
-            expect(() => fn({object: Object})).throws(literals.OBJECT_ACCESS_DENIED);
+            expect(() => parse('object.create({})')({object: Object})).throws(literals.OBJECT_ACCESS_DENIED);
 
         });
 
@@ -443,25 +327,19 @@ describe('parsing', () => {
 
         it('should return the result', () => {
 
-            fn = parse('call()');
-
-            expect(fn({call: () => 2})).equals(2);
+            expect(parse('call()')({call: () => 2})).equals(2);
 
         });
 
         it('should parse calls with arguments', () => {
 
-            fn = parse('call(1)');
-
-            expect(fn({call: a => a + 1})).equals(2);
+            expect(parse('call(1)')({call: a => a + 1})).equals(2);
 
         });
 
         it('should parse calls with computed arguments', () => {
 
-            fn = parse('call(n)');
-
-            expect(fn({
+            expect(parse('call(n)')({
                 call: a => a + 1,
                 n: 1
             })).equals(2);
@@ -470,9 +348,7 @@ describe('parsing', () => {
 
         it('should parse calls with functional arguments', () => {
 
-            fn = parse('call(args())');
-
-            expect(fn({
+            expect(parse('call(args())')({
                 args: () => 1,
                 call: a => a + 1
             })).equals(2);
@@ -483,9 +359,7 @@ describe('parsing', () => {
 
             const parsedValue = 4;
 
-            fn = parse('call(1, n, args())');
-
-            expect(fn({
+            expect(parse('call(1, n, args())')({
                 args: () => 1,
                 call: (a, b, c) => a + b + c + 1,
                 n: 1
@@ -502,9 +376,7 @@ describe('parsing', () => {
                 }
             };
 
-            fn = parse('object.call()');
-
-            expect(fn($scope)).equals(1);
+            expect(parse('object.call()')($scope)).equals(1);
 
         });
 
@@ -517,17 +389,13 @@ describe('parsing', () => {
                 }
             };
 
-            fn = parse('object["call"]()');
-
-            expect(fn($scope)).equals(1);
+            expect(parse('object["call"]()')($scope)).equals(1);
 
         });
 
         it('should look up complex methods in $scope', () => {
 
-            fn = parse('a.call(1)()');
-
-            expect(fn({a: {call: a => () => a}})).equals(1);
+            expect(parse('a.call(1)()')({a: {call: a => () => a}})).equals(1);
 
         });
 
@@ -544,9 +412,7 @@ describe('parsing', () => {
                 }
             };
 
-            fn = parse('object.call()');
-
-            expect(fn($scope)).equals(1);
+            expect(parse('object.call()')($scope)).equals(1);
 
         });
 
@@ -563,9 +429,7 @@ describe('parsing', () => {
                 }
             };
 
-            fn = parse('object["call"]()');
-
-            expect(fn($scope)).equals(1);
+            expect(parse('object["call"]()')($scope)).equals(1);
 
         });
 
@@ -579,9 +443,7 @@ describe('parsing', () => {
                 }
             };
 
-            fn = parse('call()');
-
-            expect(fn($scope)).equals($scope);
+            expect(parse('call()')($scope)).equals($scope);
 
         });
 
@@ -595,9 +457,7 @@ describe('parsing', () => {
                 }
             };
 
-            fn = parse('call()');
-
-            expect(fn({}, $locals)).equals($locals);
+            expect(parse('call()')({}, $locals)).equals($locals);
 
         });
 
@@ -605,33 +465,19 @@ describe('parsing', () => {
 
             const prop = 'constructor';
 
-            expect(() => {
-
-                fn = parse(`call.${prop}("return 1")()`);
-
-                fn({call: () => {}});
-
-            }).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
+            expect(() => parse(`call.${prop}("return 1")()`)({call: () => {}})).throws(`${literals.PROPERTY_ACCESS_DENIED} ${prop}`);
 
         });
 
         it('should not allow access to aliased constructor', () => {
 
-            expect(() => {
-
-                fn = parse('call()');
-
-                fn({call: (() => {}).constructor});
-
-            }).throws(`${literals.PROPERTY_ACCESS_DENIED} constructor`);
+            expect(() => parse('call()')({call: (() => {}).constructor})).throws(`${literals.PROPERTY_ACCESS_DENIED} constructor`);
 
         });
 
         it('should not allow window as a parameter', () => {
 
-            fn = parse('func(wnd)');
-
-            expect(() => fn({
+            expect(() => parse('func(wnd)')({
                 func: () => {},
                 wnd: window
             })).throws(literals.WINDOW_ACCESS_DENIED);
@@ -640,9 +486,7 @@ describe('parsing', () => {
 
         it('should not allow calling window methods', () => {
 
-            fn = parse('wnd.scrollTo(0)');
-
-            expect(() => fn({
+            expect(() => parse('wnd.scrollTo(0)')({
                 wnd: window
             })).throws(literals.WINDOW_ACCESS_DENIED);
 
@@ -650,9 +494,7 @@ describe('parsing', () => {
 
         it('should not allow window to be returned', () => {
 
-            fn = parse('func()');
-
-            expect(() => fn({
+            expect(() => parse('func()')({
                 func: () => window
             })).throws(literals.WINDOW_ACCESS_DENIED);
 
@@ -660,9 +502,7 @@ describe('parsing', () => {
 
         it('should not allow `.apply`', () => {
 
-            fn = parse('func.apply(obj)');
-
-            expect(() => fn({
+            expect(() => parse('func.apply(obj)')({
                 func: () => {},
                 obj: {}
             })).throws(literals.APPLY_BIND_CALL_ACCESS_DENIED);
@@ -671,9 +511,7 @@ describe('parsing', () => {
 
         it('should not allow `.bind`', () => {
 
-            fn = parse('func.bind(obj)');
-
-            expect(() => fn({
+            expect(() => parse('func.bind(obj)')({
                 func: () => {},
                 obj: {}
             })).throws(literals.APPLY_BIND_CALL_ACCESS_DENIED);
@@ -682,9 +520,7 @@ describe('parsing', () => {
 
         it('should not allow `.call`', () => {
 
-            fn = parse('func.call(obj)');
-
-            expect(() => fn({
+            expect(() => parse('func.call(obj)')({
                 func: () => {},
                 obj: {}
             })).throws(literals.APPLY_BIND_CALL_ACCESS_DENIED);
@@ -697,34 +533,28 @@ describe('parsing', () => {
 
         it('should look up properties', () => {
 
-            fn = parse('aValue');
+            const parser = parse('aValue');
 
-            expect(fn({aValue: 1})).equals(1);
-            expect(fn({})).undefined();
+            expect(parser({aValue: 1})).equals(1);
+            expect(parser({})).undefined();
 
         });
 
         it('should look up dynamic indices', () => {
 
-            fn = parse('array[1]');
-
-            expect(fn({array: [1, 2]})).equals(2);
+            expect(parse('array[1]')({array: [1, 2]})).equals(2);
 
         });
 
         it('should look up dynamic properties', () => {
 
-            fn = parse('object["aKey"]');
-
-            expect(fn({object: {aKey: 1}})).equals(1);
+            expect(parse('object["aKey"]')({object: {aKey: 1}})).equals(1);
 
         });
 
         it('should look up computed indices', () => {
 
-            fn = parse('array[index]');
-
-            expect(fn({
+            expect(parse('array[index]')({
                 array: [1, 2],
                 index: 1
             })).equals(2);
@@ -733,9 +563,7 @@ describe('parsing', () => {
 
         it('should look up computed properties', () => {
 
-            fn = parse('object[key]');
-
-            expect(fn({
+            expect(parse('object[key]')({
                 key: 'aKey',
                 object: {aKey: 1}
             })).equals(1);
@@ -744,30 +572,28 @@ describe('parsing', () => {
 
         it('should return undefined when looking up properties on undefined', () => {
 
-            fn = parse('aValue');
-
-            expect(fn()).undefined();
+            expect(parse('aValue')()).undefined();
 
         });
 
         it('should look up nested properties', () => {
 
-            fn = parse('aKey.anotherKey');
+            const parser = parse('aKey.anotherKey');
 
-            expect(fn({aKey: {anotherKey: 2}})).equals(2);
-            expect(fn({aKey: {}})).undefined();
-            expect(fn({})).undefined();
+            expect(parser({aKey: {anotherKey: 2}})).equals(2);
+            expect(parser({aKey: {}})).undefined();
+            expect(parser({})).undefined();
 
         });
 
         it('should look up properties at any depth', () => {
 
-            fn = parse('aKey.secondKey.thirdKey.fourthKey');
+            const parser = parse('aKey.secondKey.thirdKey.fourthKey');
 
-            expect(fn({aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
-            expect(fn({aKey: {secondKey: {thirdKey: {}}}})).undefined();
-            expect(fn({aKey: {}})).undefined();
-            expect(fn()).undefined();
+            expect(parser({aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
+            expect(parser({aKey: {secondKey: {thirdKey: {}}}})).undefined();
+            expect(parser({aKey: {}})).undefined();
+            expect(parser()).undefined();
 
         });
 
@@ -776,9 +602,7 @@ describe('parsing', () => {
             const $scope = {aKey: 1};
             const $locals = {aKey: 2};
 
-            fn = parse('aKey');
-
-            expect(fn($scope, $locals)).equals(2);
+            expect(parse('aKey')($scope, $locals)).equals(2);
 
         });
 
@@ -787,9 +611,7 @@ describe('parsing', () => {
             const $scope = {aKey: 1};
             const $locals = {anotherKey: 2};
 
-            fn = parse('aKey');
-
-            expect(fn($scope, $locals)).equals(1);
+            expect(parse('aKey')($scope, $locals)).equals(1);
 
         });
 
@@ -798,20 +620,18 @@ describe('parsing', () => {
             const $scope = {aKey: {anotherKey: 1}};
             const $locals = {aKey: {}};
 
-            fn = parse('aKey.anotherKey');
-
-            expect(fn($scope, $locals)).undefined();
+            expect(parse('aKey.anotherKey')($scope, $locals)).undefined();
 
         });
 
         it('should look up properties at any depth from $local', () => {
 
-            fn = parse('aKey.secondKey.thirdKey.fourthKey');
+            const parser = parse('aKey.secondKey.thirdKey.fourthKey');
 
-            expect(fn({}, {aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
-            expect(fn({}, {aKey: {secondKey: {thirdKey: {}}}})).undefined();
-            expect(fn({}, {aKey: {}})).undefined();
-            expect(fn()).undefined();
+            expect(parser({}, {aKey: {secondKey: {thirdKey: {fourthKey: 1}}}})).equals(1);
+            expect(parser({}, {aKey: {secondKey: {thirdKey: {}}}})).undefined();
+            expect(parser({}, {aKey: {}})).undefined();
+            expect(parser()).undefined();
 
         });
 
@@ -822,11 +642,10 @@ describe('parsing', () => {
         it('should return $locals', () => {
 
             const $locals = {aKey: 2};
+            const parser = parse('$locals');
 
-            fn = parse('$locals');
-
-            expect(fn({}, $locals)).equals($locals);
-            expect(fn()).undefined();
+            expect(parser({}, $locals)).equals($locals);
+            expect(parser()).undefined();
 
         });
 
@@ -834,9 +653,7 @@ describe('parsing', () => {
 
             const $locals = {aKey: 1};
 
-            fn = parse('$locals.aKey');
-
-            expect(fn({}, $locals)).equals(1);
+            expect(parse('$locals.aKey')({}, $locals)).equals(1);
 
         });
 
@@ -847,11 +664,10 @@ describe('parsing', () => {
         it('should return $scope', () => {
 
             const $scope = {};
+            const parser = parse('this');
 
-            fn = parse('this');
-
-            expect(fn($scope)).equals($scope);
-            expect(fn()).undefined();
+            expect(parser($scope)).equals($scope);
+            expect(parser()).undefined();
 
         });
 
@@ -859,9 +675,7 @@ describe('parsing', () => {
 
             const $scope = {aKey: 1};
 
-            fn = parse('this.aKey');
-
-            expect(fn($scope)).equals(1);
+            expect(parse('this.aKey')($scope)).equals(1);
 
         });
 
@@ -931,9 +745,7 @@ describe('parsing', () => {
 
         it('should not allow window to be assigned', () => {
 
-            fn = parse('wnd = obj');
-
-            expect(() => fn({
+            expect(() => parse('wnd = obj')({
                 obj: window
             })).throws(literals.WINDOW_ACCESS_DENIED);
 
