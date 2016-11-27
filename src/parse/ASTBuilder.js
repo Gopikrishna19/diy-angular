@@ -74,38 +74,16 @@ export default class ASTBuilder {
 
     }
 
-    additive() {
-
-        let left = this.multiplicative(),
-            token = this.expect(...ASTBuilder.ADDITIVES);
-
-        while (token) {
-
-            left = {
-                left,
-                operator: token.text,
-                right: this.multiplicative(),
-                type: ASTBuilder.BINARY
-            };
-
-            token = this.expect(...ASTBuilder.ADDITIVES);
-
-        }
-
-        return left;
-
-    }
-
     assign() {
 
-        const name = this.logicalOR();
+        const name = this.operation();
 
         if (this.expect('=')) {
 
             return {
                 name,
                 type: ASTBuilder.ASSIGNMENT,
-                value: this.logicalOR()
+                value: this.operation()
             };
 
         }
@@ -223,28 +201,6 @@ export default class ASTBuilder {
 
     }
 
-    equality() {
-
-        let left = this.relational(),
-            token = this.expect(...ASTBuilder.EQUALITIES);
-
-        while (token) {
-
-            left = {
-                left,
-                operator: token.text,
-                right: this.relational(),
-                type: ASTBuilder.BINARY
-            };
-
-            token = this.expect(...ASTBuilder.EQUALITIES);
-
-        }
-
-        return left;
-
-    }
-
     expect(...targets) {
 
         if (this.peek(...targets)) {
@@ -257,6 +213,28 @@ export default class ASTBuilder {
 
     }
 
+    getNextPrecedent(operators, type, nextPrecedent) {
+
+        let left = nextPrecedent(),
+            token = this.expect(...operators);
+
+        while (token) {
+
+            left = {
+                left,
+                operator: token.text,
+                right: nextPrecedent(),
+                type
+            };
+
+            token = this.expect(...operators);
+
+        }
+
+        return left;
+
+    }
+
     identifier() {
 
         return {
@@ -266,69 +244,16 @@ export default class ASTBuilder {
 
     }
 
-    logicalAND() {
+    operation() {
 
-        let left = this.equality(),
-            token = this.expect('&&');
+        const multiplicative = () => this.getNextPrecedent(ASTBuilder.MULTIPLICATIVES, ASTBuilder.BINARY, () => this.unary());
+        const additive = () => this.getNextPrecedent(ASTBuilder.ADDITIVES, ASTBuilder.BINARY, multiplicative);
+        const relational = () => this.getNextPrecedent(ASTBuilder.RELATIONALS, ASTBuilder.BINARY, additive);
+        const equality = () => this.getNextPrecedent(ASTBuilder.EQUALITIES, ASTBuilder.BINARY, relational);
+        const logicalAND = () => this.getNextPrecedent(['&&'], ASTBuilder.LOGICAL, equality);
+        const logicalOR = () => this.getNextPrecedent(['||'], ASTBuilder.LOGICAL, logicalAND);
 
-        while (token) {
-
-            left = {
-                left,
-                operator: token.text,
-                right: this.equality(),
-                type: ASTBuilder.LOGICAL
-            };
-
-            token = this.expect('&&');
-
-        }
-
-        return left;
-
-    }
-
-    logicalOR() {
-
-        let left = this.logicalAND(),
-            token = this.expect('||');
-
-        while (token) {
-
-            left = {
-                left,
-                operator: token.text,
-                right: this.logicalAND(),
-                type: ASTBuilder.LOGICAL
-            };
-
-            token = this.expect('||');
-
-        }
-
-        return left;
-
-    }
-
-    multiplicative() {
-
-        let left = this.unary(),
-            token = this.expect(...ASTBuilder.MULTIPLICATIVES);
-
-        while (token) {
-
-            left = {
-                left,
-                operator: token.text,
-                right: this.unary(),
-                type: ASTBuilder.BINARY
-            };
-
-            token = this.expect(...ASTBuilder.MULTIPLICATIVES);
-
-        }
-
-        return left;
+        return logicalOR();
 
     }
 
@@ -424,28 +349,6 @@ export default class ASTBuilder {
             body: this.assign(),
             type: ASTBuilder.PROGRAM
         };
-
-    }
-
-    relational() {
-
-        let left = this.additive(),
-            token = this.expect(...ASTBuilder.RELATIONALS);
-
-        while (token) {
-
-            left = {
-                left,
-                operator: token.text,
-                right: this.additive(),
-                type: ASTBuilder.BINARY
-            };
-
-            token = this.expect(...ASTBuilder.RELATIONALS);
-
-        }
-
-        return left;
 
     }
 
