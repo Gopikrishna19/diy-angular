@@ -84,6 +84,44 @@ describe('filtering', () => {
 
         });
 
+        describe('number', () => {
+
+            it('should return the value', () => {
+
+                expect(parse('arr | filter : 2')({arr: [2, 1, 2]})).equals([2, 2]);
+
+            });
+
+            it('should match any value in a complex array', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            age: 42,
+                            name: 'Mary'
+                        },
+                        {
+                            age: 43,
+                            name: 'John'
+                        },
+                        {
+                            age: 44,
+                            name: 'Jane'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : 42')($scope)).equals([
+                    {
+                        age: 42,
+                        name: 'Mary'
+                    }
+                ]);
+
+            });
+
+        });
+
     });
 
 });

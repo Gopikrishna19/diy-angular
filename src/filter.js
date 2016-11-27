@@ -13,6 +13,14 @@ const deepCompare = (target, predicate, compare) => {
 };
 
 const stringCompare = (a, b) => a.toLowerCase().indexOf(b.toLowerCase()) >= 0;
+const numberCompare = (a, b) => a === b;
+
+const getNumberPredicate = predicate =>
+    value => deepCompare(
+        value,
+        predicate,
+        numberCompare
+    );
 
 const getStringPredicate = predicate =>
     value => deepCompare(
@@ -26,6 +34,7 @@ export default () =>
         array.filter(
             {
                 Function: () => predicate,
+                Number: () => getNumberPredicate(predicate),
                 String: () => getStringPredicate(predicate)
             }[predicate.constructor.name]()
         );
