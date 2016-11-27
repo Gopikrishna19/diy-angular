@@ -322,6 +322,50 @@ describe('filtering', () => {
 
             });
 
+            it('should match any value in a nested array', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            users: [
+                                {
+                                    name: {first: 'Joe'},
+                                    role: 'admin'
+                                },
+                                {
+                                    name: {first: 'Jane'},
+                                    role: 'moderator'
+                                }
+                            ]
+                        },
+                        {
+                            users: [
+                                {
+                                    name: {first: 'Mary'},
+                                    role: 'admin'
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : {users: {name: {first: "o"}}}')($scope)).equals([
+                    {
+                        users: [
+                            {
+                                name: {first: 'Joe'},
+                                role: 'admin'
+                            },
+                            {
+                                name: {first: 'Jane'},
+                                role: 'moderator'
+                            }
+                        ]
+                    }
+                ]);
+
+            });
+
             it('should match negations in string', () => {
 
                 const $scope = {
