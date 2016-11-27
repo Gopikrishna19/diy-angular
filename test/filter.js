@@ -13,4 +13,18 @@ describe('Filters', () => {
 
     });
 
+    it('should allow registering multiple filters', () => {
+
+        const aFilter = () => {};
+        const anotherFilter = () => {};
+
+        register({
+            aFilter: () => aFilter,
+            anotherFilter: () => anotherFilter
+        });
+        expect(filter('aFilter')).equals(aFilter);
+        expect(filter('anotherFilter')).equals(anotherFilter);
+
+    });
+
 });
