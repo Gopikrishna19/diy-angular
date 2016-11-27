@@ -17,7 +17,7 @@ describe('filtering', () => {
             it('should return the value', () => {
 
                 const $scope = {
-                    isEven: n => n % 2 === 0
+                    'isEven': n => n % 2 === 0
                 };
 
                 expect(parse('[0, 1, 2, 3] | filter : isEven')($scope)).equals([0, 2]);
@@ -97,24 +97,66 @@ describe('filtering', () => {
                 const $scope = {
                     arr: [
                         {
-                            age: 42,
+                            age: 2,
                             name: 'Mary'
                         },
                         {
-                            age: 43,
+                            age: 3,
                             name: 'John'
                         },
                         {
-                            age: 44,
+                            age: 4,
                             name: 'Jane'
                         }
                     ]
                 };
 
-                expect(parse('arr | filter : 42')($scope)).equals([
+                expect(parse('arr | filter : 2')($scope)).equals([
                     {
-                        age: 42,
+                        age: 2,
                         name: 'Mary'
+                    }
+                ]);
+
+            });
+
+        });
+
+        describe('boolean', () => {
+
+            it('should return the value', () => {
+
+                expect(parse('arr | filter : true')({arr: [true, false, true]})).equals([true, true]);
+
+            });
+
+            it('should match any value in a complex array', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            admin: true,
+                            name: 'Mary'
+                        },
+                        {
+                            admin: true,
+                            name: 'John'
+                        },
+                        {
+                            admin: false,
+                            name: 'Jane'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : true')($scope)).equals([
+                    {
+                        admin: true,
+                        name: 'Mary'
+                    },
+                    {
+                        admin: true,
+                        name: 'John'
                     }
                 ]);
 

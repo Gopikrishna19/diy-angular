@@ -33,8 +33,9 @@ export default () =>
     (array, predicate) =>
         array.filter(
             {
-                Function: () => predicate,
-                Number: () => getNumberPredicate(predicate),
-                String: () => getStringPredicate(predicate)
+                'Boolean': () => getNumberPredicate(predicate),
+                'Function': () => predicate,
+                'Number': () => getNumberPredicate(predicate),
+                'String': () => getStringPredicate(predicate)
             }[predicate.constructor.name]()
         );
