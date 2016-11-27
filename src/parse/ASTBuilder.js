@@ -222,12 +222,20 @@ export default class ASTBuilder {
 
         while (this.expect('|')) {
 
+            const args = [expression];
+
             expression = {
-                args: [expression],
+                args,
                 callee: this.identifier(),
                 filter: true,
                 type: ASTBuilder.FUNCTION
             };
+
+            while (this.expect(':')) {
+
+                args.push(this.assign());
+
+            }
 
         }
 

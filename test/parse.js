@@ -1050,6 +1050,16 @@ describe('parsing', () => {
 
         });
 
+        it('should take additional parameters', () => {
+
+            register('repeat', () => (str, length) => Array.from({length}).fill(str).join(''));
+            register('surround', () => (str, before, after) => `${before}${str}${after}`);
+
+            expect(parse('aString | repeat : 3')({aString: 'Hello'})).equals('HelloHelloHello');
+            expect(parse('aString | surround : "*" : "!"')({aString: 'Hello'})).equals('*Hello!');
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
