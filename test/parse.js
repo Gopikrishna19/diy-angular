@@ -1020,6 +1020,16 @@ describe('parsing', () => {
 
     });
 
+    describe('statements', () => {
+
+        it('should return the value of the last statement', () => {
+
+            expect(parse('a = 0; b = 2; a + b')({})).equals(2);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('^1a')).throws(`${literals.UNEXPECTED_CHARACTER} ^`);

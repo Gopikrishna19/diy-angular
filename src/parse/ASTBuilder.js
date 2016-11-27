@@ -339,8 +339,16 @@ export default class ASTBuilder {
 
     program() {
 
+        const body = [];
+
+        do {
+
+            body.push(this.assign());
+
+        } while (this.tokens.length && this.expect(';'));
+
         return {
-            body: this.assign(),
+            body,
             type: ASTBuilder.PROGRAM
         };
 

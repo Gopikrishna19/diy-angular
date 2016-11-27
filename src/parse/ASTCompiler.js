@@ -397,7 +397,13 @@ export default class ASTCompiler {
                 return identifier;
 
             },
-            [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`,
+            [ASTBuilder.PROGRAM]: () => {
+
+                ast.body.slice(0, -1).forEach(statement => this.append = `${this.recurse(statement)};`);
+
+                this.append = `return ${this.recurse(ast.body[ast.body.length - 1])};`;
+
+            },
             [ASTBuilder.TERNARY]: () => {
 
                 const condition = this.nextVar;
