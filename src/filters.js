@@ -1,3 +1,4 @@
+import filterFactory from './filter';
 import {isObject} from 'lodash';
 
 const filters = {};
@@ -17,3 +18,5 @@ export const register = (name, factory) => {
     }
 
 };
+
+register('filter', filterFactory);

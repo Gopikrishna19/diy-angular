@@ -1,7 +1,7 @@
 import {filter, register} from '../src/filters';
 import {expect} from 'code';
 
-describe('Filters', () => {
+describe('filters', () => {
 
     it('should allow registering a filter', () => {
 
@@ -24,6 +24,16 @@ describe('Filters', () => {
         });
         expect(filter('aFilter')).equals(aFilter);
         expect(filter('anotherFilter')).equals(anotherFilter);
+
+    });
+
+    describe('filter', () => {
+
+        it('should be available', () => {
+
+            expect(filter('filter')).function();
+
+        });
 
     });
 
