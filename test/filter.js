@@ -46,6 +46,42 @@ describe('filtering', () => {
 
             });
 
+            it('should match any value in a complex array', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            firstName: 'John',
+                            lastName: 'Brown'
+                        },
+                        [
+                            {
+                                firstName: 'Jane',
+                                lastName: 'Fox'
+                            }
+                        ],
+                        {
+                            firstName: 'Mary',
+                            lastName: 'Quick'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : "o"')($scope)).equals([
+                    {
+                        firstName: 'John',
+                        lastName: 'Brown'
+                    },
+                    [
+                        {
+                            firstName: 'Jane',
+                            lastName: 'Fox'
+                        }
+                    ]
+                ]);
+
+            });
+
         });
 
     });
