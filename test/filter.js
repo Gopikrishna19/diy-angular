@@ -82,6 +82,12 @@ describe('filtering', () => {
 
             });
 
+            it('should negate matching predicates starting with a !', () => {
+
+                expect(parse('arr | filter : "!a"')({arr: ['apple', 'brown', 'aloha']})).equals(['brown']);
+
+            });
+
         });
 
         describe('number', () => {

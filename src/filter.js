@@ -16,18 +16,20 @@ const genericCompare = (a, b) => a === b;
 const stringCompare = (a, b) => a && a.toLowerCase().indexOf(`${b}`.toLowerCase()) >= 0;
 
 const getGenericPredicate = predicate =>
-    value => deepCompare(
-        value,
-        predicate,
-        genericCompare
-    );
+    value => deepCompare(value, predicate, genericCompare);
 
 const getStringPredicate = predicate =>
-    value => deepCompare(
-        value,
-        predicate,
-        stringCompare
-    );
+    value => {
+
+        if (predicate[0] === '!') {
+
+            return !deepCompare(value, predicate.slice(1), stringCompare);
+
+        }
+
+        return deepCompare(value, predicate, stringCompare);
+
+    };
 
 export default () =>
     (array, predicate) => {
