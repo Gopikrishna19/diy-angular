@@ -1,4 +1,4 @@
-import {filter, register} from '../src/filter';
+import {filter, register} from '../src/filters';
 import {expect} from 'code';
 
 describe('Filters', () => {

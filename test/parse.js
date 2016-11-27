@@ -1,7 +1,7 @@
 import {expect} from 'code';
 import literals from '../src/literals';
 import parse from '../src/parse';
-import {register} from '../src/filter';
+import {register} from '../src/filters';
 import sinon from 'sinon';
 
 describe('parsing', () => {

@@ -1,5 +1,5 @@
 import ASTBuilder from './ASTBuilder';
-import {filter} from '../filter';
+import {filter} from '../filters';
 import literals from '../literals';
 
 const $scope = 's';
