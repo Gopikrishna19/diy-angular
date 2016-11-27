@@ -12,7 +12,7 @@ describe('filtering', () => {
 
     describe('based on', () => {
 
-        describe('predicate function', () => {
+        describe('function', () => {
 
             it('should return the value', () => {
 
@@ -204,6 +204,125 @@ describe('filtering', () => {
                 };
 
                 expect(parse('arr | filter : "undefined"')($scope)).equals(['not undefined']);
+
+            });
+
+        });
+
+        describe('object', () => {
+
+            it('should return the value', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: 'Joe',
+                            role: 'admin'
+                        },
+                        {
+                            name: 'Jane',
+                            role: 'moderator'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter:{name: "o"}')($scope)).equals([
+                    {
+                        name: 'Joe',
+                        role: 'admin'
+                    }
+                ]);
+
+            });
+
+            it('should match complex predicates', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: 'Joe',
+                            role: 'admin'
+                        },
+                        {
+                            name: 'Jane',
+                            role: 'moderator'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter:{name: "o", role: "m"}')($scope)).equals([
+                    {
+                        name: 'Joe',
+                        role: 'admin'
+                    }
+                ]);
+
+            });
+
+            it('should match everything on an empty predicate', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: 'Joe',
+                            role: 'admin'
+                        },
+                        {
+                            name: 'Jane',
+                            role: 'moderator'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter:{}')($scope)).equals($scope.arr);
+
+            });
+
+            it('should match any value in a complex array', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: {first: 'Joe'},
+                            role: 'admin'
+                        },
+                        {
+                            name: {first: 'Jane'},
+                            role: 'moderator'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter:{name: {first: "o"}}')($scope)).equals([
+                    {
+                        name: {first: 'Joe'},
+                        role: 'admin'
+                    }
+                ]);
+
+            });
+
+            it('should match negations in string', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: {first: 'Joe'},
+                            role: 'admin'
+                        },
+                        {
+                            name: {first: 'Jane'},
+                            role: 'moderator'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter:{name: {first: "!o"}}')($scope)).equals([
+                    {
+                        name: {first: 'Jane'},
+                        role: 'moderator'
+                    }
+                ]);
 
             });
 
