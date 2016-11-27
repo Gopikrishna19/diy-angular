@@ -269,7 +269,13 @@ export default class ASTBuilder {
         let next,
             primary;
 
-        if (this.expect('[')) {
+        if (this.expect('(')) {
+
+            primary = this.assign();
+
+            this.consume(')');
+
+        } else if (this.expect('[')) {
 
             primary = this.declareArray();
 

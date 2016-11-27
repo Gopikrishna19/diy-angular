@@ -1008,6 +1008,18 @@ describe('parsing', () => {
 
     });
 
+    describe('operators', () => {
+
+        it('should parse parenthesis to alter precedence', () => {
+
+            expect(parse('1 * (3 - 1)')()).equals(2);
+            expect(parse('false && (true || true)')()).false();
+            expect(parse('-((a % 2) === 0 ? 1 : 2)')({a: 42})).equals(-1);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('^1a')).throws(`${literals.UNEXPECTED_CHARACTER} ^`);
