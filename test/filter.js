@@ -164,6 +164,45 @@ describe('filtering', () => {
 
         });
 
+        describe('null', () => {
+
+            it('should return the value', () => {
+
+                expect(parse('arr | filter : null')({arr: [null, 'not null']})).equals([null]);
+
+            });
+
+            it('should not get confused with string', () => {
+
+                expect(parse('arr | filter : "null"')({arr: [null, 'not null']})).equals(['not null']);
+
+            });
+
+        });
+
+        describe('undefined', () => {
+
+            it('should return the value', () => {
+
+                expect(parse('arr | filter : undefined')({arr: [undefined, 'not undefined']})).equals([undefined]);
+
+            });
+
+            it('should not get confused with string', () => {
+
+                const $scope = {
+                    arr: [
+                        undefined,
+                        'not undefined'
+                    ]
+                };
+
+                expect(parse('arr | filter : "undefined"')($scope)).equals(['not undefined']);
+
+            });
+
+        });
+
     });
 
 });

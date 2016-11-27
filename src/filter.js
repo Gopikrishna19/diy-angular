@@ -12,14 +12,14 @@ const deepCompare = (target, predicate, compare) => {
 
 };
 
-const stringCompare = (a, b) => a.toLowerCase().indexOf(b.toLowerCase()) >= 0;
-const numberCompare = (a, b) => a === b;
+const genericCompare = (a, b) => a === b;
+const stringCompare = (a, b) => a && a.toLowerCase().indexOf(`${b}`.toLowerCase()) >= 0;
 
-const getNumberPredicate = predicate =>
+const getGenericPredicate = predicate =>
     value => deepCompare(
         value,
         predicate,
-        numberCompare
+        genericCompare
     );
 
 const getStringPredicate = predicate =>
@@ -30,12 +30,21 @@ const getStringPredicate = predicate =>
     );
 
 export default () =>
-    (array, predicate) =>
-        array.filter(
+    (array, predicate) => {
+
+        if (predicate === null || predicate === undefined) {
+
+            return array.filter(getGenericPredicate(predicate));
+
+        }
+
+        return array.filter(
             {
-                'Boolean': () => getNumberPredicate(predicate),
+                'Boolean': () => getGenericPredicate(predicate),
                 'Function': () => predicate,
-                'Number': () => getNumberPredicate(predicate),
+                'Number': () => getGenericPredicate(predicate),
                 'String': () => getStringPredicate(predicate)
             }[predicate.constructor.name]()
         );
+
+    };
