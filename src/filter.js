@@ -1,4 +1,4 @@
-import {isObject} from 'lodash';
+import {isArray, isObject} from 'lodash';
 
 const deepCompare = (target, predicate, compare, inObject = false) => { // eslint-disable-line complexity
 
@@ -6,13 +6,23 @@ const deepCompare = (target, predicate, compare, inObject = false) => { // eslin
 
         return !deepCompare(target, predicate.slice(1), stringCompare);
 
+    } else if (isArray(target)) {
+
+        return target.some(value => deepCompare(value, predicate, compare));
+
     } else if (isObject(predicate)) {
 
-        return Object.values(predicate).some(value => deepCompare(target, value, compare, true));
+        return Object.keys(predicate).some(key => deepCompare(target[key], predicate[key], compare, true));
 
     } else if (isObject(target)) {
 
-        return Object.values(target).some(value => deepCompare(value, predicate, compare, true));
+        if (!inObject || isObject(predicate) || predicate === undefined) {
+
+            return Object.values(target).some(value => deepCompare(value, predicate, compare, true));
+
+        }
+
+        return false;
 
     } else if (inObject && predicate === undefined) {
 

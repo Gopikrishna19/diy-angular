@@ -366,6 +366,29 @@ describe('filtering', () => {
 
             });
 
+            it('should match only on the same depth', () => {
+
+                const $scope = {
+                    arr: [
+                        {user: 'Bob'},
+                        {user: {name: 'Bob'}},
+                        {
+                            user: {
+                                name: {
+                                    first: 'Bob',
+                                    last: 'Fox'
+                                }
+                            }
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter:{user: {name: "Bob"}}')($scope)).equals([
+                    {user: {name: 'Bob'}}
+                ]);
+
+            });
+
             it('should match negations in string', () => {
 
                 const $scope = {
