@@ -979,6 +979,33 @@ describe('parsing', () => {
 
         });
 
+        it('should parse || with higher precedence than ternary', () => {
+
+            expect(parse('0 || 1 ? 0 || 2 : 0 || 3')()).equals(2);
+
+        });
+
+    });
+
+    describe('ternary operator', () => {
+
+        it('should return the result', () => {
+
+            expect(parse('a === 42 ? true : false')({a: 42})).true();
+            expect(parse('a === 42 ? true : false')({a: 43})).false();
+
+        });
+
+        it('should parse nested expressions', () => {
+
+            expect(parse('a === 42 ? b === 42 ? "a and b" : "a" : c === 42 ? "c" : "none"')({
+                a: 44,
+                b: 43,
+                c: 42
+            })).equals('c');
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
@@ -990,6 +1017,7 @@ describe('parsing', () => {
         expect(() => parse('"\\u0T00"')).throws(literals.INVALID_UNICODE);
         expect(() => parse('[1')).throws(`${literals.UNEXPECTED_EXPECTED} ]`);
         expect(() => parse('{1')).throws(`${literals.UNEXPECTED_EXPECTED} :`);
+        expect(() => parse('a ? b')).throws(`${literals.UNEXPECTED_EXPECTED} :`);
         expect(() => parse('{1:1')).throws(`${literals.UNEXPECTED_EXPECTED} }`);
         expect(() => parse('wnd')({wnd: window})).throws(literals.WINDOW_ACCESS_DENIED);
 

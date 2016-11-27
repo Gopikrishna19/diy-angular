@@ -21,6 +21,7 @@ export default class ASTBuilder {
     static NEGATIONS = ['!'];
     static PROGRAM = Symbol.for('PROGRAM');
     static RELATIONALS = ['<', '>', '<=', '>='];
+    static TERNARY = Symbol.for('TERNARY');
     static THIS = Symbol.for('THIS');
     static UNARY = Symbol.for('UNARY');
 
@@ -76,14 +77,14 @@ export default class ASTBuilder {
 
     assign() {
 
-        const name = this.operation();
+        const name = this.ternary();
 
         if (this.expect('=')) {
 
             return {
                 name,
                 type: ASTBuilder.ASSIGNMENT,
-                value: this.operation()
+                value: this.ternary()
             };
 
         }
@@ -244,19 +245,6 @@ export default class ASTBuilder {
 
     }
 
-    operation() {
-
-        const multiplicative = () => this.getNextPrecedent(ASTBuilder.MULTIPLICATIVES, ASTBuilder.BINARY, () => this.unary());
-        const additive = () => this.getNextPrecedent(ASTBuilder.ADDITIVES, ASTBuilder.BINARY, multiplicative);
-        const relational = () => this.getNextPrecedent(ASTBuilder.RELATIONALS, ASTBuilder.BINARY, additive);
-        const equality = () => this.getNextPrecedent(ASTBuilder.EQUALITIES, ASTBuilder.BINARY, relational);
-        const logicalAND = () => this.getNextPrecedent(['&&'], ASTBuilder.LOGICAL, equality);
-        const logicalOR = () => this.getNextPrecedent(['||'], ASTBuilder.LOGICAL, logicalAND);
-
-        return logicalOR();
-
-    }
-
     peek(...targets) {
 
         if (this.tokens.length) {
@@ -352,6 +340,8 @@ export default class ASTBuilder {
 
     }
 
+    /* OPERATIONS */
+
     unary() {
 
         const token = this.expect(...ASTBuilder.BINARY_OPERATORS);
@@ -361,6 +351,44 @@ export default class ASTBuilder {
             operator: token.text,
             type: ASTBuilder.UNARY
         } : this.primary();
+
+    }
+
+    binary() {
+
+        const multiplicative = () => this.getNextPrecedent(ASTBuilder.MULTIPLICATIVES, ASTBuilder.BINARY, () => this.unary());
+        const additive = () => this.getNextPrecedent(ASTBuilder.ADDITIVES, ASTBuilder.BINARY, multiplicative);
+        const relational = () => this.getNextPrecedent(ASTBuilder.RELATIONALS, ASTBuilder.BINARY, additive);
+        const equality = () => this.getNextPrecedent(ASTBuilder.EQUALITIES, ASTBuilder.BINARY, relational);
+        const logicalAND = () => this.getNextPrecedent(['&&'], ASTBuilder.LOGICAL, equality);
+        const logicalOR = () => this.getNextPrecedent(['||'], ASTBuilder.LOGICAL, logicalAND);
+
+        return logicalOR();
+
+    }
+
+    ternary() {
+
+        const condition = this.binary();
+
+        if (this.expect('?')) {
+
+            const ifPath = this.assign();
+
+            this.consume(':');
+
+            const elsePath = this.assign();
+
+            return {
+                condition,
+                elsePath,
+                ifPath,
+                type: ASTBuilder.TERNARY
+            };
+
+        }
+
+        return condition;
 
     }
 

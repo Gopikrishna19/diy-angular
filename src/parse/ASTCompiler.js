@@ -398,6 +398,18 @@ export default class ASTCompiler {
 
             },
             [ASTBuilder.PROGRAM]: () => this.append = `return ${this.recurse(ast.body)};`,
+            [ASTBuilder.TERNARY]: () => {
+
+                const condition = this.nextVar;
+                const identifier = this.nextVar;
+
+                this.append = ASTCompiler.assign(condition, this.recurse(ast.condition));
+                this.append = ASTCompiler.ifPath(condition, ASTCompiler.assign(identifier, this.recurse(ast.ifPath)));
+                this.append = ASTCompiler.ifPath(ASTCompiler.not(condition), ASTCompiler.assign(identifier, this.recurse(ast.elsePath)));
+
+                return identifier;
+
+            },
             [ASTBuilder.THIS]: () => $scope,
             [ASTBuilder.UNARY]: () => ASTCompiler.unary(ast.operator, this.recurse(ast.operand))
         };

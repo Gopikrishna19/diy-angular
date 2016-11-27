@@ -76,14 +76,14 @@ export default class Lexer {
 
     static isStructSymbol(char) {
 
-        return Lexer.is(char, '[]{}:,.()');
+        return Lexer.is(char, '[]{}:,.()?');
 
     }
 
     static isValidExpOperator(char) {
 
         return [
-            Lexer.is(char, '+-'),
+            Lexer.is(char, ASTBuilder.ADDITIVES),
             Lexer.isNumber(char)
         ].some(condition => condition);
 
