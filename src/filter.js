@@ -1,4 +1,4 @@
-const getStringFn = predicate => x => x.indexOf(predicate) >= 0;
+const getStringFn = predicate => x => x.toLowerCase().indexOf(predicate.toLowerCase()) >= 0;
 
 export default () =>
     (array, predicate) =>
