@@ -220,7 +220,7 @@ export default class ASTBuilder {
 
         let expression = this.assign();
 
-        if (this.expect('|')) {
+        while (this.expect('|')) {
 
             expression = {
                 args: [expression],

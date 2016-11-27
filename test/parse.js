@@ -1041,6 +1041,15 @@ describe('parsing', () => {
 
         });
 
+        it('should allow multiple filters', () => {
+
+            register('uppercase', () => str => str.toUpperCase());
+            register('exclaim', () => str => `${str}!`);
+
+            expect(parse('aString | uppercase | exclaim')({aString: 'Hello'})).equals('HELLO!');
+
+        });
+
     });
 
     it('should throw on invalid expression', () => {
