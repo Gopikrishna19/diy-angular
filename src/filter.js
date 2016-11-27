@@ -4,7 +4,7 @@ export default () =>
     (array, predicate) =>
         array.filter(
             {
-                function: predicate,
-                string: getStringFn(predicate)
-            }[typeof predicate]
+                Function: () => predicate,
+                String: () => getStringFn(predicate)
+            }[predicate.constructor.name]()
         );
