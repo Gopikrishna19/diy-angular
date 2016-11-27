@@ -226,7 +226,7 @@ describe('filtering', () => {
                     ]
                 };
 
-                expect(parse('arr | filter:{name: "o"}')($scope)).equals([
+                expect(parse('arr | filter : {name: "o"}')($scope)).equals([
                     {
                         name: 'Joe',
                         role: 'admin'
@@ -250,7 +250,7 @@ describe('filtering', () => {
                     ]
                 };
 
-                expect(parse('arr | filter:{name: "o", role: "m"}')($scope)).equals([
+                expect(parse('arr | filter : {name: "o", role: "m"}')($scope)).equals([
                     {
                         name: 'Joe',
                         role: 'admin'
@@ -274,7 +274,27 @@ describe('filtering', () => {
                     ]
                 };
 
-                expect(parse('arr | filter:{}')($scope)).equals($scope.arr);
+                expect(parse('arr | filter : {}')($scope)).equals($scope.arr);
+
+            });
+
+            it('should match everything on an undefined predicate', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: {first: 'Joe'},
+                            role: 'admin'
+                        },
+                        {
+                            name: {first: 'Jane'},
+                            role: 'moderator'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : {name: something}')($scope)).equals($scope.arr);
+                expect(parse('arr | filter : {name: {first: something}}')($scope)).equals($scope.arr);
 
             });
 
@@ -293,7 +313,7 @@ describe('filtering', () => {
                     ]
                 };
 
-                expect(parse('arr | filter:{name: {first: "o"}}')($scope)).equals([
+                expect(parse('arr | filter : {name: {first: "o"}}')($scope)).equals([
                     {
                         name: {first: 'Joe'},
                         role: 'admin'
@@ -317,7 +337,7 @@ describe('filtering', () => {
                     ]
                 };
 
-                expect(parse('arr | filter:{name: {first: "!o"}}')($scope)).equals([
+                expect(parse('arr | filter : {name: {first: "!o"}}')($scope)).equals([
                     {
                         name: {first: 'Jane'},
                         role: 'moderator'

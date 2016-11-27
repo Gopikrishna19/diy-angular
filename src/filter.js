@@ -1,6 +1,6 @@
 import {isObject} from 'lodash';
 
-const deepCompare = (target, predicate, compare) => { // eslint-disable-line complexity
+const deepCompare = (target, predicate, compare, inObject = false) => { // eslint-disable-line complexity
 
     if (typeof predicate === 'string' && predicate[0] === '!') {
 
@@ -8,11 +8,15 @@ const deepCompare = (target, predicate, compare) => { // eslint-disable-line com
 
     } else if (isObject(predicate)) {
 
-        return Object.values(predicate).some(value => deepCompare(target, value, compare));
+        return Object.values(predicate).some(value => deepCompare(target, value, compare, true));
 
     } else if (isObject(target)) {
 
-        return Object.values(target).some(value => deepCompare(value, predicate, compare));
+        return Object.values(target).some(value => deepCompare(value, predicate, compare, true));
+
+    } else if (inObject && predicate === undefined) {
+
+        return true;
 
     }
 
@@ -28,7 +32,7 @@ const getGenericPredicate = predicate =>
 
 const getObjectPredicate = predicate =>
     value => Object.keys(predicate).every(
-        key => deepCompare(value[key], predicate[key], stringCompare)
+        key => deepCompare(value[key], predicate[key], stringCompare, true)
     );
 
 const getStringPredicate = predicate =>
