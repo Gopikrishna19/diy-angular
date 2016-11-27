@@ -1,10 +1,12 @@
+import {isObject} from 'lodash';
+
 const filters = {};
 
 export const filter = name => filters[name];
 
 export const register = (name, factory) => {
 
-    if (typeof name === 'object') {
+    if (isObject(name)) {
 
         Object.keys(name).forEach(key => register(key, name[key]));
 

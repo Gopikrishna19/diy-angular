@@ -1,6 +1,7 @@
 import {expect} from 'code';
 import literals from '../src/literals';
 import parse from '../src/parse';
+import {register} from '../src/filter';
 import sinon from 'sinon';
 
 describe('parsing', () => {
@@ -1025,6 +1026,18 @@ describe('parsing', () => {
         it('should return the value of the last statement', () => {
 
             expect(parse('a = 0; b = 2; a + b')({})).equals(2);
+
+        });
+
+    });
+
+    describe('filters', () => {
+
+        it('should return the filtered value', () => {
+
+            register('uppercase', () => str => str.toUpperCase());
+
+            expect(parse('aString | uppercase')({aString: 'Hello'})).equals('HELLO');
 
         });
 

@@ -8,6 +8,7 @@ export default class ASTBuilder {
     static ASSIGNMENTS = ['='];
     static BINARY = Symbol.for('BINARY');
     static EQUALITIES = ['==', '!=', '===', '!=='];
+    static FILTER_OPERATORS = ['|'];
     static FUNCTION = Symbol.for('FUNCTION');
     static IDENTIFIER = Symbol.for('IDENTIFIER');
     static LITERAL = Symbol.for('LITERAL');
@@ -66,7 +67,8 @@ export default class ASTBuilder {
 
     static OPERATORS = [
         ...ASTBuilder.BINARY_OPERATORS,
-        ...ASTBuilder.LOGICAL_OPERATORS
+        ...ASTBuilder.LOGICAL_OPERATORS,
+        ...ASTBuilder.FILTER_OPERATORS
     ];
 
     constructor(lexer) {
@@ -214,6 +216,25 @@ export default class ASTBuilder {
 
     }
 
+    filter() {
+
+        let expression = this.assign();
+
+        if (this.expect('|')) {
+
+            expression = {
+                args: [expression],
+                callee: this.identifier(),
+                filter: true,
+                type: ASTBuilder.FUNCTION
+            };
+
+        }
+
+        return expression;
+
+    }
+
     getNextPrecedent(operators, type, nextPrecedent) {
 
         let left = nextPrecedent(),
@@ -271,7 +292,7 @@ export default class ASTBuilder {
 
         if (this.expect('(')) {
 
-            primary = this.assign();
+            primary = this.filter();
 
             this.consume(')');
 
@@ -343,7 +364,7 @@ export default class ASTBuilder {
 
         do {
 
-            body.push(this.assign());
+            body.push(this.filter());
 
         } while (this.tokens.length && this.expect(';'));
 

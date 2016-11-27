@@ -1,4 +1,5 @@
 import ASTBuilder from './ASTBuilder';
+import {filter} from '../filter';
 import literals from '../literals';
 
 const $scope = 's';
@@ -13,6 +14,12 @@ export default class ASTCompiler {
         this.variables.push(variable);
 
         return variable;
+
+    }
+
+    get filterVar() {
+
+        return `v${this.variableGenerator.next().value}`;
 
     }
 
@@ -167,6 +174,14 @@ export default class ASTCompiler {
 
     }
 
+    static filter(filters, filterName, identifier) {
+
+        filters[filterName] = identifier;
+
+        return identifier;
+
+    }
+
     static func(name, args) {
 
         return `${name} && ${ASTCompiler.assertComputedObject(`${name}(${args})`, false)}`;
@@ -238,6 +253,7 @@ export default class ASTCompiler {
         this.astBuilder = astBuilder;
         this.variableGenerator = ASTCompiler.nextVar();
         this.variables = [];
+        this.filters = {};
 
     }
 
@@ -257,17 +273,27 @@ export default class ASTCompiler {
 
         }
 
+        if (Object.keys(this.filters).length) {
+
+            const variables = Object.keys(this.filters).map(key => `${this.filters[key]}=filter(${ASTCompiler.escape(key)})`);
+
+            this.state.body.unshift(ASTCompiler.declare(variables));
+
+        }
+
         return new Function(
             'assertFunction',
             'assertMethod',
             'assertObject',
             'getDefaultValue',
+            'filter',
             `return function(${$scope}, ${$locals}) { ${this.state.body.join('').replace(/;+/g, ';')} }`
         )(
             ASTCompiler.assertFunction,
             ASTCompiler.assertMethod,
             ASTCompiler.assertObject,
-            ASTCompiler.getDefaultValue
+            ASTCompiler.getDefaultValue,
+            filter
         );
 
     }
@@ -293,19 +319,30 @@ export default class ASTCompiler {
             [ASTBuilder.BINARY]: () => ASTCompiler.binary(this.recurse(ast.left), ast.operator, this.recurse(ast.right)),
             [ASTBuilder.FUNCTION]: () => {
 
-                const callContext = {};
                 const args = ast.args.map(arg => this.recurse(arg));
-                let name = this.recurse(ast.callee, callContext);
+                let name;
 
-                if (callContext.name) {
+                if (ast.filter) {
 
-                    this.append = ASTCompiler.assertComputedObject(callContext.context);
+                    name = ASTCompiler.filter(this.filters, ast.callee.name, this.filterVar);
 
-                    name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
+                } else {
+
+                    const callContext = {};
+
+                    name = this.recurse(ast.callee, callContext);
+
+                    if (callContext.name) {
+
+                        this.append = ASTCompiler.assertComputedObject(callContext.context);
+
+                        name = ASTCompiler.getIdentifier(callContext.context, callContext.name, callContext.computed);
+
+                    }
+
+                    this.append = ASTCompiler.assertComputedFunction(name);
 
                 }
-
-                this.append = ASTCompiler.assertComputedFunction(name);
 
                 return ASTCompiler.func(name, args);
 
