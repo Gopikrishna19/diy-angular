@@ -20,4 +20,10 @@ describe('Filter filter', () => {
 
     });
 
+    it('should filter based on a string', () => {
+
+        expect(parse('arr | filter : "a"')({arr: ['a', 'b', 'a']})).equals(['a', 'a']);
+
+    });
+
 });
