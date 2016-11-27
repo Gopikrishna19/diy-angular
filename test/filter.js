@@ -26,4 +26,10 @@ describe('Filter filter', () => {
 
     });
 
+    it('should filter based on a substring', () => {
+
+        expect(parse('arr | filter : "a"')({arr: ['apple', 'brown', 'aloha']})).equals(['apple', 'aloha']);
+
+    });
+
 });

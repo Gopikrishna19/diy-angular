@@ -1,5 +1,10 @@
-const getPredicateFn = predicate => x => x === predicate;
+const getStringFn = predicate => x => x.indexOf(predicate) >= 0;
 
 export default () =>
     (array, predicate) =>
-        array.filter(typeof predicate === 'function' ? predicate : getPredicateFn(predicate));
+        array.filter(
+            {
+                function: predicate,
+                string: getStringFn(predicate)
+            }[typeof predicate]
+        );
