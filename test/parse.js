@@ -1062,6 +1062,18 @@ describe('parsing', () => {
 
     });
 
+    describe('raw functions', () => {
+
+        it('should return the given functions', () => {
+
+            const func = () => {};
+
+            expect(parse(func)).equals(func);
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('^1a')).throws(`${literals.UNEXPECTED_CHARACTER} ^`);
