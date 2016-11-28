@@ -552,6 +552,15 @@ describe('Scope', () => {
 
         });
 
+        it('should apply given expressions', () => {
+
+            $scope.call = listenerFn;
+
+            $scope.$apply('call()');
+            sinon.assert.calledOnce(listenerFn);
+
+        });
+
     });
 
     describe('$evalAsync', () => {
@@ -636,6 +645,21 @@ describe('Scope', () => {
 
             $scope.$digest();
             sinon.assert.calledTwice(watchFn);
+
+        });
+
+        it('should evaluate given expressions', done => {
+
+            $scope.call = listenerFn;
+
+            $scope.$evalAsync('call()');
+
+            setTimeout(() => {
+
+                sinon.assert.calledOnce(listenerFn);
+                done();
+
+            }, delay);
 
         });
 

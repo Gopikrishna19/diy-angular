@@ -267,7 +267,7 @@ export default class Scope {
 
             Scope.$$beginPhase(this, '$apply');
 
-            this.$eval(...args);
+            return this.$eval(...args);
 
         } finally {
 
