@@ -668,7 +668,7 @@ export default class Scope {
 
         const getChanges = scope => {
 
-            newValue = watchFn(scope);
+            newValue = parse(watchFn)(scope);
 
             return (isObject(newValue) ? getCollectionChanges : getPrimitiveChanges)();
 

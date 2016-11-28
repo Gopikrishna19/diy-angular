@@ -1418,6 +1418,22 @@ describe('Scope', () => {
 
         });
 
+        it('should $watch expressions', () => {
+
+            let aValue = null;
+
+            $scope.aValue = [0, 1, 2];
+
+            $scope.$watchCollection(
+                'aValue',
+                newValue => aValue = newValue
+            );
+
+            $scope.$digest();
+            expect(aValue).equals($scope.aValue);
+
+        });
+
     });
 
     describe('child scope', () => {
@@ -1960,7 +1976,7 @@ describe('Scope', () => {
 
     describe('$watch', () => {
 
-        it('should $watch expressions in $scope', () => {
+        it('should $watch expressions', () => {
 
             let aValue = null;
 
@@ -1972,7 +1988,7 @@ describe('Scope', () => {
             );
 
             $scope.$digest();
-            expect(aValue).equals($scope.aValue);
+            expect(aValue).equals('123');
 
         });
 
