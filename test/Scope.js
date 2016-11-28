@@ -1958,4 +1958,24 @@ describe('Scope', () => {
 
     });
 
+    describe('$watch', () => {
+
+        it('should $watch expressions in $scope', () => {
+
+            let aValue = null;
+
+            $scope.aValue = '123';
+
+            $scope.$watch(
+                'aValue',
+                newValue => aValue = newValue
+            );
+
+            $scope.$digest();
+            expect(aValue).equals($scope.aValue);
+
+        });
+
+    });
+
 });

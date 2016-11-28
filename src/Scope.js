@@ -1,6 +1,7 @@
 import {clone, cloneDeep, forEachRight, isArray, isEqual, isObject} from 'lodash';
 import literals from './literals';
 import {log} from './logger';
+import parse from './parse';
 
 const $$applyAsyncId = new WeakMap();
 const $$applyAsyncQueue = new WeakMap();
@@ -506,7 +507,7 @@ export default class Scope {
             compareValues,
             last: $$initialWatchValue,
             listenerFn,
-            watchFn
+            watchFn: parse(watchFn)
         };
 
         $$watchers.get(this).unshift(watcher);
