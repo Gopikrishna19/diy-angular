@@ -188,13 +188,7 @@ describe('filtering', () => {
 
         describe('undefined', () => {
 
-            it('should return the value', () => {
-
-                expect(parse('arr | filter : undefined')({arr: [undefined, 'not undefined']})).equals([undefined]);
-
-            });
-
-            it('should not get confused with string', () => {
+            it('should ignore undefined values', () => {
 
                 const $scope = {
                     arr: [
@@ -383,7 +377,7 @@ describe('filtering', () => {
                     ]
                 };
 
-                expect(parse('arr | filter:{user: {name: "Bob"}}')($scope)).equals([
+                expect(parse('arr | filter : {user: {name: "Bob"}}')($scope)).equals([
                     {user: {name: 'Bob'}}
                 ]);
 
@@ -408,6 +402,123 @@ describe('filtering', () => {
                     {
                         name: {first: 'Jane'},
                         role: 'moderator'
+                    }
+                ]);
+
+            });
+
+        });
+
+        describe('wildcard $', () => {
+
+            it('should return any matching value in array', () => {
+
+                expect(parse('arr | filter : {$: "o"}')({arr: ['Joe', 'Jane', 'Mary']})).equals(['Joe']);
+
+            });
+
+            it('should return any matching value in object', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: 'Joe',
+                            role: 'admin'
+                        },
+                        {
+                            name: 'Jane',
+                            role: 'moderator'
+                        },
+                        {
+                            name: 'Mary',
+                            role: 'admin'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : {$: "o"}')($scope)).equals([
+                    {
+                        name: 'Joe',
+                        role: 'admin'
+                    },
+                    {
+                        name: 'Jane',
+                        role: 'moderator'
+                    }
+                ]);
+
+            });
+
+            it('should match any value in a complex array', () => {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: {
+                                first: 'Joe',
+                                last: 'Fox'
+                            },
+                            role: 'admin'
+                        },
+                        {
+                            name: {
+                                first: 'Jane',
+                                last: 'Quick'
+                            },
+                            role: 'moderator'
+                        },
+                        {
+                            name: {
+                                first: 'Mary',
+                                last: 'Brown'
+                            },
+                            role: 'admin'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : {name: {$: "o"}}')($scope)).equals([
+                    {
+                        name: {
+                            first: 'Joe',
+                            last: 'Fox'
+                        },
+                        role: 'admin'
+                    },
+                    {
+                        name: {
+                            first: 'Mary',
+                            last: 'Brown'
+                        },
+                        role: 'admin'
+                    }
+                ]);
+
+            });
+
+            it('should match nested wildcards', function () {
+
+                const $scope = {
+                    arr: [
+                        {
+                            name: {first: 'Joe'},
+                            role: 'admin'
+                        },
+                        {
+                            name: {first: 'Jane'},
+                            role: 'moderator'
+                        },
+                        {
+                            name: {first: 'Mary'},
+                            role: 'admin'
+                        }
+                    ]
+                };
+
+                expect(parse('arr | filter : {$: {$: "o"}}')($scope)).equals([
+                    {
+                        name: {first: 'Joe'},
+                        role: 'admin'
                     }
                 ]);
 

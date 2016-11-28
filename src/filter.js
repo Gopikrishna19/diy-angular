@@ -1,32 +1,47 @@
 import {isArray, isObject} from 'lodash';
 
-const deepCompare = (target, predicate, compare, inObject = false) => { // eslint-disable-line complexity
+const isNull = (target, predicate) => target === null || predicate === null;
 
-    if (typeof predicate === 'string' && predicate[0] === '!') {
+const comparator = (target, predicate) => {
 
-        return !deepCompare(target, predicate.slice(1), stringCompare);
-
-    } else if (isArray(target)) {
-
-        return target.some(value => deepCompare(value, predicate, compare));
-
-    } else if (isObject(predicate)) {
-
-        return Object.keys(predicate).some(key => deepCompare(target[key], predicate[key], compare, true));
-
-    } else if (isObject(target)) {
-
-        if (!inObject || isObject(predicate) || predicate === undefined) {
-
-            return Object.values(target).some(value => deepCompare(value, predicate, compare, true));
-
-        }
+    if (target === undefined) {
 
         return false;
 
-    } else if (inObject && predicate === undefined) {
+    } else if (isNull(target, predicate)) {
+
+        return target === predicate;
+
+    }
+
+    return `${target}`.toLowerCase().indexOf(`${predicate}`.toLowerCase()) >= 0;
+
+};
+
+const processPredicate = (key, target, predicate, compare) => {
+
+    const expectation = predicate[key];
+    const isWildcard = key === '$';
+
+    if (expectation === undefined) {
 
         return true;
+
+    }
+
+    return deepCompare(isWildcard ? target : target[key], expectation, compare, isWildcard, isWildcard);
+
+};
+
+const processTarget = (target, predicate, compare, compareAny, compareWildcard) => {
+
+    if (isObject(predicate) && !compareWildcard) {
+
+        return Object.keys(predicate).every(key => processPredicate(key, target, predicate, compare));
+
+    } else if (compareAny) {
+
+        return Object.values(target).some(value => deepCompare(value, predicate, compare, compareAny));
 
     }
 
@@ -34,37 +49,61 @@ const deepCompare = (target, predicate, compare, inObject = false) => { // eslin
 
 };
 
-const genericCompare = (a, b) => a === b;
-const stringCompare = (a, b) => a && a.toLowerCase().indexOf(`${b}`.toLowerCase()) >= 0;
+const isStringNegation = predicate => typeof predicate === 'string' && predicate[0] === '!';
 
-const getGenericPredicate = predicate =>
-    value => deepCompare(value, predicate, genericCompare);
+const deepCompare = (target, predicate, compare, compareAny, compareWildcard) => {
 
-const getObjectPredicate = predicate =>
-    value => Object.keys(predicate).every(
-        key => deepCompare(value[key], predicate[key], stringCompare, true)
-    );
+    const steps = [
+        () => !deepCompare(target, predicate.slice(1), compare, compareAny),
+        () => target.some(value => deepCompare(value, predicate, compare, compareAny)),
+        () => processTarget(target, predicate, compare, compareAny, compareWildcard)
+    ];
 
-const getStringPredicate = predicate =>
-    value => deepCompare(value, predicate, stringCompare);
+    const conditions = [
+        () => isStringNegation(predicate),
+        () => isArray(target),
+        () => isObject(target)
+    ];
+
+    const nextStep = steps[conditions.findIndex(condition => condition())];
+
+    return nextStep ? nextStep() : compare(target, predicate);
+
+};
+
+const getPredicateFn = predicate =>
+    value => {
+
+        if (isObject(predicate) && ('$' in predicate) && !isObject(value)) {
+
+            return deepCompare(value, predicate.$, comparator);
+
+        }
+
+        return deepCompare(value, predicate, comparator, true);
+
+    };
+
+const isPrimitive = predicate => [
+    () => predicate === null,
+    () => predicate === undefined,
+    () => predicate.constructor.name === 'Boolean',
+    () => predicate.constructor.name === 'Number',
+    () => predicate.constructor.name === 'Object',
+    () => predicate.constructor.name === 'String'
+].some(condition => condition());
 
 export default () =>
     (array, predicate) => {
 
-        if (predicate === null || predicate === undefined) {
+        let predicateFn = predicate;
 
-            return array.filter(getGenericPredicate(predicate));
+        if (isPrimitive(predicate)) {
+
+            predicateFn = getPredicateFn(predicate);
 
         }
 
-        return array.filter(
-            {
-                'Boolean': () => getGenericPredicate(predicate),
-                'Function': () => predicate,
-                'Number': () => getGenericPredicate(predicate),
-                'Object': () => getObjectPredicate(predicate),
-                'String': () => getStringPredicate(predicate)
-            }[predicate.constructor.name]()
-        );
+        return array.filter(predicateFn);
 
     };
