@@ -1,4 +1,4 @@
-import {isArray, isObject} from 'lodash';
+import {isArray, isEqual, isObject} from 'lodash';
 
 const isNull = (target, predicate) => target === null || predicate === null;
 
@@ -73,6 +73,12 @@ const deepCompare = (target, predicate, compare, compareAny, compareWildcard) =>
 
 const getPredicateFn = (predicate, compare = comparator) =>
     value => {
+
+        if (compare === true) {
+
+            compare = isEqual;
+
+        }
 
         if (isObject(predicate) && ('$' in predicate) && !isObject(value)) {
 

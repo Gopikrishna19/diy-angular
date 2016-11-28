@@ -541,6 +541,21 @@ describe('filtering', () => {
 
         });
 
+        it('should do strict equality', () => {
+
+            const $scope = {
+                arr: [
+                    {name: 'Jo'},
+                    {name: 'Joe'}
+                ]
+            };
+
+            expect(parse('arr | filter : {name: "Jo"} : true')($scope)).equals([
+                {name: 'Jo'}
+            ]);
+
+        });
+
     });
 
 });
