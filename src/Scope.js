@@ -415,7 +415,7 @@ export default class Scope {
 
     $eval(evalFn, ...args) {
 
-        return evalFn(this, ...args);
+        return parse(evalFn)(this, ...args);
 
     }
 

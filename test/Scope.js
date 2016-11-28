@@ -495,6 +495,12 @@ describe('Scope', () => {
 
         });
 
+        it('should evaluate given expressions', () => {
+
+            expect($scope.$eval('2')).equals(2);
+
+        });
+
     });
 
     describe('$apply', () => {
