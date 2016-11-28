@@ -71,16 +71,16 @@ const deepCompare = (target, predicate, compare, compareAny, compareWildcard) =>
 
 };
 
-const getPredicateFn = predicate =>
+const getPredicateFn = (predicate, compare = comparator) =>
     value => {
 
         if (isObject(predicate) && ('$' in predicate) && !isObject(value)) {
 
-            return deepCompare(value, predicate.$, comparator);
+            return deepCompare(value, predicate.$, compare);
 
         }
 
-        return deepCompare(value, predicate, comparator, true);
+        return deepCompare(value, predicate, compare, true);
 
     };
 
@@ -94,13 +94,13 @@ const isPrimitive = predicate => [
 ].some(condition => condition());
 
 export default () =>
-    (array, predicate) => {
+    (array, predicate, compare) => {
 
         let predicateFn = predicate;
 
         if (isPrimitive(predicate)) {
 
-            predicateFn = getPredicateFn(predicate);
+            predicateFn = getPredicateFn(predicate, compare);
 
         }
 

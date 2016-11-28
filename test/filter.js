@@ -528,4 +528,19 @@ describe('filtering', () => {
 
     });
 
+    describe('with custom comparator', () => {
+
+        it('should return the value', () => {
+
+            const $scope = {
+                'aComparator': (target, predicate) => target === predicate,
+                arr: ['o', 'oo', 'ao', 'aa']
+            };
+
+            expect(parse('arr | filter : {$: "o"} : aComparator')($scope)).equals(['o']);
+
+        });
+
+    });
+
 });
