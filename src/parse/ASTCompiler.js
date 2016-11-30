@@ -232,6 +232,8 @@ export default class ASTCompiler {
             case ASTBuilder.LOCALS:
             case ASTBuilder.THIS:
                 return false;
+            case ASTBuilder.OBJECT_PROPERTY_EXPRESSION:
+                return ASTCompiler.isConstant(ast.object) && (!ast.computed || ASTCompiler.isConstant(ast.property));
         }
 
         return false;

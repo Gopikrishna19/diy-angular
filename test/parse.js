@@ -390,6 +390,27 @@ describe('parsing', () => {
 
         });
 
+        it('should mark looked up properties constant if object is constant', () => {
+
+            expect(parse('{a: 1}.a').constant).true();
+
+        });
+
+        it('should mark dynamic looked up properties constant if object is constant', () => {
+
+            expect(parse('{a: 1}["a"]').constant).true();
+
+        });
+
+        it('should not mark computed properties as constant', () => {
+
+            expect(parse('obj.a').constant).false();
+            expect(parse('obj["a"]').constant).false();
+            expect(parse('{a: 1}[something]').constant).false();
+            expect(parse('obj[something]').constant).false();
+
+        });
+
     });
 
     describe('functions', () => {
