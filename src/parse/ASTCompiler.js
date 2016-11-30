@@ -220,34 +220,28 @@ export default class ASTCompiler {
 
     static isConstant(ast) {
 
-        switch (ast.type) {
-            case ASTBuilder.PROGRAM:
-                return ast.body.every(expr => ASTCompiler.isConstant(expr));
-            case ASTBuilder.LITERAL:
-                return true;
-            case ASTBuilder.ARRAY:
-                return ast.elements.every(element => ASTCompiler.isConstant(element));
-            case ASTBuilder.OBJECT:
-                return ast.properties.every(property => ASTCompiler.isConstant(property.value));
-            case ASTBuilder.LOCALS:
-            case ASTBuilder.THIS:
-                return false;
-            case ASTBuilder.FUNCTION:
-                return ast.filter && ast.args.every(arg => ASTCompiler.isConstant(arg));
-            case ASTBuilder.OBJECT_PROPERTY_EXPRESSION:
-                return ASTCompiler.isConstant(ast.object) && (!ast.computed || ASTCompiler.isConstant(ast.property));
-            case ASTBuilder.ASSIGNMENT:
-                return ASTCompiler.isConstant(ast.name) && ASTCompiler.isConstant(ast.value);
-            case ASTBuilder.UNARY:
-                return ASTCompiler.isConstant(ast.operand);
-            case ASTBuilder.BINARY:
-            case ASTBuilder.LOGICAL:
-                return ASTCompiler.isConstant(ast.left) && ASTCompiler.isConstant(ast.right);
-            case ASTBuilder.TERNARY:
-                return ASTCompiler.isConstant(ast.condition) && ASTCompiler.isConstant(ast.ifPath) && ASTCompiler.isConstant(ast.elsePath);
-        }
+        const nodeTypes = {
+            [ASTBuilder.ARRAY]: () => ast.elements.every(ASTCompiler.isConstant),
+            [ASTBuilder.ASSIGNMENT]: () => ASTCompiler.isConstant(ast.name) && ASTCompiler.isConstant(ast.value),
+            [ASTBuilder.BINARY]: () => ASTCompiler.isConstant(ast.left) && ASTCompiler.isConstant(ast.right),
+            [ASTBuilder.FUNCTION]: () => ast.filter && ast.args.every(ASTCompiler.isConstant),
+            [ASTBuilder.LITERAL]: () => true,
+            [ASTBuilder.LOGICAL]: () => ASTCompiler.isConstant(ast.left) && ASTCompiler.isConstant(ast.right),
+            [ASTBuilder.OBJECT]: () => ast.properties.every(property => ASTCompiler.isConstant(property.value)),
+            [ASTBuilder.PROGRAM]: () => ast.body.every(ASTCompiler.isConstant),
+            [ASTBuilder.UNARY]: () => ASTCompiler.isConstant(ast.operand),
+            [ASTBuilder.OBJECT_PROPERTY_EXPRESSION]: () => ASTCompiler.isConstant(ast.object) && (
+                !ast.computed ||
+                ASTCompiler.isConstant(ast.property)
+            ),
+            [ASTBuilder.TERNARY]: () => [
+                ASTCompiler.isConstant(ast.condition),
+                ASTCompiler.isConstant(ast.ifPath),
+                ASTCompiler.isConstant(ast.elsePath)
+            ].every(condition => condition)
+        };
 
-        return false;
+        return (nodeTypes[ast.type] || (() => false))();
 
     }
 
