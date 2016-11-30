@@ -235,6 +235,15 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as constant if all elements are constant', () => {
+
+            expect(parse('[1, 2, 3]').constant).true();
+            expect(parse('[1, [2, [3]]]').constant).true();
+            expect(parse('[1, 2, a]').constant).false();
+            expect(parse('[1, [2, [a]]]').constant).false();
+
+        });
+
     });
 
     describe('objects', () => {
@@ -369,6 +378,15 @@ describe('parsing', () => {
         it('should be marked as literal', () => {
 
             expect(parse('[1, 2, aVar]').literal).true();
+
+        });
+
+        it('should be marked as constant if all properties are constant', () => {
+
+            expect(parse('{a: 1, b: 2}').constant).true();
+            expect(parse('{a: 1, b: {c: 3}}').constant).true();
+            expect(parse('{a: 1, b: something}').constant).false();
+            expect(parse('{a: 1, b: {c: something}}').constant).false();
 
         });
 
