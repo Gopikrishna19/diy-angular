@@ -748,6 +748,12 @@ describe('parsing', () => {
 
         });
 
+        it('should not be marked as constant', () => {
+
+            expect(parse('this').constant).false();
+
+        });
+
     });
 
     describe('assignments', () => {

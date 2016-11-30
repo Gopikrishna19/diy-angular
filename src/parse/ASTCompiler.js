@@ -229,6 +229,9 @@ export default class ASTCompiler {
                 return ast.elements.every(element => ASTCompiler.isConstant(element));
             case ASTBuilder.OBJECT:
                 return ast.properties.every(property => ASTCompiler.isConstant(property.value));
+            case ASTBuilder.LOCALS:
+            case ASTBuilder.THIS:
+                return false;
         }
 
         return false;
