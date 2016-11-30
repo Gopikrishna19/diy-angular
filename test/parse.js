@@ -617,6 +617,12 @@ describe('parsing', () => {
 
         });
 
+        it('should not be marked as constant', () => {
+
+            expect(parse('aFunction()').constant).false();
+
+        });
+
     });
 
     describe('$scope', () => {
