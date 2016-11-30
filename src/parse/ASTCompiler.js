@@ -238,6 +238,13 @@ export default class ASTCompiler {
                 return ASTCompiler.isConstant(ast.object) && (!ast.computed || ASTCompiler.isConstant(ast.property));
             case ASTBuilder.ASSIGNMENT:
                 return ASTCompiler.isConstant(ast.name) && ASTCompiler.isConstant(ast.value);
+            case ASTBuilder.UNARY:
+                return ASTCompiler.isConstant(ast.operand);
+            case ASTBuilder.BINARY:
+            case ASTBuilder.LOGICAL:
+                return ASTCompiler.isConstant(ast.left) && ASTCompiler.isConstant(ast.right);
+            case ASTBuilder.TERNARY:
+                return ASTCompiler.isConstant(ast.condition) && ASTCompiler.isConstant(ast.ifPath) && ASTCompiler.isConstant(ast.elsePath);
         }
 
         return false;

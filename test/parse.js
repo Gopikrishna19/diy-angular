@@ -908,6 +908,13 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as constant if the argument is constant', () => {
+
+            expect(parse('+42').constant).true();
+            expect(parse('+a').constant).false();
+
+        });
+
     });
 
     describe('multiplicative operators', () => {
@@ -1117,6 +1124,19 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as constant if both arguments are constants', () => {
+
+            expect(parse('1 + 2').constant).true();
+            expect(parse('1 - a').constant).false();
+            expect(parse('a * 1').constant).false();
+            expect(parse('a / a').constant).false();
+            expect(parse('true && false').constant).true();
+            expect(parse('true || a').constant).false();
+            expect(parse('a || false').constant).false();
+            expect(parse('a && b').constant).false();
+
+        });
+
     });
 
     describe('ternary operator', () => {
@@ -1135,6 +1155,16 @@ describe('parsing', () => {
                 b: 3,
                 c: 2
             })).equals('c');
+
+        });
+
+        it('should be marked as constant if all arguments are constants', () => {
+
+            expect(parse('true ? 1 : 2').constant).true();
+            expect(parse('a ? 1 : 2').constant).false();
+            expect(parse('true ? a : 2').constant).false();
+            expect(parse('true ? 1 : b').constant).false();
+            expect(parse('a ? b : c').constant).false();
 
         });
 
