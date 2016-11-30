@@ -232,7 +232,7 @@ export default class ASTCompiler {
             case ASTBuilder.FUNCTION:
             case ASTBuilder.LOCALS:
             case ASTBuilder.THIS:
-                return false;
+                return ast.filter && ast.args.every(arg => ASTCompiler.isConstant(arg));
             case ASTBuilder.OBJECT_PROPERTY_EXPRESSION:
                 return ASTCompiler.isConstant(ast.object) && (!ast.computed || ASTCompiler.isConstant(ast.property));
         }

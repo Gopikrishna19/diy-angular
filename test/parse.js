@@ -1182,6 +1182,17 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as constant if arguments are constants', () => {
+
+            register('aFilter', array => array);
+
+            expect(parse('[1, 2, 3] | aFilter').constant).true();
+            expect(parse('[1, 2, a] | aFilter').constant).false();
+            expect(parse('[1, 2, 3] | aFilter : 42').constant).true();
+            expect(parse('[1, 2, 3] | aFilter : a').constant).false();
+
+        });
+
     });
 
     describe('raw functions', () => {
