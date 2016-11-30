@@ -218,6 +218,17 @@ export default class ASTCompiler {
 
     }
 
+    static isLiteral(ast) {
+
+        return ast.body.length === 0 ||
+            ast.body.length === 1 && (
+                ast.body[0].type === ASTBuilder.LITERAL ||
+                ast.body[0].type === ASTBuilder.ARRAY ||
+                ast.body[0].type === ASTBuilder.OBJECT
+            );
+
+    }
+
     static not(condition) {
 
         return `!(${condition})`;
@@ -281,7 +292,7 @@ export default class ASTCompiler {
 
         }
 
-        return new Function(
+        const parseFn = new Function(
             'assertFunction',
             'assertMethod',
             'assertObject',
@@ -295,6 +306,10 @@ export default class ASTCompiler {
             ASTCompiler.getDefaultValue,
             filter
         );
+
+        parseFn.literal = ASTCompiler.isLiteral(ast);
+
+        return parseFn;
 
     }
 

@@ -25,6 +25,12 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as literal', () => {
+
+            expect(parse('2').literal).true();
+
+        });
+
     });
 
     describe('floating points', () => {
@@ -123,6 +129,12 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as literal', () => {
+
+            expect(parse('"abc"').literal).true();
+
+        });
+
     });
 
     describe('literals', () => {
@@ -142,6 +154,13 @@ describe('parsing', () => {
         it('should parse false', () => {
 
             expect(parse('false')()).false();
+
+        });
+
+        it('should be marked as literal', () => {
+
+            expect(parse('true').literal).true();
+            expect(parse('false').literal).true();
 
         });
 
@@ -188,6 +207,12 @@ describe('parsing', () => {
         it('should look up dynamic indices', () => {
 
             expect(parse('[1,2,3,4][1]')()).equals(2);
+
+        });
+
+        it('should be marked as literal', () => {
+
+            expect(parse('{a: 1, b: aVar}').literal).true();
 
         });
 
@@ -319,6 +344,12 @@ describe('parsing', () => {
         it('should not allow access to Object', () => {
 
             expect(() => parse('object.create({})')({object: Object})).throws(literals.OBJECT_ACCESS_DENIED);
+
+        });
+
+        it('should be marked as literal', () => {
+
+            expect(parse('[1, 2, aVar]').literal).true();
 
         });
 
@@ -790,6 +821,14 @@ describe('parsing', () => {
 
         });
 
+        it('should not be marked as literal', () => {
+
+            expect(parse('+2').literal).false();
+            expect(parse('!false').literal).false();
+            expect(parse('-2').literal).false();
+
+        });
+
     });
 
     describe('multiplicative operators', () => {
@@ -988,21 +1027,34 @@ describe('parsing', () => {
 
     });
 
+    describe('binary operators', () => {
+
+        it('should not be marked as literal', () => {
+
+            expect(parse('1 * 2').literal).false();
+            expect(parse('1 + 2').literal).false();
+            expect(parse('1 == 2').literal).false();
+            expect(parse('1 || 2').literal).false();
+
+        });
+
+    });
+
     describe('ternary operator', () => {
 
         it('should return the result', () => {
 
-            expect(parse('a === 42 ? true : false')({a: 42})).true();
-            expect(parse('a === 42 ? true : false')({a: 43})).false();
+            expect(parse('a === 2 ? true : false')({a: 2})).true();
+            expect(parse('a === 2 ? true : false')({a: 3})).false();
 
         });
 
         it('should parse nested expressions', () => {
 
-            expect(parse('a === 42 ? b === 42 ? "a and b" : "a" : c === 42 ? "c" : "none"')({
-                a: 44,
-                b: 43,
-                c: 42
+            expect(parse('a === 2 ? b === 2 ? "a and b" : "a" : c === 2 ? "c" : "none"')({
+                a: 4,
+                b: 3,
+                c: 2
             })).equals('c');
 
         });
@@ -1015,7 +1067,7 @@ describe('parsing', () => {
 
             expect(parse('1 * (3 - 1)')()).equals(2);
             expect(parse('false && (true || true)')()).false();
-            expect(parse('-((a % 2) === 0 ? 1 : 2)')({a: 42})).equals(-1);
+            expect(parse('-((a % 2) === 0 ? 1 : 2)')({a: 2})).equals(-1);
 
         });
 
