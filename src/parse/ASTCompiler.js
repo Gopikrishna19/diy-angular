@@ -229,12 +229,15 @@ export default class ASTCompiler {
                 return ast.elements.every(element => ASTCompiler.isConstant(element));
             case ASTBuilder.OBJECT:
                 return ast.properties.every(property => ASTCompiler.isConstant(property.value));
-            case ASTBuilder.FUNCTION:
             case ASTBuilder.LOCALS:
             case ASTBuilder.THIS:
+                return false;
+            case ASTBuilder.FUNCTION:
                 return ast.filter && ast.args.every(arg => ASTCompiler.isConstant(arg));
             case ASTBuilder.OBJECT_PROPERTY_EXPRESSION:
                 return ASTCompiler.isConstant(ast.object) && (!ast.computed || ASTCompiler.isConstant(ast.property));
+            case ASTBuilder.ASSIGNMENT:
+                return ASTCompiler.isConstant(ast.name) && ASTCompiler.isConstant(ast.value);
         }
 
         return false;

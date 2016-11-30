@@ -853,6 +853,15 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as constant if both sides are constants', () => {
+
+            expect(parse('1 = 2').constant).true();
+            expect(parse('a = 2').constant).false();
+            expect(parse('1 = b').constant).false();
+            expect(parse('a = b').constant).false();
+
+        });
+
     });
 
     describe('unary operators', () => {
