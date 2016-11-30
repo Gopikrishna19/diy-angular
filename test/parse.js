@@ -31,6 +31,12 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as constant', () => {
+
+            expect(parse('2').constant).true();
+
+        });
+
     });
 
     describe('floating points', () => {
@@ -135,6 +141,12 @@ describe('parsing', () => {
 
         });
 
+        it('should be marked as constant', () => {
+
+            expect(parse('2').constant).true();
+
+        });
+
     });
 
     describe('literals', () => {
@@ -161,6 +173,13 @@ describe('parsing', () => {
 
             expect(parse('true').literal).true();
             expect(parse('false').literal).true();
+
+        });
+
+        it('should be marked as constant', () => {
+
+            expect(parse('true').constant).true();
+            expect(parse('false').constant).true();
 
         });
 

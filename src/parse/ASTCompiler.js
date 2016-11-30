@@ -218,6 +218,19 @@ export default class ASTCompiler {
 
     }
 
+    static isConstant(ast) {
+
+        switch (ast.type) {
+            case ASTBuilder.PROGRAM:
+                return ast.body.every(expr => ASTCompiler.isConstant(expr));
+            case ASTBuilder.LITERAL:
+                return true;
+        }
+
+        return false;
+
+    }
+
     static isLiteral(ast) {
 
         return ast.body.length === 0 ||
@@ -308,6 +321,7 @@ export default class ASTCompiler {
         );
 
         parseFn.literal = ASTCompiler.isLiteral(ast);
+        parseFn.constant = ASTCompiler.isConstant(ast);
 
         return parseFn;
 
