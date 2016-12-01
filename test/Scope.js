@@ -481,6 +481,43 @@ describe('Scope', () => {
 
             });
 
+            it('should destroy the watcher if the watched value has onetime operator ::', () => {
+
+                $scope.a = 1;
+                $scope.$watch('::a', listenerFn);
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, 1, 1, $scope);
+
+                listenerFn.reset();
+                $scope.a = 2;
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
+            it('should wait to destroy the watcher until the expression with onetime operator is defined', () => {
+
+                $scope.$watch('::a', listenerFn);
+
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, undefined, undefined, $scope);
+
+                listenerFn.reset();
+                $scope.a = 1;
+                $scope.$digest();
+                sinon.assert.calledOnce(listenerFn);
+                sinon.assert.calledWithExactly(listenerFn, 1, undefined, $scope);
+
+                listenerFn.reset();
+                $scope.a = 2;
+                $scope.$digest();
+                sinon.assert.notCalled(listenerFn);
+
+            });
+
         });
 
     });

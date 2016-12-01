@@ -1246,6 +1246,16 @@ describe('parsing', () => {
 
     });
 
+    describe('onetime operator', () => {
+
+        it('should be marked as onetime', () => {
+
+            expect(parse('::a').onetime).true();
+
+        });
+
+    });
+
     it('should throw on invalid expression', () => {
 
         expect(() => parse('^1a')).throws(`${literals.UNEXPECTED_CHARACTER} ^`);

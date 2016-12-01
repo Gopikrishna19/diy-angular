@@ -61,15 +61,19 @@ export default class Scope {
 
     }
 
-    static $$delegateConstantWatch($scope, watchFn, listenerFn, compareValues) {
+    static $$delegateConstantWatch($scope, watchFn, listenerFn, compareValues, onetime) {
 
         const destroyWatch = $scope.$watch(
-            () => watchFn,
-            (...args) => {
+            () => watchFn($scope),
+            (newValue, ...args) => {
 
-                listenerFn(...args);
+                listenerFn(newValue, ...args);
 
-                destroyWatch();
+                if (!onetime || newValue !== undefined) {
+
+                    destroyWatch();
+
+                }
 
             },
             compareValues
@@ -523,9 +527,9 @@ export default class Scope {
 
         watchFn = parse(watchFn);
 
-        if (watchFn.constant) {
+        if (watchFn.constant || watchFn.onetime) {
 
-            return Scope.$$delegateConstantWatch(this, watchFn, listenerFn, compareValues);
+            return Scope.$$delegateConstantWatch(this, watchFn, listenerFn, compareValues, watchFn.onetime);
 
         }
 
