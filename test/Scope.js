@@ -465,6 +465,22 @@ describe('Scope', () => {
 
             });
 
+            it('should destroy the watcher if the watched value is a constant', () => {
+
+                $scope.$watch('[1, 2, 3]');
+
+                expect(() => $scope.$digest()).not.throws();
+
+            });
+
+            it('should not destroy the watcher if the watched value is not a constant', () => {
+
+                $scope.$watch('[1, 2, a]');
+
+                expect(() => $scope.$digest()).throws(literals.INFINITE_DIGESTION);
+
+            });
+
         });
 
     });

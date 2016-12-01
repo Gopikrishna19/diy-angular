@@ -61,6 +61,24 @@ export default class Scope {
 
     }
 
+    static $$delegateConstantWatch($scope, watchFn, listenerFn, compareValues) {
+
+        const destroyWatch = $scope.$watch(
+            () => watchFn,
+            (...args) => {
+
+                listenerFn(...args);
+
+                destroyWatch();
+
+            },
+            compareValues
+        );
+
+        return destroyWatch;
+
+    }
+
     static $$digestOnce($root) {
 
         let continueDigest = true,
@@ -503,11 +521,19 @@ export default class Scope {
 
     $watch(watchFn, listenerFn = (() => {}), compareValues = false) {
 
+        watchFn = parse(watchFn);
+
+        if (watchFn.constant) {
+
+            return Scope.$$delegateConstantWatch(this, watchFn, listenerFn, compareValues);
+
+        }
+
         const watcher = {
             compareValues,
             last: $$initialWatchValue,
             listenerFn,
-            watchFn: parse(watchFn)
+            watchFn
         };
 
         $$watchers.get(this).unshift(watcher);
