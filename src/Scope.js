@@ -39,7 +39,7 @@ export default class Scope {
 
         return compareValues ?
             isEqual(newValue, oldValue) :
-        newValue === oldValue || Scope.testNaN(newValue, oldValue);
+            newValue === oldValue || Scope.testNaN(newValue, oldValue);
 
     }
 

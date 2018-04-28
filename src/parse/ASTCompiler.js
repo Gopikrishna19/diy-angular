@@ -29,7 +29,7 @@ export default class ASTCompiler {
 
     }
 
-    static * nextVar() {
+    static* nextVar() {
 
         let id = 0;
 
@@ -127,9 +127,9 @@ export default class ASTCompiler {
 
             return `(${
                 ASTCompiler.getComputedDefaultValue(left, 0)
-                }) ${operator} (${
+            }) ${operator} (${
                 ASTCompiler.getComputedDefaultValue(right, 0)
-                })`;
+            })`;
 
         }
 
@@ -160,9 +160,9 @@ export default class ASTCompiler {
                 value.replace(/[^ a-zA-Z0-9]/g, char => `\\u${
                     (`0000${
                         char.charCodeAt(0).toString(radix)
-                        }`).slice(start)
-                    }`)
-                }'`;
+                    }`).slice(start)
+                }`)
+            }'`;
 
         } else if (value === null) {
 
@@ -346,7 +346,7 @@ export default class ASTCompiler {
         const nodeTypes = {
             [ASTBuilder.ARRAY]: () => `[${
                 ast.elements.map(element => this.recurse(element))
-                }]`,
+            }]`,
             [ASTBuilder.ASSIGNMENT]: () => {
 
                 const assignContext = {};
@@ -435,8 +435,8 @@ export default class ASTCompiler {
             [ASTBuilder.OBJECT]: () => `{${
                 ast.properties.map(({key, value}) => `${
                     key.type === ASTBuilder.IDENTIFIER ? key.name : ASTCompiler.escape(key.value)
-                    }: ${this.recurse(value)}`)
-                }}`,
+                }: ${this.recurse(value)}`)
+            }}`,
             [ASTBuilder.OBJECT_PROPERTY_EXPRESSION]: () => {
 
                 const identifier = this.nextVar;

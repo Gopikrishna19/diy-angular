@@ -10,7 +10,7 @@
         "consistent-return": 2,
         "complexity": [
             2,
-            3
+            5
         ],
         "arrow-body-style": [
             2,
