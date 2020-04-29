@@ -8,7 +8,7 @@
   "author": "Gopikrishna Sathyamurthy",
   "license": "ISC",
   "dependencies": {
-    "jquery": "3.3.1",
+    "jquery": "3.5.0",
     "lodash": "4.17.10"
   },
   "devDependencies": {
